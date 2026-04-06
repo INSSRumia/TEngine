@@ -79,10 +79,17 @@ public class GameModule
     private static ITimerModule _timer;
 
     /// <summary>
+    /// 获取实体生命周期模块。
+    /// </summary>
+    public static IEntityModule Entity => _entity ??= ModuleSystem.RegisterModule<IEntityModule>(new EntityModule());
+
+    private static IEntityModule _entity;
+
+    /// <summary>
     /// 获取本地化模块。
     /// </summary>
     public static ILocalizationModule Localization => _localization ??= Get<ILocalizationModule>();
-    
+
     private static ILocalizationModule _localization;
     #endregion
     
@@ -114,5 +121,6 @@ public class GameModule
         _scene = null;
         _timer = null;
         _localization = null;
+        _entity = null;
     }
 }
