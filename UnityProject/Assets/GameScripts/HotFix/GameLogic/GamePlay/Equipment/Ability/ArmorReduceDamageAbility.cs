@@ -1,17 +1,18 @@
+using GameLogic.GamePlay.Common;
 namespace GameLogic.Equipment
 {
-    public class ArmorReduceDamageAbility : EquipmentAbility<ArmorRuntimeData>
+    public class ArmorReduceDamageAbility : EquipmentAbility<ArmorRuntimeData>, IReceiveDamage
     {
-        public int ReduceDamage(int damage)
+        public void ReceiveDamage(int damage)
         {
-            if (damage <= 0 || EquipmentOwner == null || EquipmentOwner.RuntimeData == null || EquipmentOwner.RuntimeData.IsBroken)
-                return damage;
+            if (damage <= 0 || EquipmentOwner == null || EquipmentOwner.RuntimeData == null || EquipmentOwner.OwnerMarble == null)
+                return;
 
-            if (EquipmentOwner.RuntimeData.Hp > 0)
-                return damage;
+            damage -= EquipmentOwner.RuntimeData.Defense;
+            if(damage <= 0)
+                return;
 
-            var reduceValue = EquipmentOwner.RuntimeData.Defense;
-            return damage - reduceValue < 0 ? 0 : damage - reduceValue;
+            EquipmentOwner.OwnerMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage);
         }
     }
 }

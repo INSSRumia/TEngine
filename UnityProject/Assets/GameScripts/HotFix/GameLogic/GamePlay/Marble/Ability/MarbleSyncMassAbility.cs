@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleSyncMassAbility : Ability<IPhysics>
+    public class MarbleSyncMassAbility : Ability<MarbleRuntimeData>
     {
         public override void OnAdd()
         {

@@ -14,6 +14,7 @@ namespace GameLogic.Equipment
             var attack = EquipmentOwner.RuntimeData.Attack;
             if (!EquipmentOwner.RuntimeData.IsDamageByVelocity)
                 return attack;
+            
 
             return Mathf.Max(0, Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * attack));
         }

@@ -2,9 +2,9 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleAddDamageAbility : Ability<MarbleRuntimeData>
+    public class MarbleReceiveDamageAbility : Ability<MarbleRuntimeData>, IReceiveDamage
     {
-        public void AddDamage(int value)
+        public void ReceiveDamage(int value)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
                 return;

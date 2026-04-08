@@ -55,7 +55,7 @@ namespace GameLogic.GamePlay.Common
             ability.OnRemove();
         }
 
-        public TAbility GetAbility<TAbility>() where TAbility : class, IAbility
+        public TAbility GetAbility<TAbility>() where TAbility : class
         {
             foreach (var ability in _lstAbility)
             {

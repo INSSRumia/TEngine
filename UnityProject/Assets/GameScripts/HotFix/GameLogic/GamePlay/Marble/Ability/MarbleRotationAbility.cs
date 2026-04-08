@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleRotationAbility : Ability<IRotation>
+    public class MarbleRotationAbility : Ability<MarbleRuntimeData>
     {
         public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.FixedUpdate;
 

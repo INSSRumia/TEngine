@@ -72,7 +72,7 @@ namespace GameLogic.Marble
         {
             marbleComponent.AddAbility(new MarbleSyncScaleAbility());
             marbleComponent.AddAbility(new MarbleSyncMassAbility());
-            marbleComponent.AddAbility(new MarbleAddDamageAbility());
+            marbleComponent.AddAbility(new MarbleReceiveDamageAbility());
             marbleComponent.AddAbility(new MarbleAddHealAbility());
             marbleComponent.AddAbility(new MarbleAddExpAbility());
             marbleComponent.AddAbility(new MarbleHandleDamageAbility());

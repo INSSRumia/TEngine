@@ -23,7 +23,7 @@ namespace GameLogic.GamePlay.Common
 
     public abstract class Ability<TRuntimeData> : IAbility
     {
-        public virtual int Priority { get; protected set; } = 10000;
+        public virtual int Priority { get; protected set; } = 0;
         public virtual AbilityExecutionMode ExecutionMode => AbilityExecutionMode.None;
 
         private ASC _owner;

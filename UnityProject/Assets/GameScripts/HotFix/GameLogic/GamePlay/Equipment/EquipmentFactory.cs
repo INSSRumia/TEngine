@@ -77,7 +77,7 @@ namespace GameLogic.Equipment
         {
             equipment.AddAbility(new ArmorMountAbility());
             equipment.AddAbility(new ArmorReduceDamageAbility());
-            equipment.AddAbility(new ArmorAbsorbDamageAbility());
+            equipment.AddAbility(new ArmorReceiveDamageAbility());
         }
 
         private static void AttachDefaultAbilities(WeaponEquipment equipment)

@@ -1,4 +1,4 @@
-using GameLogic.Marble;
+using GameLogic.GamePlay.Common;
 using UnityEngine;
 
 namespace GameLogic.Equipment
@@ -29,7 +29,7 @@ namespace GameLogic.Equipment
             if (damage <= 0)
                 return;
 
-            targetMarble.GetAbility<MarbleAddDamageAbility>()?.AddDamage(damage);
+            targetMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage);
         }
     }
 }

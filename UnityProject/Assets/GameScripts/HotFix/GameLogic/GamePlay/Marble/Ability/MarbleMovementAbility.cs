@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleMovementAbility : Ability<IMovement>
+    public class MarbleMovementAbility : Ability<MarbleRuntimeData>
     {
         public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.FixedUpdate;
 
