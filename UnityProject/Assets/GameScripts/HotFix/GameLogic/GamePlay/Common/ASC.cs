@@ -1,8 +1,19 @@
-using System.Collections.Generic;
 using TEngine;
+using UnityEngine;
+using System.Collections.Generic;
 
-namespace GameLogic.Marble
+namespace GameLogic.GamePlay.Common
 {
+    public abstract class ASC : MonoBehaviour
+    {
+        public Rigidbody2D Rigidbody { get; private set; }
+
+        private void Awake()
+        {
+            Rigidbody = GetComponent<Rigidbody2D>();
+        }
+    }
+
     public abstract class ASC<TRuntimeData> : ASC
     {
         public TRuntimeData RuntimeData { get; private set; }

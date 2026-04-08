@@ -1,4 +1,6 @@
-namespace GameLogic.Marble
+using UnityEngine;
+
+namespace GameLogic.GamePlay.Common
 {
     public interface IAbility
     {
@@ -21,13 +23,9 @@ namespace GameLogic.Marble
 
     public abstract class Ability<TRuntimeData> : IAbility
     {
-        /// <summary>
-        /// 优先级，优先级越高，越先轮询。
-        /// </summary>
         public virtual int Priority { get; protected set; } = 10000;
-
         public virtual AbilityExecutionMode ExecutionMode => AbilityExecutionMode.None;
-        
+
         private ASC _owner;
         public ASC<TRuntimeData> Owner => _owner as ASC<TRuntimeData>;
 
@@ -35,11 +33,12 @@ namespace GameLogic.Marble
         {
             _owner = owner;
         }
+
         public virtual void OnAdd() { }
         public virtual void OnRemove() { }
         public virtual void OnUpdate(float elapseSeconds, float realElapseSeconds) { }
         public virtual void OnFixedUpdate(float elapseSeconds, float realElapseSeconds) { }
-        
+
         public static int SortByPriority(Ability<TRuntimeData> a, Ability<TRuntimeData> b)
         {
             return b.Priority.CompareTo(a.Priority);

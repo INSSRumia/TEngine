@@ -1,0 +1,32 @@
+[
+  {
+    "config_id": "Soldier",
+    "name": "士兵",
+    "lst_level_config": [
+      {
+        "level": 0,
+        "upgrade_exp": 100,
+        "hp": 100,
+        "shield": 100,
+        "defense": 5,
+        "speed": 5,
+        "mass": 1,
+        "scale": 1,
+        "lst_equipment_id": [],
+        "lst_ability_id": []
+      },
+      {
+        "level": 1,
+        "upgrade_exp": 150,
+        "hp": 150,
+        "shield": 150,
+        "defense": 5,
+        "speed": 5,
+        "mass": 1,
+        "scale": 1,
+        "lst_equipment_id": [],
+        "lst_ability_id": []
+      }
+    ]
+  }
+]

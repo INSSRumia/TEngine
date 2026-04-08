@@ -1,3 +1,5 @@
+using GameLogic.GamePlay.Common;
+
 namespace GameLogic.Marble
 {
     public class MarbleDeadAbility : Ability<MarbleRuntimeData>

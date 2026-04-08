@@ -1,5 +1,6 @@
 using TEngine;
 using UnityEngine;
+using GameLogic.Equipment;
 
 namespace GameLogic.Marble
 {
@@ -19,6 +20,7 @@ namespace GameLogic.Marble
             {
                 ConfigId = id,
                 InstId = 0,
+                Camp = camp,
                 IsAlive = true,
                 Level = level,
                 UpgradeExp = levelData.UpgradeExp,
@@ -39,9 +41,11 @@ namespace GameLogic.Marble
 
         private static Marble CreateMarble(MarbleRuntimeData runtimeData)
         {
+            var levelData = GetMarbleLevelConfig(runtimeData.ConfigId, runtimeData.Level);
             var marbleComponent = CreateMarbleInternal(runtimeData.ConfigId);
             marbleComponent.Init(runtimeData);
             AttachDefaultAbilities(marbleComponent);
+            AttachEquipment(marbleComponent, levelData);
             return marbleComponent;
         }
 
@@ -76,6 +80,17 @@ namespace GameLogic.Marble
             marbleComponent.AddAbility(new MarbleLevelUpAbility());
             marbleComponent.AddAbility(new MarbleMovementAbility());
             marbleComponent.AddAbility(new MarbleRotationAbility());
+        }
+
+        private static void AttachEquipment(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)
+        {
+            if (marbleComponent == null || levelData?.LstEquipmentId == null)
+                return;
+
+            foreach (var equipmentConfig in levelData.LstEquipmentId)
+            {
+                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig);
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 <module name="GameConfig">
     <bean name="MarbleConfig" valueType="false" sep=",">
-        <var name="id" type="string" />
+        <var name="config_id" type="string" />
         <var name="name" type="string" />
         <var name="lst_level_config" type="list, MarbleLevelConfig" />
     </bean>
@@ -16,12 +16,12 @@
         <var name="speed" type="float" />
         <var name="mass" type="float" />
         <var name="scale" type="float" />
-        <var name="lst_equipment_config" type="list, EquipmentConfig" />
+        <var name="lst_equipment_id" type="list, EquipmentConfig" />
         <var name="lst_ability_id" type="list, string" />
     </bean>
 
     <bean name="EquipmentConfig" valueType="false" sep=",">
-        <var name="id" type="string" />
+        <var name="config_id" type="string" />
         # 装备位于marble的哪个位置
         # 0: top, 1: left, 2: right, 3: bottom 4: middle
         <var name="slot" type="int" />
@@ -63,6 +63,6 @@
         <var name="aim_angle" type="float" />
     </bean>
 
-    <table name="TbMarble" value="MarbleConfig" input="marble.xlsx" index="id"/>
+    <table name="TbMarble" value="MarbleConfig" input="marble.xlsx" index="config_id"/>
 
 </module>

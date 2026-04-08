@@ -2,7 +2,7 @@ using Luban;
 using GameConfig;
 using TEngine;
 using UnityEngine;
-
+using SimpleJSON;
 /// <summary>
 /// 配置加载器。
 /// </summary>
@@ -36,7 +36,7 @@ public class ConfigSystem
     /// </summary>
     public void Load()
     {
-        _tables = new Tables(LoadByteBuf);
+        _tables = new Tables(LoadJsonData);
         _init = true;
     }
 
@@ -54,5 +54,19 @@ public class ConfigSystem
         TextAsset textAsset = _resourceModule.LoadAsset<TextAsset>(file);
         byte[] bytes = textAsset.bytes;
         return new ByteBuf(bytes);
+    }
+    /// <summary>
+    /// 加载Json配置。
+    /// </summary>
+    /// <param name="file">FileName</param>
+    /// <returns>JSONNode</returns>
+    private JSONNode LoadJsonData(string file)
+    {
+        if (_resourceModule == null)
+        {
+            _resourceModule = ModuleSystem.GetModule<IResourceModule>();
+        }
+        TextAsset textAsset = _resourceModule.LoadAsset<TextAsset>(file);
+        return JSON.Parse(textAsset.text);
     }
 }

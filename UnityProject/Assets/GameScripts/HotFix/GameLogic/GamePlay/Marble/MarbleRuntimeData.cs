@@ -5,6 +5,7 @@ namespace GameLogic.Marble
     /// </summary>
     public partial class MarbleRuntimeData : RuntimeData, IHealth, IShield, IDefense, IExp, IScale, IPhysics, IMovement, IRotation, IPendingValue
     {
+        public int Camp { get; set; }
         public bool IsAlive { get; set; }
         public int Hp { get; set; }
         public int MaxHp { get; set; }

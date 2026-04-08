@@ -1,4 +1,4 @@
-namespace GameLogic.Marble
+namespace GameLogic
 {
     public abstract class RuntimeData
     {
