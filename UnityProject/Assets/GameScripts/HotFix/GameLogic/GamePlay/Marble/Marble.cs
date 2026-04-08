@@ -1,7 +1,4 @@
-namespace GameLogic.GameScripts.HotFix.GameLogic.GamePlay.Marble
+namespace GameLogic.Marble
 {
-    public class Marble
-    {
-        
-    }
+    public class Marble : ASC<MarbleRuntimeData> { }
 }

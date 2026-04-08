@@ -3,9 +3,9 @@ namespace GameLogic
 {   
     public static partial class EventDef
     {
-        public static class Base
+        public static class Combat
         {
-            public static EventId GameStart = RuntimeId.ToRuntimeId("Base.GameStart");
+            public static EventId<Marble.Marble> MarbleDie = RuntimeId.ToRuntimeId("Combat.MarbleDie");
           
         }
     }

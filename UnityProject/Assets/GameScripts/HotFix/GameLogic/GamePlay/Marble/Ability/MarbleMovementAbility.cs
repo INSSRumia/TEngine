@@ -1,0 +1,29 @@
+using UnityEngine;
+
+namespace GameLogic.Marble
+{
+    public class MarbleMovementAbility : Ability<IMovement>
+    {
+        public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.FixedUpdate;
+
+        public override void OnFixedUpdate(float elapseSeconds, float realElapseSeconds)
+        {
+            if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
+                return;
+
+            var targetSpd = Owner.RuntimeData.TargetVelocity;
+            var curSpd = Owner.Rigidbody.velocity.magnitude;
+            if (curSpd > targetSpd)
+                return;
+
+            var targetDir = Owner.RuntimeData.TargetDirection;
+            if (Mathf.Approximately(targetDir.sqrMagnitude, 0f))
+                return;
+
+            var mass = Owner.Rigidbody.mass;
+            var acc = Owner.RuntimeData.Acceleration;
+            var force = targetDir * acc * mass;
+            Owner.Rigidbody.AddForce(force, ForceMode2D.Force);
+        }
+    }
+}

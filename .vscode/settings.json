@@ -1,0 +1,20 @@
+{
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.defaultSolution": "UnityProject/UnityProject.sln",
+    "files.exclude": {
+        "**/.git": true,
+        ".vsconfig": true,
+        "**/*.png": true,
+        "**/*.asset": true,
+        "**/*.tss": true,
+        "**/*.dll": true,
+        "**/*.meta": true,
+        "**/.DS_Store": true,
+        "**/Library": true,
+        "**/Temp": true,
+        "**/obj": true,
+        "**/Logs": true,
+        "**/Packages": true,
+        "*.": true
+    },
+}

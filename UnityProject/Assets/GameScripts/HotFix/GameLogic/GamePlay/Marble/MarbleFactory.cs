@@ -1,65 +1,81 @@
-using System.Collections.Generic;
 using TEngine;
 using UnityEngine;
 
 namespace GameLogic.Marble
 {
-    public class Marble : MonoBehaviour
+    public static class MarbleFactory
     {
-        public MarbleRuntimeData RuntimeData { get; private set; }
-        private readonly List<MarbleAbility> _lstAbility = new List<MarbleAbility>();
-        public IReadOnlyList<MarbleAbility> Abilities => _lstAbility;
-        
-        public Rigidbody2D Rigidbody { get; private set; }
+        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Marbles");
 
-        private void Awake()
+        public static Marble CreateMarble(string id, int camp, int level = 0)
         {
-            Rigidbody = GetComponent<Rigidbody2D>();
+            var levelData = GetMarbleLevelConfig(id, level);
+            if (levelData == null)
+            {
+                return null;
+            }
+
+            var runtimeData = new MarbleRuntimeData
+            {
+                ConfigId = id,
+                InstId = 0,
+                IsAlive = true,
+                Level = level,
+                UpgradeExp = levelData.UpgradeExp,
+                MaxHp = levelData.Hp,
+                Hp = levelData.Hp,
+                MaxShield = levelData.Shield,
+                Shield = levelData.Shield,
+                Defense = levelData.Defense,
+                Scale = levelData.Scale,
+                Mass = levelData.Mass,
+                TargetVelocity = levelData.Speed,
+                Acceleration = levelData.Speed * 10,
+                AngularAcceleration = 360f,
+            };
+
+            return CreateMarble(runtimeData);
         }
 
-        public void Init(MarbleRuntimeData data)
+        private static Marble CreateMarble(MarbleRuntimeData runtimeData)
         {
-            RuntimeData = data;
-            RuntimeData.Marble = this;
+            var marbleComponent = CreateMarbleInternal(runtimeData.ConfigId);
+            marbleComponent.Init(runtimeData);
+            AttachDefaultAbilities(marbleComponent);
+            return marbleComponent;
         }
-        
-        public void AddAbility(MarbleAbility ability)
+
+        private static Marble CreateMarbleInternal(string id)
         {
-            if(_lstAbility.Contains(ability))
-            {
-                Log.Error($"重复添加能力: {ability.GetType().Name}");
-                return;
-            }
-            _lstAbility.Add(ability);
-            _lstAbility.Sort(MarbleAbility.SortByPriority);
-            ability.Init(this);
-            ability.OnAdd();
+            var prefab = GameModule.Resource.LoadGameObject(_path + "\\" + id);
+            var marble = GameObject.Instantiate(prefab);
+            return marble.GetComponent<Marble>();
         }
-        
-        public void RemoveAbility(MarbleAbility ability)
+
+        public static GameConfig.GameConfig.MarbleLevelConfig GetMarbleLevelConfig(string id, int level)
         {
-            if(!_lstAbility.Contains(ability))
+            var data = ConfigSystem.Instance.Tables.TbMarble.Get(id);
+            var levelData = data.LstLevelConfig.Find(x => x.Level == level);
+            if (levelData == null)
             {
-                Log.Error($"移除不存在的能力: {ability.GetType().Name}");                
-                ability.OnRemove();
+                Log.Error($"Marble level data not found: {id} {level}");
+                return null;
             }
-            _lstAbility.Remove(ability);
+            return levelData;
         }
-        
-        public void OnUpdate(float elapseSeconds, float realElapseSeconds)
+
+        private static void AttachDefaultAbilities(Marble marbleComponent)
         {
-            foreach (var ability in _lstAbility)
-            {
-                ability.OnUpdate(elapseSeconds, realElapseSeconds);
-            }
-        }
-        
-        public void OnFixedUpdate(float elapseSeconds, float realElapseSeconds)
-        {
-            foreach (var ability in _lstAbility)
-            {
-                ability.OnFixedUpdate(elapseSeconds, realElapseSeconds);
-            }
+            marbleComponent.AddAbility(new MarbleSyncScaleAbility());
+            marbleComponent.AddAbility(new MarbleSyncMassAbility());
+            marbleComponent.AddAbility(new MarbleAddDamageAbility());
+            marbleComponent.AddAbility(new MarbleAddHealAbility());
+            marbleComponent.AddAbility(new MarbleAddExpAbility());
+            marbleComponent.AddAbility(new MarbleHandleDamageAbility());
+            marbleComponent.AddAbility(new MarbleDeadAbility());
+            marbleComponent.AddAbility(new MarbleLevelUpAbility());
+            marbleComponent.AddAbility(new MarbleMovementAbility());
+            marbleComponent.AddAbility(new MarbleRotationAbility());
         }
     }
 }
