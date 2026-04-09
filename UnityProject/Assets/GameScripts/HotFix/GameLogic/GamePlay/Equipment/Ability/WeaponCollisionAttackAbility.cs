@@ -29,7 +29,7 @@ namespace GameLogic.Equipment
             if (damage <= 0)
                 return;
 
-            targetMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage);
+            targetMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage, EquipmentOwner);
         }
     }
 }

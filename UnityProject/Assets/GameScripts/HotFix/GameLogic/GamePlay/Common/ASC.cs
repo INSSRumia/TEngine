@@ -1,6 +1,7 @@
 using TEngine;
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace GameLogic.GamePlay.Common
 {
@@ -20,6 +21,7 @@ namespace GameLogic.GamePlay.Common
         private readonly List<IAbility> _lstAbility = new List<IAbility>();
         private readonly List<IAbility> _lstUpdateAbility = new List<IAbility>();
         private readonly List<IAbility> _lstFixedUpdateAbility = new List<IAbility>();
+        private readonly Dictionary<Type, List<IAbility>> _abilityInterfaceMap = new Dictionary<Type, List<IAbility>>();
         public IReadOnlyList<IAbility> Abilities => _lstAbility;
 
         public void Init(TRuntimeData data)
@@ -52,6 +54,7 @@ namespace GameLogic.GamePlay.Common
             _lstAbility.Remove(ability);
             _lstUpdateAbility.Remove(ability);
             _lstFixedUpdateAbility.Remove(ability);
+            UnregisterAbilityInterfaces(ability);
             ability.OnRemove();
         }
 
@@ -72,7 +75,10 @@ namespace GameLogic.GamePlay.Common
 
             foreach (var ability in _lstUpdateAbility)
             {
-                ability.OnUpdate(elapseSeconds, realElapseSeconds);
+                if (ability is IAbilityUpdate updateAbility)
+                {
+                    updateAbility.OnAbilityUpdate(elapseSeconds, realElapseSeconds);
+                }
             }
         }
 
@@ -80,29 +86,83 @@ namespace GameLogic.GamePlay.Common
         {
             foreach (var ability in _lstFixedUpdateAbility)
             {
-                ability.OnFixedUpdate(elapseSeconds, realElapseSeconds);
+                if (ability is IAbilityFixedUpdate fixedUpdateAbility)
+                {
+                    fixedUpdateAbility.OnAbilityFixedUpdate(elapseSeconds, realElapseSeconds);
+                }
             }
         }
 
         private void RegisterAbilityExecution(IAbility ability)
         {
-            var executionMode = ability.ExecutionMode;
-            if ((executionMode & AbilityExecutionMode.Update) != 0)
+            if (ability is IAbilityUpdate)
             {
                 _lstUpdateAbility.Add(ability);
                 _lstUpdateAbility.Sort(SortByPriority);
             }
 
-            if ((executionMode & AbilityExecutionMode.FixedUpdate) != 0)
+            if (ability is IAbilityFixedUpdate)
             {
                 _lstFixedUpdateAbility.Add(ability);
                 _lstFixedUpdateAbility.Sort(SortByPriority);
+            }
+
+            RegisterAbilityInterfaces(ability);
+        }
+
+        public List<TAbility> GetAbilities<TAbility>() where TAbility : class
+        {
+            if (!_abilityInterfaceMap.TryGetValue(typeof(TAbility), out var abilityList))
+            {
+                return s_emptyAbilityList<TAbility>.Value;
+            }
+
+            var result = new List<TAbility>(abilityList.Count);
+            foreach (var ability in abilityList)
+            {
+                if (ability is TAbility typedAbility)
+                {
+                    result.Add(typedAbility);
+                }
+            }
+            return result;
+        }
+
+        private void RegisterAbilityInterfaces(IAbility ability)
+        {
+            var interfaces = ability.GetType().GetInterfaces();
+            foreach (var interfaceType in interfaces)
+            {
+                if (!_abilityInterfaceMap.TryGetValue(interfaceType, out var abilityList))
+                {
+                    abilityList = new List<IAbility>();
+                    _abilityInterfaceMap.Add(interfaceType, abilityList);
+                }
+
+                if (!abilityList.Contains(ability))
+                {
+                    abilityList.Add(ability);
+                    abilityList.Sort(SortByPriority);
+                }
+            }
+        }
+
+        private void UnregisterAbilityInterfaces(IAbility ability)
+        {
+            foreach (var pair in _abilityInterfaceMap)
+            {
+                pair.Value.Remove(ability);
             }
         }
 
         private static int SortByPriority(IAbility a, IAbility b)
         {
             return b.Priority.CompareTo(a.Priority);
+        }
+
+        private static class s_emptyAbilityList<TAbility>
+        {
+            public static readonly List<TAbility> Value = new List<TAbility>(0);
         }
     }
 }

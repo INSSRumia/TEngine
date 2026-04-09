@@ -3,7 +3,7 @@ namespace GameLogic.Equipment
 {
     public class ArmorReduceDamageAbility : EquipmentAbility<ArmorRuntimeData>, IReceiveDamage
     {
-        public void ReceiveDamage(int damage)
+        public void ReceiveDamage(int damage, ASC source = null)
         {
             if (damage <= 0 || EquipmentOwner == null || EquipmentOwner.RuntimeData == null || EquipmentOwner.OwnerMarble == null)
                 return;
@@ -12,7 +12,7 @@ namespace GameLogic.Equipment
             if(damage <= 0)
                 return;
 
-            EquipmentOwner.OwnerMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage);
+            EquipmentOwner.OwnerMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage, source ?? EquipmentOwner);
         }
     }
 }

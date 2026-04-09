@@ -2,16 +2,14 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleAddHealAbility : Ability<MarbleRuntimeData>
+    public class MarbleAddHealAbility : Ability<MarbleRuntimeData>, IReceiveHeal
     {
-        public void AddHeal(int value)
+        public void ReceiveHeal(int value, ASC source = null)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
                 return;
 
-            Owner.RuntimeData.PendingHeal += value;
-            Owner.GetAbility<MarbleHandleDamageAbility>()?.Resolve();
-            Owner.GetAbility<MarbleDeadAbility>()?.Resolve();
+            Owner.GetAbility<MarbleHealPipelineAbility>()?.Execute(value, source);
         }
     }
 }

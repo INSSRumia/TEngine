@@ -29,6 +29,9 @@ namespace GameLogic.Marble
                 MaxShield = levelData.Shield,
                 Shield = levelData.Shield,
                 Defense = levelData.Defense,
+                DamageMultiplier = 1f,
+                HealMultiplier = 1f,
+                ShieldMultiplier = 1f,
                 Scale = levelData.Scale,
                 Mass = levelData.Mass,
                 TargetVelocity = levelData.Speed,
@@ -72,6 +75,9 @@ namespace GameLogic.Marble
         {
             marbleComponent.AddAbility(new MarbleSyncScaleAbility());
             marbleComponent.AddAbility(new MarbleSyncMassAbility());
+            marbleComponent.AddAbility(new MarbleDamagePipelineAbility());
+            marbleComponent.AddAbility(new MarbleHealPipelineAbility());
+            marbleComponent.AddAbility(new MarbleShieldPipelineAbility());
             marbleComponent.AddAbility(new MarbleReceiveDamageAbility());
             marbleComponent.AddAbility(new MarbleAddHealAbility());
             marbleComponent.AddAbility(new MarbleAddExpAbility());

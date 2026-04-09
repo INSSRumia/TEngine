@@ -3,11 +3,9 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleRotationAbility : Ability<MarbleRuntimeData>
+    public class MarbleRotationAbility : Ability<MarbleRuntimeData>, IAbilityFixedUpdate
     {
-        public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.FixedUpdate;
-
-        public override void OnFixedUpdate(float elapseSeconds, float realElapseSeconds)
+        public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;

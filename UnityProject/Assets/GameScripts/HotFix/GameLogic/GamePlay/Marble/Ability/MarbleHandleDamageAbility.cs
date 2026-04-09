@@ -3,41 +3,57 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleHandleDamageAbility : Ability<MarbleRuntimeData>
+    public class MarbleHandleDamageAbility : Ability<MarbleRuntimeData>,
+        IAfterApplyDamage,
+        IAfterApplyHeal,
+        IAfterApplyShield
     {
         public override int Priority => 9900;
 
-        public void Resolve()
+        public void AfterApplyDamage(IAbility ability)
         {
+            var context = (ability as MarbleDamagePipelineAbility)?.CurrentContext;
+            if (Owner == null || Owner.RuntimeData == null || context == null)
+                return;
             if (!Owner.RuntimeData.IsAlive)
                 return;
-            
-            int hp = Owner.RuntimeData.Hp;
-            int maxHp = Owner.RuntimeData.MaxHp;
-            int shield = Owner.RuntimeData.Shield;
-            int maxShield = Owner.RuntimeData.MaxShield;
-            int damage = Owner.RuntimeData.PendingDamage;
-            int heal = Owner.RuntimeData.PendingHeal;
-            int defense = Owner.RuntimeData.Defense;
 
-            damage -= defense;
-            damage = Mathf.Max(damage, 0);
+            var runtimeData = Owner.RuntimeData;
+            var finalDamage = Mathf.Max(context.FinalValue, 0);
+            if (finalDamage <= 0)
+                return;
 
-            // 只要有护盾值存在，就能完全抵挡伤害
-            if (shield > 0)
+            if (runtimeData.Shield > 0)
             {
-                shield = shield - damage;
-                shield = Mathf.Clamp(shield, 0, maxShield);
-                damage = 0;
+                runtimeData.Shield = Mathf.Clamp(runtimeData.Shield - finalDamage, 0, runtimeData.MaxShield);
+                return;
             }
-            
-            hp += heal - damage;
-            hp = Mathf.Clamp(hp, 0, maxHp);
-            
-            Owner.RuntimeData.Hp = hp;
-            Owner.RuntimeData.Shield = shield;
-            Owner.RuntimeData.PendingDamage = 0;
-            Owner.RuntimeData.PendingHeal = 0;
+
+            runtimeData.Hp = Mathf.Clamp(runtimeData.Hp - finalDamage, 0, runtimeData.MaxHp);
+        }
+
+        public void AfterApplyHeal(IAbility ability)
+        {
+            var context = (ability as MarbleHealPipelineAbility)?.CurrentContext;
+            if (Owner == null || Owner.RuntimeData == null || context == null)
+                return;
+            if (!Owner.RuntimeData.IsAlive)
+                return;
+
+            var runtimeData = Owner.RuntimeData;
+            runtimeData.Hp = Mathf.Clamp(runtimeData.Hp + Mathf.Max(context.FinalValue, 0), 0, runtimeData.MaxHp);
+        }
+
+        public void AfterApplyShield(IAbility ability)
+        {
+            var context = (ability as MarbleShieldPipelineAbility)?.CurrentContext;
+            if (Owner == null || Owner.RuntimeData == null || context == null)
+                return;
+            if (!Owner.RuntimeData.IsAlive)
+                return;
+
+            var runtimeData = Owner.RuntimeData;
+            runtimeData.Shield = Mathf.Clamp(runtimeData.Shield + Mathf.Max(context.FinalValue, 0), 0, runtimeData.MaxShield);
         }
     }
 }

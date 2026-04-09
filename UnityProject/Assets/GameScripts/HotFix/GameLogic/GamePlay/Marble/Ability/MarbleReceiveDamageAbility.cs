@@ -4,14 +4,12 @@ namespace GameLogic.Marble
 {
     public class MarbleReceiveDamageAbility : Ability<MarbleRuntimeData>, IReceiveDamage
     {
-        public void ReceiveDamage(int value)
+        public void ReceiveDamage(int value, ASC source = null)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
                 return;
 
-            Owner.RuntimeData.PendingDamage += value;
-            Owner.GetAbility<MarbleHandleDamageAbility>()?.Resolve();
-            Owner.GetAbility<MarbleDeadAbility>()?.Resolve();
+            Owner.GetAbility<MarbleDamagePipelineAbility>()?.Execute(value, source);
         }
     }
 }

@@ -3,11 +3,9 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Equipment
 {
-    public class WeaponCooldownAbility : EquipmentAbility<WeaponRuntimeData>
+    public class WeaponCooldownAbility : EquipmentAbility<WeaponRuntimeData>, IAbilityUpdate
     {
-        public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.Update;
-
-        public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
+        public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (EquipmentOwner == null || EquipmentOwner.RuntimeData == null)
                 return;

@@ -5,26 +5,84 @@ namespace GameLogic.GamePlay.Common
     public interface IAbility
     {
         int Priority { get; }
-        AbilityExecutionMode ExecutionMode { get; }
         void Init(ASC owner);
         void OnAdd();
         void OnRemove();
-        void OnUpdate(float elapseSeconds, float realElapseSeconds);
-        void OnFixedUpdate(float elapseSeconds, float realElapseSeconds);
     }
 
-    [System.Flags]
-    public enum AbilityExecutionMode
+    public interface IAbilityUpdate
     {
-        None = 0,
-        Update = 1 << 0,
-        FixedUpdate = 1 << 1,
+        void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds);
+    }
+
+    public interface IAbilityFixedUpdate
+    {
+        void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds);
+    }
+
+    public interface IReceiveDamage
+    {
+        void ReceiveDamage(int value, ASC source = null);
+    }
+
+    public interface IReceiveHeal
+    {
+        void ReceiveHeal(int value, ASC source = null);
+    }
+
+    public interface IReceiveShield
+    {
+        void ReceiveShield(int value, ASC source = null);
+    }
+
+    public interface IAfterReceiveDamage
+    {
+        void AfterReceiveDamage(IAbility ability);
+    }
+
+    public interface IAfterCalculateDamage
+    {
+        void AfterCalculateDamage(IAbility ability);
+    }
+
+    public interface IAfterApplyDamage
+    {
+        void AfterApplyDamage(IAbility ability);
+    }
+
+    public interface IAfterReceiveHeal
+    {
+        void AfterReceiveHeal(IAbility ability);
+    }
+
+    public interface IAfterCalculateHeal
+    {
+        void AfterCalculateHeal(IAbility ability);
+    }
+
+    public interface IAfterApplyHeal
+    {
+        void AfterApplyHeal(IAbility ability);
+    }
+
+    public interface IAfterReceiveShield
+    {
+        void AfterReceiveShield(IAbility ability);
+    }
+
+    public interface IAfterCalculateShield
+    {
+        void AfterCalculateShield(IAbility ability);
+    }
+
+    public interface IAfterApplyShield
+    {
+        void AfterApplyShield(IAbility ability);
     }
 
     public abstract class Ability<TRuntimeData> : IAbility
     {
         public virtual int Priority { get; protected set; } = 0;
-        public virtual AbilityExecutionMode ExecutionMode => AbilityExecutionMode.None;
 
         private ASC _owner;
         public ASC<TRuntimeData> Owner => _owner as ASC<TRuntimeData>;
@@ -36,8 +94,6 @@ namespace GameLogic.GamePlay.Common
 
         public virtual void OnAdd() { }
         public virtual void OnRemove() { }
-        public virtual void OnUpdate(float elapseSeconds, float realElapseSeconds) { }
-        public virtual void OnFixedUpdate(float elapseSeconds, float realElapseSeconds) { }
 
         public static int SortByPriority(Ability<TRuntimeData> a, Ability<TRuntimeData> b)
         {

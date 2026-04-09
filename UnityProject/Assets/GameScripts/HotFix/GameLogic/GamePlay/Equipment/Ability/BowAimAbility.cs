@@ -4,11 +4,9 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Equipment
 {
-    public class BowAimAbility : EquipmentAbility<BowRuntimeData>
+    public class BowAimAbility : EquipmentAbility<BowRuntimeData>, IAbilityUpdate
     {
-        public override AbilityExecutionMode ExecutionMode => AbilityExecutionMode.Update;
-
-        public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
+        public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (EquipmentOwner == null || EquipmentOwner.RuntimeData == null)
                 return;

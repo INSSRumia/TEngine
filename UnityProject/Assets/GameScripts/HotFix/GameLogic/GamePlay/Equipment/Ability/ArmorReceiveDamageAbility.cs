@@ -3,7 +3,7 @@ namespace GameLogic.Equipment
 {
     public class ArmorReceiveDamageAbility : EquipmentAbility<ArmorRuntimeData>, IReceiveDamage
     {
-        public void ReceiveDamage(int damage)
+        public void ReceiveDamage(int damage, ASC source = null)
         {
             if (damage <= 0 || EquipmentOwner == null || EquipmentOwner.RuntimeData == null || EquipmentOwner.RuntimeData.IsBroken)
                 return;
