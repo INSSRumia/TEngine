@@ -18,6 +18,11 @@
             "config_id": "sword",
             "level": 0,
             "slot": 2
+          },
+          {
+            "config_id": "shield",
+            "level": 0,
+            "slot": 1
           }
         ],
         "lst_ability": [
@@ -43,6 +48,11 @@
             "config_id": "sword",
             "level": 1,
             "slot": 2
+          },
+          {
+            "config_id": "shield",
+            "level": 1,
+            "slot": 1
           }
         ],
         "lst_ability": [
