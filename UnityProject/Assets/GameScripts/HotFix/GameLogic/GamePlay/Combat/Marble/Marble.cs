@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GameLogic.Gameplay.Combat.Equipment;
+using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -8,6 +9,7 @@ namespace GameLogic.Gameplay.Combat.Marble
     {
         [SerializeField] private List<Transform> _lstEquipmentPoints = new List<Transform>();
         private readonly Dictionary<EquipmentSlot, Transform> _slotPointMap = new Dictionary<EquipmentSlot, Transform>();
+        private readonly Dictionary<EquipmentSlot, Equipment.Equipment> _equipmentMap = new Dictionary<EquipmentSlot, Equipment.Equipment>();
 
         protected override void Awake()
         {
@@ -27,6 +29,58 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (_slotPointMap.TryGetValue(slot, out var point) && point != null)
                 return point;
             return null;
+        }
+
+        public Equipment.Equipment GetEquipment(EquipmentSlot slot)
+        {
+            return _equipmentMap.TryGetValue(slot, out var equipment) ? equipment : null;
+        }
+
+        public void RegisterEquipment(Equipment.Equipment equipment)
+        {
+            if (equipment == null || equipment.RuntimeData == null)
+                return;
+
+            var slot = equipment.RuntimeData.Slot;
+
+            if (_equipmentMap.TryGetValue(slot, out var existingEquipment) && existingEquipment != null && existingEquipment != equipment)
+            {
+                DestroyEquipment(slot);
+            }
+
+            _equipmentMap[slot] = equipment;
+        }
+
+        public void UnregisterEquipment(EquipmentSlot slot)
+        {
+            _equipmentMap.Remove(slot);
+        }
+
+        public void DestroyEquipment(EquipmentSlot slot)
+        {
+            if (_equipmentMap.TryGetValue(slot, out var equipment) && equipment != null)
+            {
+                _equipmentMap.Remove(slot);
+                EquipmentFactory.DestroyEquipment(equipment);
+            }
+        }
+
+        public void DestroyAllEquipment()
+        {
+            foreach (var kvp in _equipmentMap)
+            {
+                if (kvp.Value != null)
+                {
+                    EquipmentFactory.DestroyEquipment(kvp.Value);
+                }
+            }
+            _equipmentMap.Clear();
+        }
+
+        public void HandleDead()
+        {
+            if(RuntimeData.IsAlive)
+                return;
         }
 
         private void OnDrawGizmos()

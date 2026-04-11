@@ -13,25 +13,25 @@ using SimpleJSON;
 
 namespace GameConfig.GameConfig
 {
-public sealed partial class EquipIndexConfig : Luban.BeanBase
+public sealed partial class EquipAttachConfig : Luban.BeanBase
 {
-    public EquipIndexConfig(JSONNode _buf) 
+    public EquipAttachConfig(JSONNode _buf) 
     {
         { if(!_buf["config_id"].IsString) { throw new SerializationException(); }  ConfigId = _buf["config_id"]; }
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
         { if(!_buf["slot"].IsNumber) { throw new SerializationException(); }  Slot = _buf["slot"]; }
     }
 
-    public static EquipIndexConfig DeserializeEquipIndexConfig(JSONNode _buf)
+    public static EquipAttachConfig DeserializeEquipAttachConfig(JSONNode _buf)
     {
-        return new GameConfig.EquipIndexConfig(_buf);
+        return new GameConfig.EquipAttachConfig(_buf);
     }
 
     public readonly string ConfigId;
     public readonly int Level;
     public readonly int Slot;
    
-    public const int __ID__ = 724429118;
+    public const int __ID__ = 1118695581;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)

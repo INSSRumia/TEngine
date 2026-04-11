@@ -1,5 +1,5 @@
 <module name="GameConfig">
-    <bean name="EquipIndexConfig" valueType="false" sep=",">
+    <bean name="EquipAttachConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="level" type="int" />
         <!-- # 装备位于marble的哪个位置

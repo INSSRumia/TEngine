@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TEngine;
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
+using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -57,8 +58,6 @@ namespace GameLogic.Gameplay.Combat.Marble
         private bool _isProcessing;
         public DamageContext CurrentContext { get; private set; }
 
-        public override int Priority => 10000;
-
         public void Execute(int value, ASC source = null)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
@@ -87,30 +86,34 @@ namespace GameLogic.Gameplay.Combat.Marble
             try
             {
                 context.Stage = DamageStage.Receive;
-                foreach (var ability in Owner.GetAbilities<IAfterReceiveDamage>())
-                {
+                var lstAfterReceiveDamageAbilities = ListPool<IAfterReceiveDamage>.Get();
+                Owner.GetAbilities<IAfterReceiveDamage>(ref lstAfterReceiveDamageAbilities);
+                foreach (var ability in lstAfterReceiveDamageAbilities)
                     ability.AfterReceiveDamage(this);
-                }
+                ListPool<IAfterReceiveDamage>.Release(lstAfterReceiveDamageAbilities);
 
                 context.Stage = DamageStage.Calculate;
-                context.FinalValue = Mathf.Max(0,
-                    Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.DamageAddition) * Owner.RuntimeData.DamageMultiplier) - Owner.RuntimeData.Defense);
-                foreach (var ability in Owner.GetAbilities<IAfterCalculateDamage>())
-                {
+                context.FinalValue = Mathf.Max(0, Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.DamageAddition) * Owner.RuntimeData.DamageMultiplier) - Owner.RuntimeData.Defense);
+                var lstAfterCalculateDamageAbilities = ListPool<IAfterCalculateDamage>.Get();
+                Owner.GetAbilities<IAfterCalculateDamage>(ref lstAfterCalculateDamageAbilities);
+                foreach (var ability in lstAfterCalculateDamageAbilities)
                     ability.AfterCalculateDamage(this);
-                }
+                ListPool<IAfterCalculateDamage>.Release(lstAfterCalculateDamageAbilities);
 
                 if (context.FinalValue > 0)
                 {
                     context.Stage = DamageStage.Apply;
                     ApplyDamage(context.FinalValue);
 
-                    foreach (var ability in Owner.GetAbilities<IAfterApplyDamage>())
-                    {
+                    var lstAfterApplyDamageAbilities = ListPool<IAfterApplyDamage>.Get();
+                    Owner.GetAbilities<IAfterApplyDamage>(ref lstAfterApplyDamageAbilities);
+                    foreach (var ability in lstAfterApplyDamageAbilities)
                         ability.AfterApplyDamage(this);
-                    }
+                    ListPool<IAfterApplyDamage>.Release(lstAfterApplyDamageAbilities);
 
-                    Owner.GetAbility<MarbleDeadAbility>()?.Resolve();
+                    var marbleDeadAbility = Owner.GetAbility<MarbleDeadAbility>();
+                    if (marbleDeadAbility != null)
+                        marbleDeadAbility.Execute();
                 }
 
                 context.Stage = DamageStage.Completed;

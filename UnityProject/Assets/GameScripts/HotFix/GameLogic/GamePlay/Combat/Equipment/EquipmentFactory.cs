@@ -8,7 +8,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public static class EquipmentFactory
     {
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
-        public static ASC CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
+
+        public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
         {
             if (ownerMarble == null || config == null)
                 return null;
@@ -22,12 +23,13 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId);
 
+            Equipment equipment = null;
             switch (levelConfig)
             {
                 case ArmorLevelConfig armorConfig:
                 {
-                    var equipment = gameObject.GetComponent<ArmorEquipment>();
-                    equipment.Init(ownerMarble, new ArmorRuntimeData
+                    var armorEquipment = gameObject.GetComponent<ArmorEquipment>();
+                    armorEquipment.Init(ownerMarble, new ArmorRuntimeData
                     {
                         ConfigId = config.ConfigId,
                         Slot = slot,
@@ -37,13 +39,14 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         MaxHp = armorConfig.Hp,
                         Defense = armorConfig.Defense,
                     });
-                    AttachDefaultAbilities(equipment);
-                    return equipment;
+                    AttachDefaultAbilities(armorEquipment);
+                    equipment = armorEquipment;
+                    break;
                 }
                 case BowLevelConfig bowConfig:
                 {
-                    var equipment = gameObject.GetComponent<BowEquipment>();
-                    equipment.Init(ownerMarble, new BowRuntimeData
+                    var bowEquipment = gameObject.GetComponent<BowEquipment>();
+                    bowEquipment.Init(ownerMarble, new BowRuntimeData
                     {
                         ConfigId = config.ConfigId,
                         Slot = slot,
@@ -57,13 +60,14 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         ArrowAngleStep = bowConfig.ArrowAngleStep,
                         AimAngle = bowConfig.AimAngle,
                     });
-                    AttachDefaultAbilities(equipment);
-                    return equipment;
+                    AttachDefaultAbilities(bowEquipment);
+                    equipment = bowEquipment;
+                    break;
                 }
                 case SwordLevelConfig swordConfig:
                 {
-                    var equipment = gameObject.GetComponent<SwordEquipment>();
-                    equipment.Init(ownerMarble, new SwordRuntimeData
+                    var swordEquipment = gameObject.GetComponent<SwordEquipment>();
+                    swordEquipment.Init(ownerMarble, new SwordRuntimeData
                     {
                         ConfigId = config.ConfigId,
                         Slot = slot,
@@ -73,11 +77,30 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         IsDamageByVelocity = swordConfig.IsDamageByVelocity,
                         Cooldown = swordConfig.Cooldown,
                     });
-                    AttachDefaultAbilities(equipment);
-                    return equipment;
+                    AttachDefaultAbilities(swordEquipment);
+                    equipment = swordEquipment;
+                    break;
                 }
-                default:
-                    return null;
+            }
+
+            if (equipment != null)
+            {
+                ownerMarble.RegisterEquipment(equipment);
+            }
+
+            return equipment;
+        }
+
+        public static void DestroyEquipment(Equipment equipment)
+        {
+            if (equipment == null)
+                return;
+
+            Log.Info($"[EquipmentFactory] 销毁装备: {equipment.RuntimeData?.ConfigId}");
+
+            if (equipment.gameObject != null)
+            {
+                Object.Destroy(equipment.gameObject);
             }
         }
 

@@ -1,5 +1,6 @@
 using TEngine;
 using UnityEngine;
+using GameLogic.GamePlay.Combat;
 using GameLogic.Gameplay.Combat.Equipment;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -50,6 +51,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var marbleComponent = CreateMarbleInternal(runtimeData.ConfigId);
             marbleComponent.Init(runtimeData);
             AttachDefaultAbilities(marbleComponent);
+            AttachOptionalAbilities(marbleComponent, levelData);
             AttachEquipment(marbleComponent, levelData);
             return marbleComponent;
         }
@@ -74,21 +76,51 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private static void AttachDefaultAbilities(Marble marbleComponent)
         {
-            marbleComponent.AddAbility(new MarbleSyncScaleAbility());
-            marbleComponent.AddAbility(new MarbleSyncMassAbility());
-            marbleComponent.AddAbility(new MarbleDamagePipelineAbility());
-            marbleComponent.AddAbility(new MarbleHealPipelineAbility());
-            marbleComponent.AddAbility(new MarbleShieldHealPipelineAbility());
-            marbleComponent.AddAbility(new MarbleReceiveDamageAbility());
-            marbleComponent.AddAbility(new MarbleAddHealAbility());
-            marbleComponent.AddAbility(new MarbleAddExpAbility());
-            marbleComponent.AddAbility(new MarbleHandleDamageAbility());
-            marbleComponent.AddAbility(new MarbleDeadAbility());
-            marbleComponent.AddAbility(new MarbleLevelUpAbility());
-            marbleComponent.AddAbility(new MarbleGetTargetAbility());
-            marbleComponent.AddAbility(new MarbleCloseToTargetAbility());
-            marbleComponent.AddAbility(new MarbleMovementAbility());
-            marbleComponent.AddAbility(new MarbleRotationAbility());
+            AttachCoreAbility(marbleComponent, new MarbleSyncScaleAbility());
+            AttachCoreAbility(marbleComponent, new MarbleSyncMassAbility());
+            AttachCoreAbility(marbleComponent, new MarbleDamagePipelineAbility());
+            AttachCoreAbility(marbleComponent, new MarbleHealPipelineAbility());
+            AttachCoreAbility(marbleComponent, new MarbleShieldHealPipelineAbility());
+            AttachCoreAbility(marbleComponent, new MarbleReceiveDamageAbility());
+            AttachCoreAbility(marbleComponent, new MarbleAddHealAbility());
+            AttachCoreAbility(marbleComponent, new MarbleAddExpAbility());
+            AttachCoreAbility(marbleComponent, new MarbleDeadAbility());
+            AttachCoreAbility(marbleComponent, new MarbleLevelUpAbility());
+            AttachCoreAbility(marbleComponent, new MarbleGetTargetAbility());
+            AttachCoreAbility(marbleComponent, new MarbleMovementAbility());
+            AttachCoreAbility(marbleComponent, new MarbleRotationAbility());
+        }
+
+        private static void AttachCoreAbility(Marble marble, Ability<Marble> ability)
+        {
+            ability.Category = AbilityCategory.Core;
+            marble.AddAbility(ability);
+        }
+
+        private static void AttachOptionalAbilities(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)
+        {
+            if (levelData?.LstAbility == null)
+                return;
+
+            foreach (var config in levelData.LstAbility)
+            {
+                var ability = CreateAbilityFromConfig(config);
+                if (ability != null)
+                {
+                    ability.Priority = config.Priority;
+                    marbleComponent.AddAbility(ability);
+                }
+            }
+        }
+
+        public static Ability<Marble> CreateAbilityFromConfig(GameConfig.GameConfig.MarbleAbilityConfig config)
+        {
+            return config switch
+            {
+                GameConfig.GameConfig.MarbleCloseToTargetAbilityConfig closeConfig =>
+                    new MarbleCloseToTargetAbility { CloseDistance = closeConfig.CloseDistance },
+                _ => null
+            };
         }
 
         private static void AttachEquipment(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)

@@ -20,7 +20,13 @@
             "slot": 2
           }
         ],
-        "lst_ability_id": []
+        "lst_ability": [
+          {
+            "$type": "MarbleCloseToTargetAbilityConfig",
+            "priority": 0,
+            "close_distance": 3
+          }
+        ]
       },
       {
         "level": 1,
@@ -39,7 +45,13 @@
             "slot": 2
           }
         ],
-        "lst_ability_id": []
+        "lst_ability": [
+          {
+            "$type": "MarbleCloseToTargetAbilityConfig",
+            "priority": 0,
+            "close_distance": 3
+          }
+        ]
       }
     ]
   }

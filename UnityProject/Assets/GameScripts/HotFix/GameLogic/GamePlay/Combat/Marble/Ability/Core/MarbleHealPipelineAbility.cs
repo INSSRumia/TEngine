@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TEngine;
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
+using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -57,8 +58,6 @@ namespace GameLogic.Gameplay.Combat.Marble
         private bool _isProcessing;
         public HealContext CurrentContext { get; private set; }
 
-        public override int Priority => 10000;
-
         public void Execute(int value, ASC source = null)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
@@ -87,26 +86,29 @@ namespace GameLogic.Gameplay.Combat.Marble
             try
             {
                 context.Stage = HealStage.Receive;
-                foreach (var ability in Owner.GetAbilities<IAfterReceiveHeal>())
-                {
+                var lstAfterReceiveHealAbilities = ListPool<IAfterReceiveHeal>.Get();
+                Owner.GetAbilities<IAfterReceiveHeal>(ref lstAfterReceiveHealAbilities);
+                foreach (var ability in lstAfterReceiveHealAbilities)
                     ability.AfterReceiveHeal(this);
-                }
+                ListPool<IAfterReceiveHeal>.Release(lstAfterReceiveHealAbilities);
 
                 context.Stage = HealStage.Calculate;
                 context.FinalValue = Mathf.Max(0,
                     Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.HealAddition) * Owner.RuntimeData.HealMultiplier));
-                foreach (var ability in Owner.GetAbilities<IAfterCalculateHeal>())
-                {
+                var lstAfterCalculateHealAbilities = ListPool<IAfterCalculateHeal>.Get();
+                Owner.GetAbilities<IAfterCalculateHeal>(ref lstAfterCalculateHealAbilities);
+                foreach (var ability in lstAfterCalculateHealAbilities)
                     ability.AfterCalculateHeal(this);
-                }
+                ListPool<IAfterCalculateHeal>.Release(lstAfterCalculateHealAbilities);
 
                 if (context.FinalValue > 0)
                 {
                     context.Stage = HealStage.Apply;
-                    foreach (var ability in Owner.GetAbilities<IAfterApplyHeal>())
-                    {
+                    var lstAfterApplyHealAbilities = ListPool<IAfterApplyHeal>.Get();
+                    Owner.GetAbilities<IAfterApplyHeal>(ref lstAfterApplyHealAbilities);
+                    foreach (var ability in lstAfterApplyHealAbilities)
                         ability.AfterApplyHeal(this);
-                    }
+                    ListPool<IAfterApplyHeal>.Release(lstAfterApplyHealAbilities);
                 }
 
                 context.Stage = HealStage.Completed;

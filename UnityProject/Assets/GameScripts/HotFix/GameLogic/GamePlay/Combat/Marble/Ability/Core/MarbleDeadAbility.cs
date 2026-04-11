@@ -4,9 +4,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleDeadAbility : Ability<Marble>
     {
-        public override int Priority => 9800;
-
-        public void Resolve()
+        public void Execute()
         {
             if (Owner.RuntimeData.IsAlive || Owner.RuntimeData.Hp > 0)
                 return;

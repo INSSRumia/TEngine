@@ -3,13 +3,12 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
+    [System.Obsolete]
     public class MarbleHandleDamageAbility : Ability<Marble>,
         IAfterApplyDamage,
         IAfterApplyHeal,
         IAfterApplyShield
     {
-        public override int Priority => 9900;
-
         public void AfterApplyDamage(IAbility ability)
         {
             var context = (ability as MarbleDamagePipelineAbility)?.CurrentContext;

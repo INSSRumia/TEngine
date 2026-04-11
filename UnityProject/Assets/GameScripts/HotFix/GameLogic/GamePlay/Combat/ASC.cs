@@ -25,7 +25,15 @@ namespace GameLogic.GamePlay.Combat
         private readonly List<IAbility> _lstUpdateAbility = new List<IAbility>();
         private readonly List<IAbility> _lstFixedUpdateAbility = new List<IAbility>();
         private readonly Dictionary<Type, List<IAbility>> _abilityInterfaceMap = new Dictionary<Type, List<IAbility>>();
+
+        private readonly List<IAbility> _coreAbilities = new List<IAbility>();
+        private readonly List<IAbility> _optionalAbilities = new List<IAbility>();
+        private readonly List<IAbility> _dynamicAbilities = new List<IAbility>();
+
         public IReadOnlyList<IAbility> Abilities => _lstAbility;
+        public IReadOnlyList<IAbility> CoreAbilities => _coreAbilities;
+        public IReadOnlyList<IAbility> OptionalAbilities => _optionalAbilities;
+        public IReadOnlyList<IAbility> DynamicAbilities => _dynamicAbilities;
 
         public void Init(TRuntimeData data)
         {
@@ -39,6 +47,21 @@ namespace GameLogic.GamePlay.Combat
                 Log.Error($"重复添加能力: {ability.GetType().Name}");
                 return;
             }
+
+            var category = ability.Category;
+            switch (category)
+            {
+                case AbilityCategory.Core:
+                    _coreAbilities.Add(ability);
+                    break;
+                case AbilityCategory.Optional:
+                    _optionalAbilities.Add(ability);
+                    break;
+                case AbilityCategory.Dynamic:
+                    _dynamicAbilities.Add(ability);
+                    break;
+            }
+
             _lstAbility.Add(ability);
             _lstAbility.Sort(SortByPriority);
             RegisterAbilityExecution(ability);
@@ -53,11 +76,34 @@ namespace GameLogic.GamePlay.Combat
                 Log.Error($"移除不存在的能力: {ability.GetType().Name}");
                 return;
             }
+
+            var category = ability.Category;
+            switch (category)
+            {
+                case AbilityCategory.Core:
+                    _coreAbilities.Remove(ability);
+                    break;
+                case AbilityCategory.Optional:
+                    _optionalAbilities.Remove(ability);
+                    break;
+                case AbilityCategory.Dynamic:
+                    _dynamicAbilities.Remove(ability);
+                    break;
+            }
+
             _lstAbility.Remove(ability);
             _lstUpdateAbility.Remove(ability);
             _lstFixedUpdateAbility.Remove(ability);
             UnregisterAbilityInterfaces(ability);
             ability.OnRemove();
+        }
+
+        public void ClearOptionalAbilities()
+        {
+            for (int i = _optionalAbilities.Count - 1; i >= 0; i--)
+            {
+                RemoveAbility(_optionalAbilities[i]);
+            }
         }
 
         public TAbility GetAbility<TAbility>() where TAbility : class
@@ -122,22 +168,16 @@ namespace GameLogic.GamePlay.Combat
             RegisterAbilityInterfaces(ability);
         }
 
-        public List<TAbility> GetAbilities<TAbility>() where TAbility : class
+        public void GetAbilities<TAbility>(ref List<TAbility> result) where TAbility : class
         {
             if (!_abilityInterfaceMap.TryGetValue(typeof(TAbility), out var abilityList))
-            {
-                return s_emptyAbilityList<TAbility>.Value;
-            }
+                return;
 
-            var result = new List<TAbility>(abilityList.Count);
             foreach (var ability in abilityList)
             {
                 if (ability is TAbility typedAbility)
-                {
                     result.Add(typedAbility);
-                }
             }
-            return result;
         }
 
         private void RegisterAbilityInterfaces(IAbility ability)
