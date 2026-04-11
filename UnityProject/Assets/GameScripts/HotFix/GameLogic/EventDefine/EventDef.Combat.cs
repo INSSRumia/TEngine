@@ -5,7 +5,7 @@ namespace GameLogic
     {
         public static class Combat
         {
-            public static EventId<Marble.Marble> MarbleDie = RuntimeId.ToRuntimeId("Combat.MarbleDie");
+            public static EventId<Gameplay.Combat.Marble.Marble> MarbleDie = RuntimeId.ToRuntimeId("Combat.MarbleDie");
           
         }
     }
