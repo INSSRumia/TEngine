@@ -10,14 +10,16 @@ namespace GameLogic.GamePlay.Combat
         public Rigidbody2D Rigidbody { get; private set; }
         public ICombatManager CombatManager { get; private set; }
 
-        private void Awake()
+        protected virtual void Awake()
         {
             Rigidbody = GetComponent<Rigidbody2D>();
+            CombatManager = Combat.CombatManager.Instance;
         }
     }
 
     public abstract class ASC<TRuntimeData> : ASC
     {
+        [Sirenix.OdinInspector.ShowInInspector]
         public TRuntimeData RuntimeData { get; private set; }
         private readonly List<IAbility> _lstAbility = new List<IAbility>();
         private readonly List<IAbility> _lstUpdateAbility = new List<IAbility>();
@@ -66,6 +68,16 @@ namespace GameLogic.GamePlay.Combat
                     return result;
             }
             return null;
+        }
+
+        private void Update()
+        {
+            OnUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+        }
+
+        private void FixedUpdate()
+        {
+            OnFixedUpdate(Time.fixedDeltaTime, Time.fixedUnscaledDeltaTime);
         }
 
         public void OnUpdate(float elapseSeconds, float realElapseSeconds)

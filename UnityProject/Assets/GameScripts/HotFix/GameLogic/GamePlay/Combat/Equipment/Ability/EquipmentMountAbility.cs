@@ -1,3 +1,4 @@
+using TEngine;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Equipment
@@ -10,7 +11,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             MountToOwner();
         }
 
-        private void MountToOwner()
+        public void MountToOwner()
         {
             if (EquipmentOwner == null || EquipmentOwner.OwnerMarble == null)
                 return;
@@ -22,11 +23,12 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             BindJoint();
             EquipmentOwner.RuntimeData.IsEquipped = true;
+            Log.Info($"[EquipmentMountAbility] 装备 {EquipmentOwner.RuntimeData.ConfigId} 挂载到角色 {EquipmentOwner.OwnerMarble.RuntimeData.ConfigId}");
         }
 
         private void BindJoint()
         {
-            if (EquipmentOwner.Rigidbody == null || EquipmentOwner.OwnerMarble.Rigidbody == null)
+            if (EquipmentOwner.Rigidbody == null)
                 return;
 
             var joints = EquipmentOwner.GetComponents<Joint2D>();

@@ -7,7 +7,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public static class EquipmentFactory
     {
-        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Equipment");
+        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
         public static ASC CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
         {
             if (ownerMarble == null || config == null)
@@ -20,8 +20,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return null;
             }
 
-            var prefab = GameModule.Resource.LoadGameObject(_path + "\\" + config.ConfigId);
-            var gameObject = GameObject.Instantiate(prefab);
+            var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId);
 
             switch (levelConfig)
             {

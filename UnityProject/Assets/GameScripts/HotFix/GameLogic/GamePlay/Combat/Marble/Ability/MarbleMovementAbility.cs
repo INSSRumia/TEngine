@@ -1,5 +1,6 @@
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
+using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -10,13 +11,16 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;
 
-            var targetSpd = Owner.RuntimeData.TargetVelocity;
-            var curSpd = Owner.Rigidbody.velocity.magnitude;
-            if (curSpd > targetSpd)
+            var targetDir = Owner.RuntimeData.TargetDirection;
+            if (targetDir.sqrMagnitude < 0.001f)
                 return;
 
-            var targetDir = Owner.RuntimeData.TargetDirection;
-            if (Mathf.Approximately(targetDir.sqrMagnitude, 0f))
+            targetDir.Normalize();
+
+            var targetSpd = Owner.RuntimeData.TargetVelocity;
+            var curSpdAlongDir = Vector2.Dot(Owner.Rigidbody.velocity, targetDir);
+
+            if (curSpdAlongDir >= targetSpd)
                 return;
 
             var mass = Owner.Rigidbody.mass;

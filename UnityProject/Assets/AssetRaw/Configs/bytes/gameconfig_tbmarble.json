@@ -10,7 +10,7 @@
         "hp": 100,
         "shield": 100,
         "defense": 5,
-        "speed": 5,
+        "speed": 8,
         "mass": 1,
         "scale": 1,
         "lst_equipment": [
@@ -29,7 +29,7 @@
         "hp": 150,
         "shield": 150,
         "defense": 5,
-        "speed": 5,
+        "speed": 8,
         "mass": 1,
         "scale": 1,
         "lst_equipment": [

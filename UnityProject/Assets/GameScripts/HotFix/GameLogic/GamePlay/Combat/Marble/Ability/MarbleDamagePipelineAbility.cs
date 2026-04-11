@@ -103,6 +103,8 @@ namespace GameLogic.Gameplay.Combat.Marble
                 if (context.FinalValue > 0)
                 {
                     context.Stage = DamageStage.Apply;
+                    ApplyDamage(context.FinalValue);
+
                     foreach (var ability in Owner.GetAbilities<IAfterApplyDamage>())
                     {
                         ability.AfterApplyDamage(this);
@@ -126,6 +128,30 @@ namespace GameLogic.Gameplay.Combat.Marble
             while (_pendingContexts.Count > 0)
             {
                 ProcessContext(_pendingContexts.Dequeue());
+            }
+        }
+
+        private void ApplyDamage(int damage)
+        {
+            int defense = Owner.RuntimeData.Defense;
+            if(damage <= defense) return;
+
+            int shield = Owner.RuntimeData.Shield;
+            if(shield > 0)
+            {
+                shield = Mathf.Max(shield - damage, 0);
+                Owner.RuntimeData.Shield = shield;
+                Log.Info($"[MarbleDamagePipelineAbility] 护盾吸收了 {damage} 点伤害，剩余护盾: {shield}");
+                return;
+            }
+
+            int hp = Owner.RuntimeData.Hp;
+            if(hp > 0)
+            {
+                hp = Mathf.Max(hp - damage, 0);
+                Log.Info($"[MarbleDamagePipelineAbility] 剩余血量: {hp}");
+                Owner.RuntimeData.Hp = hp;
+                return;
             }
         }
     }

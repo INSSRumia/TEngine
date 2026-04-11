@@ -8,7 +8,7 @@
         "name": "剑",
         "lst_ability": [],
         "is_damage_by_velocity": true,
-        "cooldown": 10
+        "cooldown": 0.1
       },
       {
         "$type": "SwordLevelConfig",
@@ -16,7 +16,7 @@
         "name": "剑",
         "lst_ability": [],
         "is_damage_by_velocity": true,
-        "cooldown": 10
+        "cooldown": 0.1
       }
     ]
   }

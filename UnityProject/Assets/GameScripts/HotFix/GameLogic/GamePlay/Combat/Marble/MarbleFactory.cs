@@ -6,7 +6,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public static class MarbleFactory
     {
-        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Marbles/");
+        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Marbles/Marble");
 
         public static Marble CreateMarble(string id, int camp, int level = 0)
         {
@@ -29,9 +29,11 @@ namespace GameLogic.Gameplay.Combat.Marble
                 MaxShield = levelData.Shield,
                 Shield = levelData.Shield,
                 Defense = levelData.Defense,
+                Attack = levelData.Attack,
                 DamageMultiplier = 1f,
                 HealMultiplier = 1f,
                 ShieldHealMultiplier = 1f,
+                AttackMultiplier = 1f,
                 Scale = levelData.Scale,
                 Mass = levelData.Mass,
                 TargetVelocity = levelData.Speed,
@@ -54,9 +56,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private static Marble CreateMarbleInternal(string id)
         {
-            var prefab = GameModule.Resource.LoadGameObject(_path + "Marble");
-            // var prefab = GameModule.Resource.LoadGameObject(_path + id);
-            var marble = GameObject.Instantiate(prefab);
+            var marble = GameModule.Resource.LoadGameObject(_path);
             return marble.GetComponent<Marble>();
         }
 
@@ -85,6 +85,8 @@ namespace GameLogic.Gameplay.Combat.Marble
             marbleComponent.AddAbility(new MarbleHandleDamageAbility());
             marbleComponent.AddAbility(new MarbleDeadAbility());
             marbleComponent.AddAbility(new MarbleLevelUpAbility());
+            marbleComponent.AddAbility(new MarbleGetTargetAbility());
+            marbleComponent.AddAbility(new MarbleCloseToTargetAbility());
             marbleComponent.AddAbility(new MarbleMovementAbility());
             marbleComponent.AddAbility(new MarbleRotationAbility());
         }

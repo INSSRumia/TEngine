@@ -11,14 +11,31 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (collision == null || EquipmentOwner == null || EquipmentOwner.OwnerMarble == null || EquipmentOwner.RuntimeData == null)
                 return;
 
-            var targetMarble = collision.collider.GetComponent<Marble.Marble>();
-            if (targetMarble == null || targetMarble.RuntimeData == null)
+            var target = collision.collider.GetComponentInParent<ASC>();
+            if(target == null)
                 return;
 
-            if (!targetMarble.RuntimeData.IsAlive)
+            int targetCamp = -1;
+            IReceiveDamage targetReceiveDamage = null;
+            switch(target)
+            {
+                case Marble.Marble marble:
+                    targetCamp = marble.RuntimeData.Camp;
+                    targetReceiveDamage = marble.GetAbility<IReceiveDamage>();
+                    break;
+
+                case Equipment equipment:
+                    targetCamp = equipment.OwnerMarble.RuntimeData.Camp;
+                    targetReceiveDamage = equipment.GetAbility<IReceiveDamage>();
+                    break;
+                default:
+                    return;
+            }
+
+            if (targetReceiveDamage == null)
                 return;
 
-            if (targetMarble.RuntimeData.Camp == EquipmentOwner.OwnerMarble.RuntimeData.Camp)
+            if (targetCamp == EquipmentOwner.OwnerMarble.RuntimeData.Camp)
                 return;
 
             var cooldownAbility = EquipmentOwner.GetAbility<WeaponCooldownAbility>();
@@ -32,7 +49,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (damage <= 0)
                 return;
 
-            targetMarble.GetAbility<IReceiveDamage>()?.ReceiveDamage(damage, EquipmentOwner);
+            targetReceiveDamage?.ReceiveDamage(damage, EquipmentOwner);
         }
     }
 }
