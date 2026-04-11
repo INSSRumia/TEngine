@@ -84,7 +84,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             AttachCoreAbility(marbleComponent, new MarbleReceiveDamageAbility());
             AttachCoreAbility(marbleComponent, new MarbleAddHealAbility());
             AttachCoreAbility(marbleComponent, new MarbleAddExpAbility());
-            AttachCoreAbility(marbleComponent, new MarbleDeadAbility());
+            AttachCoreAbility(marbleComponent, new MarbleDeathAbility());
             AttachCoreAbility(marbleComponent, new MarbleLevelUpAbility());
             AttachCoreAbility(marbleComponent, new MarbleGetTargetAbility());
             AttachCoreAbility(marbleComponent, new MarbleMovementAbility());

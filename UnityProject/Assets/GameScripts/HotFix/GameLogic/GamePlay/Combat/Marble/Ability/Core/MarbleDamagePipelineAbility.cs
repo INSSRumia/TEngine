@@ -111,7 +111,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                         ability.AfterApplyDamage(this);
                     ListPool<IAfterApplyDamage>.Release(lstAfterApplyDamageAbilities);
 
-                    var marbleDeadAbility = Owner.GetAbility<MarbleDeadAbility>();
+                    var marbleDeadAbility = Owner.GetAbility<MarbleDeathAbility>();
                     if (marbleDeadAbility != null)
                         marbleDeadAbility.Execute();
                 }

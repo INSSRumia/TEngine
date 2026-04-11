@@ -98,6 +98,21 @@ namespace GameLogic.GamePlay.Combat
             ability.OnRemove();
         }
 
+        public void RemoveAllAbilities()
+        {
+            _lstUpdateAbility.Clear();
+            _lstFixedUpdateAbility.Clear();
+            _abilityInterfaceMap.Clear();
+            _coreAbilities.Clear();
+            _optionalAbilities.Clear();
+            _dynamicAbilities.Clear();
+            foreach (var ability in _lstAbility)
+            {
+                ability.OnRemove();
+            }
+            _lstAbility.Clear();
+        }
+
         public void ClearOptionalAbilities()
         {
             for (int i = _optionalAbilities.Count - 1; i >= 0; i--)

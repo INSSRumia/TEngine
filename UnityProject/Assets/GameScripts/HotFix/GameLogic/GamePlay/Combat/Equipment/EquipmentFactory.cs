@@ -186,11 +186,13 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 case ArmorEquipment armorEquipment:
                 {
                     armorEquipment.AddAbility(new EquipmentMountAbility());
+                    armorEquipment.AddAbility(new EquipmentBrokenAbility());
                     break;
                 }
                 case BowEquipment bowEquipment:
                 {
                     bowEquipment.AddAbility(new EquipmentMountAbility());
+                    bowEquipment.AddAbility(new EquipmentBrokenAbility());
                     bowEquipment.AddAbility(new WeaponCooldownAbility());
                     bowEquipment.AddAbility(new WeaponCalculateDamageAbility());
                     bowEquipment.AddAbility(new BowAimAbility());
@@ -200,6 +202,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 case SwordEquipment swordEquipment:
                 {
                     swordEquipment.AddAbility(new EquipmentMountAbility());
+                    swordEquipment.AddAbility(new EquipmentBrokenAbility());
                     swordEquipment.AddAbility(new WeaponCooldownAbility());
                     swordEquipment.AddAbility(new WeaponCalculateDamageAbility());
                     swordEquipment.AddAbility(new SwordCollisionAttackAbility());

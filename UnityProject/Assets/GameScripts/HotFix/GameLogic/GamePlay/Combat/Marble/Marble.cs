@@ -10,6 +10,7 @@ namespace GameLogic.Gameplay.Combat.Marble
         [SerializeField] private List<Transform> _lstEquipmentPoints = new List<Transform>();
         private readonly Dictionary<EquipmentSlot, Transform> _slotPointMap = new Dictionary<EquipmentSlot, Transform>();
         private readonly Dictionary<EquipmentSlot, Equipment.Equipment> _equipmentMap = new Dictionary<EquipmentSlot, Equipment.Equipment>();
+        public IReadOnlyDictionary<EquipmentSlot, Equipment.Equipment> EquipmentMap => _equipmentMap;
 
         protected override void Awake()
         {
@@ -35,6 +36,7 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             return _equipmentMap.TryGetValue(slot, out var equipment) ? equipment : null;
         }
+
 
         public void RegisterEquipment(Equipment.Equipment equipment)
         {
@@ -75,12 +77,6 @@ namespace GameLogic.Gameplay.Combat.Marble
                 }
             }
             _equipmentMap.Clear();
-        }
-
-        public void HandleDead()
-        {
-            if(RuntimeData.IsAlive)
-                return;
         }
 
         private void OnDrawGizmos()
