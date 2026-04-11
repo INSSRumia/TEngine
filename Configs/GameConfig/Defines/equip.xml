@@ -1,4 +1,4 @@
-<module name="GameConfig">
+<module name="">
     <bean name="EquipAttachConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="level" type="int" />
@@ -12,10 +12,65 @@
         <var name="lst_level_config" type="list, EquipmentLevelConfig" />
     </bean>
 
+    <!--
+    ============================================================
+    Equipment Ability 配置基类
+    ============================================================
+    用于 EquipmentLevelConfig.lst_ability 中的可选 Ability 配置。
+    -->
+    <bean name="EquipmentAbilityConfig" valueType="false" sep=",">
+        <var name="priority" type="int" />
+    </bean>
+
+    <!--
+    ============================================================
+    SwordCollisionAttackAbility 配置
+    ============================================================
+    剑碰撞攻击 Ability：碰撞时根据相对速度计算伤害。
+    -->
+    <bean name="SwordCollisionAttackAbilityConfig" alias="sword_collision_attack" parent="EquipmentAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <!--
+    ============================================================
+    ArmorReduceDamageAbility 配置
+    ============================================================
+    护甲减伤 Ability：减伤后剩余伤害转发给 OwnerMarble。
+    -->
+    <bean name="ArmorReduceDamageAbilityConfig" alias="armor_reduce_damage" parent="EquipmentAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <!--
+    ============================================================
+    ArmorAbsorbDamageAbility 配置
+    ============================================================
+    护甲吸收 Ability：护甲自身扣血，被破坏前不扣 Marble 血量。
+    -->
+    <bean name="ArmorAbsorbDamageAbilityConfig" alias="armor_absorb_damage" parent="EquipmentAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <!--
+    ============================================================
+    EquipmentLevelConfig 基类
+    ============================================================
+    -->
     <bean name="EquipmentLevelConfig" alias="equip" valueType="false" sep=",">
         <var name="level" type="int" />
         <var name="name" type="string" />
-        <var name="lst_ability" type="list, string" />
+
+        <!--
+        ============================================================
+        可选 Ability 配置列表
+        ============================================================
+        Core 文件夹中的 Ability 由 EquipmentFactory.AttachDefaultAbilities() 硬编码添加，
+        无需在此配置。
+
+        此列表用于配置可选 Ability，或额外覆盖/替换 Core Ability。
+        当前支持的类型：
+          - ArmorReduceDamage : 护甲减伤
+          - ArmorAbsorbDamage : 护甲吸收
+        -->
+        <var name="lst_ability" type="list, EquipmentAbilityConfig" />
     </bean>
 
     <bean name="ArmorLevelConfig" alias="armor" parent="EquipmentLevelConfig" valueType="false" sep=",">

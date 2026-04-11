@@ -2,10 +2,12 @@ using TEngine;
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
 using GameLogic.Gameplay.Combat.Equipment;
-
+using System;
+using GameConfig;
+using System.Collections.Generic;
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public static class MarbleFactory
+    public static partial class MarbleFactory
     {
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Marbles/Marble");
 
@@ -62,7 +64,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             return marble.GetComponent<Marble>();
         }
 
-        public static GameConfig.GameConfig.MarbleLevelConfig GetMarbleLevelConfig(string id, int level)
+        public static MarbleLevelConfig GetMarbleLevelConfig(string id, int level)
         {
             var data = ConfigSystem.Instance.Tables.TbMarble.Get(id);
             var levelData = data.LstLevelConfig.Find(x => x.Level == level);
@@ -97,7 +99,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             marble.AddAbility(ability);
         }
 
-        private static void AttachOptionalAbilities(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)
+        private static void AttachOptionalAbilities(Marble marbleComponent, MarbleLevelConfig levelData)
         {
             if (levelData?.LstAbility == null)
                 return;
@@ -113,17 +115,32 @@ namespace GameLogic.Gameplay.Combat.Marble
             }
         }
 
-        public static Ability<Marble> CreateAbilityFromConfig(GameConfig.GameConfig.MarbleAbilityConfig config)
+        private readonly static List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
         {
-            return config switch
-            {
-                GameConfig.GameConfig.MarbleCloseToTargetAbilityConfig closeConfig =>
-                    new MarbleCloseToTargetAbility { CloseDistance = closeConfig.CloseDistance },
-                _ => null
-            };
+            new DefaultMarbleAbilityCreatorForConfig(),
+        };
+        public static void RegisterAbilityCreatorForConfig(IMarbleAbilityCreatorForConfig creator)
+        {
+            _lstAbilityCreatorsForConfig.Add(creator);
+            // 降序排序
+            _lstAbilityCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
-        private static void AttachEquipment(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)
+        public static Ability<Marble> CreateAbilityFromConfig(MarbleAbilityConfig config)
+        {
+            foreach (var creator in _lstAbilityCreatorsForConfig)
+            {
+                var ability = creator.CreateAbility(config);
+                if (ability != null)
+                {
+                    return ability;
+                }
+            }
+            Log.Error($"Marble ability creator for config not found: {config.GetType().Name}");
+            return null;
+        }
+
+        private static void AttachEquipment(Marble marbleComponent, MarbleLevelConfig levelData)
         {
             if (marbleComponent == null || levelData?.LstEquipment == null)
                 return;
@@ -133,6 +150,26 @@ namespace GameLogic.Gameplay.Combat.Marble
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(config.ConfigId);
                 EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (EquipmentSlot)config.Slot);
             }
+        }
+    }
+
+    public interface IMarbleAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        Ability<Marble> CreateAbility(MarbleAbilityConfig config);
+    }
+
+    public class DefaultMarbleAbilityCreatorForConfig : IMarbleAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public Ability<Marble> CreateAbility(MarbleAbilityConfig config)
+        {
+            return config switch
+            {
+                MarbleCloseToTargetAbilityConfig closeConfig =>
+                    new MarbleCloseToTargetAbility { CloseDistance = closeConfig.CloseDistance },
+                _ => null
+            };
         }
     }
 }

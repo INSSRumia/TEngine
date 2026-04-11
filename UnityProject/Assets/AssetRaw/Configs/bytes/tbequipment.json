@@ -1,0 +1,54 @@
+[
+  {
+    "config_id": "sword",
+    "lst_level_config": [
+      {
+        "$type": "SwordLevelConfig",
+        "level": 0,
+        "name": "剑",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 0.1
+      },
+      {
+        "$type": "SwordLevelConfig",
+        "level": 1,
+        "name": "剑",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 0.1
+      }
+    ]
+  },
+  {
+    "config_id": "shield",
+    "lst_level_config": [
+      {
+        "$type": "ArmorLevelConfig",
+        "level": 0,
+        "name": "盾",
+        "lst_ability": [
+          {
+            "$type": "ArmorAbsorbDamageAbilityConfig",
+            "priority": 0
+          }
+        ],
+        "hp": 100,
+        "defense": 0
+      },
+      {
+        "$type": "ArmorLevelConfig",
+        "level": 1,
+        "name": "盾",
+        "lst_ability": [
+          {
+            "$type": "ArmorAbsorbDamageAbilityConfig",
+            "priority": 0
+          }
+        ],
+        "hp": 200,
+        "defense": 0
+      }
+    ]
+  }
+]

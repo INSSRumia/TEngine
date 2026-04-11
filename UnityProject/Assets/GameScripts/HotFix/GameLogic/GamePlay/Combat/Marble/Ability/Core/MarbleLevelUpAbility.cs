@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using GameLogic.GamePlay.Combat;
 using GameLogic.Gameplay.Combat.Equipment;
-using GameConfig.GameConfig;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {

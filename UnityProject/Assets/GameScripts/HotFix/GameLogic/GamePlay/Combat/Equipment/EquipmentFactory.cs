@@ -1,4 +1,5 @@
-using GameConfig.GameConfig;
+using System.Collections.Generic;
+using GameConfig;
 using GameLogic.GamePlay.Combat;
 using TEngine;
 using UnityEngine;
@@ -40,6 +41,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         Defense = armorConfig.Defense,
                     });
                     AttachDefaultAbilities(armorEquipment);
+                    AttachOptionalAbilities(armorEquipment, armorConfig);
                     equipment = armorEquipment;
                     break;
                 }
@@ -61,6 +63,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         AimAngle = bowConfig.AimAngle,
                     });
                     AttachDefaultAbilities(bowEquipment);
+                    AttachOptionalAbilities(bowEquipment, bowConfig);
                     equipment = bowEquipment;
                     break;
                 }
@@ -78,6 +81,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         Cooldown = swordConfig.Cooldown,
                     });
                     AttachDefaultAbilities(swordEquipment);
+                    AttachOptionalAbilities(swordEquipment, swordConfig);
                     equipment = swordEquipment;
                     break;
                 }
@@ -126,6 +130,160 @@ namespace GameLogic.Gameplay.Combat.Equipment
             equipment.AddAbility(new WeaponCalculateDamageAbility());
             equipment.AddAbility(new BowAimAbility());
             equipment.AddAbility(new BowShootAbility());
+        }
+
+        private static void AttachOptionalAbilities(ArmorEquipment equipment, ArmorLevelConfig levelConfig)
+        {
+            if (levelConfig?.LstAbility == null)
+                return;
+
+            foreach (var config in levelConfig.LstAbility)
+            {
+                var ability = CreateAbilityFromConfig(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = config.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+        }
+
+        private static void AttachOptionalAbilities(BowEquipment equipment, BowLevelConfig levelConfig)
+        {
+            if (levelConfig?.LstAbility == null)
+                return;
+
+            foreach (var config in levelConfig.LstAbility)
+            {
+                var ability = CreateAbilityFromConfig(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = config.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+        }
+
+        private static void AttachOptionalAbilities(SwordEquipment equipment, SwordLevelConfig levelConfig)
+        {
+            if (levelConfig?.LstAbility == null)
+                return;
+
+            foreach (var config in levelConfig.LstAbility)
+            {
+                var ability = CreateAbilityFromConfig(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = config.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+        }
+
+        private static List<IArmorAbilityCreatorForConfig> _lstArmorAbilityCreatorsForConfig = new List<IArmorAbilityCreatorForConfig>
+        {
+            new DefaultArmorAbilityCreatorForConfig(),
+        };
+        private static List<IBowAbilityCreatorForConfig> _lstBowAbilityCreatorsForConfig = new List<IBowAbilityCreatorForConfig>
+        {
+            new DefaultBowAbilityCreatorForConfig(),
+        };
+        private static List<ISwordAbilityCreatorForConfig> _lstSwordAbilityCreatorsForConfig = new List<ISwordAbilityCreatorForConfig>
+        {
+            new DefaultSwordAbilityCreatorForConfig(),
+        };
+
+        private static Ability<ArmorEquipment> CreateAbilityFromConfig(ArmorEquipment equipment, EquipmentAbilityConfig config)
+        {
+            foreach (var creator in _lstArmorAbilityCreatorsForConfig)
+            {
+                var ability = creator.CreateAbility(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = creator.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+            return null;
+        }
+
+        private static Ability<BowEquipment> CreateAbilityFromConfig(BowEquipment equipment, EquipmentAbilityConfig config)
+        {
+            foreach (var creator in _lstBowAbilityCreatorsForConfig)
+            {
+                var ability = creator.CreateAbility(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = creator.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+            return null;
+        }
+
+        private static Ability<SwordEquipment> CreateAbilityFromConfig(SwordEquipment equipment, EquipmentAbilityConfig config)
+        {
+            foreach (var creator in _lstSwordAbilityCreatorsForConfig)
+            {
+                var ability = creator.CreateAbility(equipment, config);
+                if (ability != null)
+                {
+                    ability.Priority = creator.Priority;
+                    equipment.AddAbility(ability);
+                }
+            }
+            return null;
+        }
+    }
+
+    public interface IArmorAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        Ability<ArmorEquipment> CreateAbility(ArmorEquipment equipment, EquipmentAbilityConfig config);
+    }
+    public class DefaultArmorAbilityCreatorForConfig : IArmorAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public Ability<ArmorEquipment> CreateAbility(ArmorEquipment equipment, EquipmentAbilityConfig config)
+        {
+            return config switch
+            {
+                ArmorReduceDamageAbilityConfig => new ArmorReduceDamageAbility(),
+                ArmorAbsorbDamageAbilityConfig => new ArmorAbsorbDamageAbility(),
+                _ => null
+            };
+        }
+    }
+    public interface IBowAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        Ability<BowEquipment> CreateAbility(BowEquipment equipment, EquipmentAbilityConfig config);
+    }
+    public class DefaultBowAbilityCreatorForConfig : IBowAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public Ability<BowEquipment> CreateAbility(BowEquipment equipment, EquipmentAbilityConfig config)
+        {
+            return config switch
+            {
+                _ => null
+            };
+        }
+    }
+    public interface ISwordAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        Ability<SwordEquipment> CreateAbility(SwordEquipment equipment, EquipmentAbilityConfig config);
+    }
+    public class DefaultSwordAbilityCreatorForConfig : ISwordAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public Ability<SwordEquipment> CreateAbility(SwordEquipment equipment, EquipmentAbilityConfig config)
+        {
+            return config switch
+            {
+                _ => null
+            };
         }
     }
 }
