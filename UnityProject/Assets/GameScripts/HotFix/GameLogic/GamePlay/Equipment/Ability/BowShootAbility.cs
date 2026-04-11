@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameLogic.Equipment
 {
-    public class BowShootAbility : EquipmentAbility<BowRuntimeData>
+    public class BowShootAbility : EquipmentAbility<BowEquipment>
     {
         public bool TryBuildShot(out IReadOnlyList<Vector2> shotDirections)
         {

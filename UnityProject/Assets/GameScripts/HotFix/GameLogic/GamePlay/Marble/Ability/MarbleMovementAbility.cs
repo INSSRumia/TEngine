@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleMovementAbility : Ability<MarbleRuntimeData>, IAbilityFixedUpdate
+    public class MarbleMovementAbility : Ability<Marble>, IAbilityFixedUpdate
     {
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

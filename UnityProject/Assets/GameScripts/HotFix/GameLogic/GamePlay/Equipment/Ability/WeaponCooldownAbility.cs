@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Equipment
 {
-    public class WeaponCooldownAbility : EquipmentAbility<WeaponRuntimeData>, IAbilityUpdate
+    public class WeaponCooldownAbility : EquipmentAbility<WeaponEquipment>, IAbilityUpdate
     {
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {

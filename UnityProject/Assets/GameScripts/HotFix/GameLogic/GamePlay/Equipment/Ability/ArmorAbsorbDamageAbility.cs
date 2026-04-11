@@ -1,7 +1,7 @@
 using GameLogic.GamePlay.Common;
 namespace GameLogic.Equipment
 {
-    public class ArmorAbsorbDamageAbility : EquipmentAbility<ArmorRuntimeData>, IReceiveDamage
+    public class ArmorAbsorbDamageAbility : EquipmentAbility<ArmorEquipment>, IReceiveDamage
     {
         public void ReceiveDamage(int damage, ASC source = null)
         {

@@ -2,15 +2,15 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleGetTargetAbility : Ability<MarbleRuntimeData>, IFixedUpdate
+    public class MarbleGetTargetAbility : Ability<Marble>, IAbilityFixedUpdate
     {
-        public void OnFixedUpdate()
+        public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false)
                 return;
 
             // TODO: 从战斗管理器中获取最近的敌人
-            Marble target = Owner.CombatManager?.GetNearestEnemy(Owner as Marble);
+            Marble target = Owner.CombatManager?.GetNearestEnemy(Owner);
 
             if(target == null)
                 return;

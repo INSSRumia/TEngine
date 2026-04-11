@@ -4,26 +4,34 @@ using UnityEngine;
 
 namespace GameLogic.Equipment
 {
-    public class Equipment<TRuntimeData> : GameLogic.GamePlay.Common.ASC<TRuntimeData>
-        where TRuntimeData : EquipmentRuntimeData
+    public class Equipment : ASC<EquipmentRuntimeData>
     {
         public Marble.Marble OwnerMarble { get; private set; }
 
-        public void Init(Marble.Marble ownerMarble, TRuntimeData runtimeData)
+        public void Init(Marble.Marble ownerMarble, EquipmentRuntimeData runtimeData)
         {
             OwnerMarble = ownerMarble;
             base.Init(runtimeData);
         }
     }
 
-    public class Equipment : Equipment<EquipmentRuntimeData> { }
-    public class ArmorEquipment : Equipment<ArmorRuntimeData> { }
-    public class SwordEquipment : Equipment<WeaponRuntimeData>
+
+    public class ArmorEquipment : Equipment 
     {
-        private void OnCollisionEnter2D(Collision2D collision)
-        {
-            GetAbility<WeaponCollisionAttackAbility>()?.HandleCollision(collision);
-        }
+        public new ArmorRuntimeData RuntimeData => base.RuntimeData as ArmorRuntimeData;
     }
-    public class BowEquipment : Equipment<BowRuntimeData> { }
+
+    public class WeaponEquipment : Equipment
+    {
+        public new WeaponRuntimeData RuntimeData => base.RuntimeData as WeaponRuntimeData;
+    }
+
+    public class SwordEquipment : WeaponEquipment
+    {
+        public new SwordRuntimeData RuntimeData => base.RuntimeData as SwordRuntimeData;
+    }
+    public class BowEquipment : WeaponEquipment
+    {
+        public new BowRuntimeData RuntimeData => base.RuntimeData as BowRuntimeData;
+    }
 }

@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleHandleDamageAbility : Ability<MarbleRuntimeData>,
+    public class MarbleHandleDamageAbility : Ability<Marble>,
         IAfterApplyDamage,
         IAfterApplyHeal,
         IAfterApplyShield

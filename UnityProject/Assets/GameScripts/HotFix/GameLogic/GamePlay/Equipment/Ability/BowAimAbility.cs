@@ -4,14 +4,18 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Equipment
 {
-    public class BowAimAbility : EquipmentAbility<BowRuntimeData>, IAbilityUpdate
+    public class BowAimAbility : EquipmentAbility<BowEquipment>, IAbilityUpdate
     {
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (EquipmentOwner == null || EquipmentOwner.RuntimeData == null)
                 return;
 
-            var aimDirection = EquipmentOwner.RuntimeData.AimDirection;
+            var targetMarble = EquipmentOwner.OwnerMarble.CombatManager?.GetTarget(EquipmentOwner.RuntimeData.TargetMarbleInstId);
+            if (targetMarble == null)
+                return;
+
+            var aimDirection = (targetMarble.transform.position - EquipmentOwner.transform.position).normalized;
             if (Mathf.Approximately(aimDirection.sqrMagnitude, 0f))
                 return;
 

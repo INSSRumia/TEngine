@@ -30,8 +30,7 @@ namespace GameLogic.GamePlay.Common
             RuntimeData = data;
         }
 
-        public void AddAbility<TAbilityRuntimeData>(Ability<TAbilityRuntimeData> ability)
-            where TAbilityRuntimeData : class
+        public void AddAbility<T>(Ability<T> ability) where T : ASC<TRuntimeData>
         {
             if (_lstAbility.Contains(ability))
             {
@@ -41,7 +40,7 @@ namespace GameLogic.GamePlay.Common
             _lstAbility.Add(ability);
             _lstAbility.Sort(SortByPriority);
             RegisterAbilityExecution(ability);
-            ability.Init(this);
+            ability.Init(this as T);
             ability.OnAdd();
         }
 

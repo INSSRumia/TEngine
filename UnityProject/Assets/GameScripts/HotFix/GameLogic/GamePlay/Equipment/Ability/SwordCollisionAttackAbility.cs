@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace GameLogic.Equipment
 {
-    public class WeaponCollisionAttackAbility : EquipmentAbility<WeaponRuntimeData>
+    public class SwordCollisionAttackAbility : EquipmentAbility<SwordEquipment>
     {
+        private const float VelocityDamageFactor = 1f;
         public void HandleCollision(Collision2D collision)
         {
             if (collision == null || EquipmentOwner == null || EquipmentOwner.OwnerMarble == null || EquipmentOwner.RuntimeData == null)
@@ -25,7 +26,9 @@ namespace GameLogic.Equipment
                 return;
 
             var relativeVelocity = collision.relativeVelocity.magnitude;
-            var damage = EquipmentOwner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage(relativeVelocity) ?? 0;
+            var damage = EquipmentOwner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage() ?? 0;
+            damage = Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * damage);
+
             if (damage <= 0)
                 return;
 

@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleAddExpAbility : Ability<MarbleRuntimeData>
+    public class MarbleAddExpAbility : Ability<Marble>
     {
         public void AddExp(int value)
         {

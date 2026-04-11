@@ -3,9 +3,8 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Equipment
 {
-    public abstract class EquipmentAbility<TRuntimeData> : GameLogic.GamePlay.Common.Ability<TRuntimeData>
-        where TRuntimeData : EquipmentRuntimeData
+    public abstract class EquipmentAbility<T> : Ability<T>
     {
-        public Equipment<TRuntimeData> EquipmentOwner => Owner as Equipment<TRuntimeData>;
+        public T EquipmentOwner => Owner;
     }
 }

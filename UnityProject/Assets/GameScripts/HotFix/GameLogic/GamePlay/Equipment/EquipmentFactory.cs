@@ -94,14 +94,14 @@ namespace GameLogic.Equipment
             equipment.AddAbility(new EquipmentMountAbility());
             equipment.AddAbility(new WeaponCooldownAbility());
             equipment.AddAbility(new WeaponCalculateDamageAbility());
-            equipment.AddAbility(new WeaponCollisionAttackAbility());
+            equipment.AddAbility(new SwordCollisionAttackAbility());
         }
 
         private static void AttachDefaultAbilities(BowEquipment equipment)
         {
             equipment.AddAbility(new EquipmentMountAbility());
             equipment.AddAbility(new WeaponCooldownAbility());
-            equipment.AddAbility(new BowFindTargetAbility());
+            equipment.AddAbility(new WeaponCalculateDamageAbility());
             equipment.AddAbility(new BowAimAbility());
             equipment.AddAbility(new BowShootAbility());
         }

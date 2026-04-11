@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleAddHealAbility : Ability<MarbleRuntimeData>, IReceiveHeal
+    public class MarbleAddHealAbility : Ability<Marble>, IReceiveHeal
     {
         public void ReceiveHeal(int value, ASC source = null)
         {

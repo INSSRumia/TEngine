@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleDeadAbility : Ability<MarbleRuntimeData>
+    public class MarbleDeadAbility : Ability<Marble>
     {
         public override int Priority => 9800;
 
@@ -11,7 +11,7 @@ namespace GameLogic.Marble
             if (Owner.RuntimeData.IsAlive || Owner.RuntimeData.Hp > 0)
                 return;
             //TODO: 处理死亡逻辑
-            GameEvent.Send(EventDef.Combat.MarbleDie, Owner as Marble);
+            GameEvent.Send(EventDef.Combat.MarbleDie, Owner);
             Owner.RuntimeData.IsAlive = false;
         }
     }

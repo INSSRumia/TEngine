@@ -3,7 +3,7 @@ using UnityEngine;
 namespace GameLogic.Equipment
 {
     // 装备挂载到角色身上
-    public class EquipmentMountAbility : EquipmentAbility<EquipmentRuntimeData>
+    public class EquipmentMountAbility : EquipmentAbility<Equipment>
     {
         public override void OnAdd()
         {

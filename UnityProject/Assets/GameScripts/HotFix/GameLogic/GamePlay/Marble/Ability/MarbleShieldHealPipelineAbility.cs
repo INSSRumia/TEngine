@@ -5,7 +5,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public partial class MarbleShieldHealPipelineAbility : Ability<MarbleRuntimeData>, IReceiveShield
+    public partial class MarbleShieldHealPipelineAbility : Ability<Marble>, IReceiveShield
     {
         public enum ShieldStage
         {

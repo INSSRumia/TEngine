@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleLevelUpAbility : Ability<MarbleRuntimeData>
+    public class MarbleLevelUpAbility : Ability<Marble>
     {
         public override int Priority => 9700;
 

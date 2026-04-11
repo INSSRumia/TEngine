@@ -3,7 +3,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public class MarbleSyncScaleAbility : Ability<MarbleRuntimeData>
+    public class MarbleSyncScaleAbility : Ability<Marble>
     {
         public override void OnAdd()
         {

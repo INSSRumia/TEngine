@@ -5,7 +5,7 @@ using GameLogic.GamePlay.Common;
 
 namespace GameLogic.Marble
 {
-    public partial class MarbleDamagePipelineAbility : Ability<MarbleRuntimeData>
+    public partial class MarbleDamagePipelineAbility : Ability<Marble>
     {
         public enum DamageStage
         {
