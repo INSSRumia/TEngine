@@ -25,7 +25,7 @@ namespace GameLogic.Equipment
                 return;
 
             var relativeVelocity = collision.relativeVelocity.magnitude;
-            var damage = EquipmentOwner.GetAbility<WeaponCollisionDamageAbility>()?.CalculateDamage(relativeVelocity) ?? 0;
+            var damage = EquipmentOwner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage(relativeVelocity) ?? 0;
             if (damage <= 0)
                 return;
 

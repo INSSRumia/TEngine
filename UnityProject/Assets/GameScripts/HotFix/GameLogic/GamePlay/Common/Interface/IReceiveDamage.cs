@@ -1,3 +1,0 @@
-namespace GameLogic.GamePlay.Common
-{
-}

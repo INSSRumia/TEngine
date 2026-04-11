@@ -8,6 +8,7 @@ namespace GameLogic.GamePlay.Common
     public abstract class ASC : MonoBehaviour
     {
         public Rigidbody2D Rigidbody { get; private set; }
+        public ICombatManager CombatManager { get; private set; }
 
         private void Awake()
         {

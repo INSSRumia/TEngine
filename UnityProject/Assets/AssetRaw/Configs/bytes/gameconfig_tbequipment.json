@@ -1,0 +1,23 @@
+[
+  {
+    "config_id": "sword",
+    "lst_level_config": [
+      {
+        "$type": "SwordLevelConfig",
+        "level": 0,
+        "name": "剑",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 10
+      },
+      {
+        "$type": "SwordLevelConfig",
+        "level": 1,
+        "name": "剑",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 10
+      }
+    ]
+  }
+]

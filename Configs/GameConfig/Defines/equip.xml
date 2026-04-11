@@ -1,0 +1,64 @@
+<module name="GameConfig">
+    <bean name="EquipIndexConfig" valueType="false" sep=",">
+        <var name="config_id" type="string" />
+        <var name="level" type="int" />
+        <!-- # 装备位于marble的哪个位置
+        # 0: top, 1: left, 2: right, 3: bottom 4: middle -->
+        <var name="slot" type="int" />
+    </bean>
+
+    <bean name="EquipmentConfig" valueType="false" sep=",">
+        <var name="config_id" type="string" />
+        <var name="lst_level_config" type="list, EquipmentLevelConfig" />
+    </bean>
+
+    <bean name="EquipmentLevelConfig" alias="equip" valueType="false" sep=",">
+        <var name="level" type="int" />
+        <var name="name" type="string" />
+        <var name="lst_ability" type="list, string" />
+    </bean>
+
+    <bean name="ArmorLevelConfig" alias="armor" parent="EquipmentLevelConfig" valueType="false" sep=",">
+        <!-- 
+        # 如果装备血量大于0，则说明装备会被破坏，在血量清空前不会扣marble血量
+        # 如果装备血量小于等于0，则装备不会被破坏，只提供defense减伤效果
+        # 例如头盔不会被破坏，只会减伤
+        # 盾牌会被破坏，在被破坏前不会扣marble血量-->
+        <var name="hp" type="int" />
+        <var name="defense" type="int" />
+    </bean>
+
+    <bean name="WeaponLevelConfig" alias="weapon" parent="EquipmentLevelConfig" valueType="false" sep=",">
+        <!-- # 武器攻击力，如果attack为null，则使用marble的attack -->
+        <var name="attack" type="int?" />
+        <!-- # 是否通过速度计算伤害,如果是，则伤害=速度差*系数*attack，否则伤害=attack -->
+        <var name="is_damage_by_velocity" type="bool" />
+        <var name="cooldown" type="float" />
+    </bean>
+
+    <bean name="SwordLevelConfig" alias="sword" parent="WeaponLevelConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="BowLevelConfig" alias="bow" parent="WeaponLevelConfig" valueType="false" sep=",">
+        <!-- # 弓的装填时间 -->
+        <!-- # <var name="cooldown" type="float" /> -->
+        <!-- # 弓的旋转速度，每秒旋转多少度 -->
+        <var name="rotate_speed" type="float" />
+        <!-- # 0: 连射 1： 散射  -->
+        <var name="shoot_type" type="int" />
+        <var name="arrow_count" type="int" />
+        <!-- # 连射时的射击间隔，不能超过cooldown
+        # 如果填0，所有箭矢都会叠在一起 -->
+        <var name="arrow_interval" type="float" />
+        <!-- # 散射时的箭矢角度差距，会以弓当前的方向为中心，向左右两边分布
+        # 例如填5度，射出3根箭矢，则每根箭矢的角度差距为5度，第一根箭矢的角度为0度，第二根箭矢的角度为5度，第三根箭矢的角度为-5度
+        # 如果填0度，则所有箭矢都会叠在一起
+        # 无论如何瞄准的方向都会射出一根箭矢，如果箭矢数量为偶数，则左右两边的的箭矢数量不会相等 -->
+        <var name="arrow_angle_step" type="float" />
+        <!-- # 瞄准角度，设弓指向目标的向量为a, 弓的前方方向为b, 则当a与b的夹角小于aim_angle时，弓允许发射。 -->
+        <var name="aim_angle" type="float" />
+    </bean>
+
+    <table name="TbEquipment" value="EquipmentConfig" input="equip.xlsx" index="config_id"/>
+
+</module>

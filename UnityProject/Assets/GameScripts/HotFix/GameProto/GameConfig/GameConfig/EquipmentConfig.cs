@@ -13,38 +13,35 @@ using SimpleJSON;
 
 namespace GameConfig.GameConfig
 {
-public abstract partial class EquipmentConfig : Luban.BeanBase
+public sealed partial class EquipmentConfig : Luban.BeanBase
 {
     public EquipmentConfig(JSONNode _buf) 
     {
         { if(!_buf["config_id"].IsString) { throw new SerializationException(); }  ConfigId = _buf["config_id"]; }
-        { if(!_buf["slot"].IsNumber) { throw new SerializationException(); }  Slot = _buf["slot"]; }
+        { var __json0 = _buf["lst_level_config"]; if(!__json0.IsArray) { throw new SerializationException(); } LstLevelConfig = new System.Collections.Generic.List<GameConfig.EquipmentLevelConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { GameConfig.EquipmentLevelConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.GameConfig.EquipmentLevelConfig.DeserializeEquipmentLevelConfig(__e0);  }  LstLevelConfig.Add(__v0); }   }
     }
 
     public static EquipmentConfig DeserializeEquipmentConfig(JSONNode _buf)
     {
-        switch ((string)_buf["$type"])
-        {
-            case "ArmorConfig": return new GameConfig.ArmorConfig(_buf);
-            case "WeaponConfig": return new GameConfig.WeaponConfig(_buf);
-            case "BowConfig": return new GameConfig.BowConfig(_buf);
-            default: throw new SerializationException();
-        }
+        return new GameConfig.EquipmentConfig(_buf);
     }
 
     public readonly string ConfigId;
-    public readonly int Slot;
+    public readonly System.Collections.Generic.List<GameConfig.EquipmentLevelConfig> LstLevelConfig;
    
+    public const int __ID__ = -1144653226;
+    public override int GetTypeId() => __ID__;
 
-    public virtual void ResolveRef(Tables tables)
+    public  void ResolveRef(Tables tables)
     {
+        foreach (var _e in LstLevelConfig) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
     {
         return "{ "
         + "configId:" + ConfigId + ","
-        + "slot:" + Slot + ","
+        + "lstLevelConfig:" + Luban.StringUtil.CollectionToString(LstLevelConfig) + ","
         + "}";
     }
 }

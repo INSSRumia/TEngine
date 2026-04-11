@@ -46,7 +46,7 @@ namespace GameLogic.Marble
 
         public void AfterApplyShield(IAbility ability)
         {
-            var context = (ability as MarbleShieldPipelineAbility)?.CurrentContext;
+            var context = (ability as MarbleShieldHealPipelineAbility)?.CurrentHealContext;
             if (Owner == null || Owner.RuntimeData == null || context == null)
                 return;
             if (!Owner.RuntimeData.IsAlive)

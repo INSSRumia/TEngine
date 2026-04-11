@@ -19,13 +19,14 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
     {
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
         { if(!_buf["upgrade_exp"].IsNumber) { throw new SerializationException(); }  UpgradeExp = _buf["upgrade_exp"]; }
+        { if(!_buf["attack"].IsNumber) { throw new SerializationException(); }  Attack = _buf["attack"]; }
         { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
         { if(!_buf["shield"].IsNumber) { throw new SerializationException(); }  Shield = _buf["shield"]; }
         { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
         { if(!_buf["speed"].IsNumber) { throw new SerializationException(); }  Speed = _buf["speed"]; }
         { if(!_buf["mass"].IsNumber) { throw new SerializationException(); }  Mass = _buf["mass"]; }
         { if(!_buf["scale"].IsNumber) { throw new SerializationException(); }  Scale = _buf["scale"]; }
-        { var __json0 = _buf["lst_equipment_id"]; if(!__json0.IsArray) { throw new SerializationException(); } LstEquipmentId = new System.Collections.Generic.List<GameConfig.EquipmentConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { GameConfig.EquipmentConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.GameConfig.EquipmentConfig.DeserializeEquipmentConfig(__e0);  }  LstEquipmentId.Add(__v0); }   }
+        { var __json0 = _buf["lst_equipment"]; if(!__json0.IsArray) { throw new SerializationException(); } LstEquipment = new System.Collections.Generic.List<GameConfig.EquipIndexConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { GameConfig.EquipIndexConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.GameConfig.EquipIndexConfig.DeserializeEquipIndexConfig(__e0);  }  LstEquipment.Add(__v0); }   }
         { var __json0 = _buf["lst_ability_id"]; if(!__json0.IsArray) { throw new SerializationException(); } LstAbilityId = new System.Collections.Generic.List<string>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  LstAbilityId.Add(__v0); }   }
     }
 
@@ -36,13 +37,14 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
 
     public readonly int Level;
     public readonly int UpgradeExp;
+    public readonly int Attack;
     public readonly int Hp;
     public readonly int Shield;
     public readonly int Defense;
     public readonly float Speed;
     public readonly float Mass;
     public readonly float Scale;
-    public readonly System.Collections.Generic.List<GameConfig.EquipmentConfig> LstEquipmentId;
+    public readonly System.Collections.Generic.List<GameConfig.EquipIndexConfig> LstEquipment;
     public readonly System.Collections.Generic.List<string> LstAbilityId;
    
     public const int __ID__ = 135936719;
@@ -50,7 +52,7 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
 
     public  void ResolveRef(Tables tables)
     {
-        foreach (var _e in LstEquipmentId) { _e?.ResolveRef(tables); }
+        foreach (var _e in LstEquipment) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
@@ -58,13 +60,14 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
         return "{ "
         + "level:" + Level + ","
         + "upgradeExp:" + UpgradeExp + ","
+        + "attack:" + Attack + ","
         + "hp:" + Hp + ","
         + "shield:" + Shield + ","
         + "defense:" + Defense + ","
         + "speed:" + Speed + ","
         + "mass:" + Mass + ","
         + "scale:" + Scale + ","
-        + "lstEquipmentId:" + Luban.StringUtil.CollectionToString(LstEquipmentId) + ","
+        + "lstEquipment:" + Luban.StringUtil.CollectionToString(LstEquipment) + ","
         + "lstAbilityId:" + Luban.StringUtil.CollectionToString(LstAbilityId) + ","
         + "}";
     }

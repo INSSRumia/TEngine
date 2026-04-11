@@ -18,7 +18,7 @@ namespace GameLogic.Equipment
 
     public class Equipment : Equipment<EquipmentRuntimeData> { }
     public class ArmorEquipment : Equipment<ArmorRuntimeData> { }
-    public class WeaponEquipment : Equipment<WeaponRuntimeData>
+    public class SwordEquipment : Equipment<WeaponRuntimeData>
     {
         private void OnCollisionEnter2D(Collision2D collision)
         {

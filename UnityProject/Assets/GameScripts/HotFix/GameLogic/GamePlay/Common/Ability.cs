@@ -5,7 +5,6 @@ namespace GameLogic.GamePlay.Common
     public interface IAbility
     {
         int Priority { get; }
-        void Init(ASC owner);
         void OnAdd();
         void OnRemove();
     }
@@ -80,22 +79,20 @@ namespace GameLogic.GamePlay.Common
         void AfterApplyShield(IAbility ability);
     }
 
-    public abstract class Ability<TRuntimeData> : IAbility
+    public abstract class Ability<T> : IAbility
     {
         public virtual int Priority { get; protected set; } = 0;
+        public T Owner {get; private set;}
 
-        private ASC _owner;
-        public ASC<TRuntimeData> Owner => _owner as ASC<TRuntimeData>;
-
-        public virtual void Init(ASC owner)
+        public virtual void Init(T owner)
         {
-            _owner = owner;
+            Owner = owner;
         }
 
         public virtual void OnAdd() { }
         public virtual void OnRemove() { }
 
-        public static int SortByPriority(Ability<TRuntimeData> a, Ability<TRuntimeData> b)
+        public static int SortByPriority(Ability<T> a, Ability<T> b)
         {
             return b.Priority.CompareTo(a.Priority);
         }

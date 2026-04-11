@@ -1,26 +1,37 @@
 using GameConfig.GameConfig;
 using GameLogic.GamePlay.Common;
+using TEngine;
 using UnityEngine;
 
 namespace GameLogic.Equipment
 {
     public static class EquipmentFactory
     {
-        public static ASC CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config)
+        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Equipment");
+        public static ASC CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
         {
             if (ownerMarble == null || config == null)
                 return null;
 
-            switch (config)
+            var levelConfig = config.LstLevelConfig.Find(x => x.Level == level);
+            if (levelConfig == null)
             {
-                case ArmorConfig armorConfig:
+                Log.Error($"Equipment level config not found: {config.ConfigId} {level}");
+                return null;
+            }
+
+            var prefab = GameModule.Resource.LoadGameObject(_path + "\\" + config.ConfigId);
+            var gameObject = GameObject.Instantiate(prefab);
+
+            switch (levelConfig)
+            {
+                case ArmorLevelConfig armorConfig:
                 {
-                    var gameObject = new GameObject($"Equipment_{armorConfig.ConfigId}");
-                    var equipment = gameObject.AddComponent<ArmorEquipment>();
+                    var equipment = gameObject.GetComponent<ArmorEquipment>();
                     equipment.Init(ownerMarble, new ArmorRuntimeData
                     {
-                        ConfigId = armorConfig.ConfigId,
-                        Slot = (EquipmentSlot)armorConfig.Slot,
+                        ConfigId = config.ConfigId,
+                        Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
                         Hp = armorConfig.Hp,
@@ -30,14 +41,13 @@ namespace GameLogic.Equipment
                     AttachDefaultAbilities(equipment);
                     return equipment;
                 }
-                case BowConfig bowConfig:
+                case BowLevelConfig bowConfig:
                 {
-                    var gameObject = new GameObject($"Equipment_{bowConfig.ConfigId}");
-                    var equipment = gameObject.AddComponent<BowEquipment>();
+                    var equipment = gameObject.GetComponent<BowEquipment>();
                     equipment.Init(ownerMarble, new BowRuntimeData
                     {
-                        ConfigId = bowConfig.ConfigId,
-                        Slot = (EquipmentSlot)bowConfig.Slot,
+                        ConfigId = config.ConfigId,
+                        Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
                         Cooldown = bowConfig.Cooldown,
@@ -51,19 +61,18 @@ namespace GameLogic.Equipment
                     AttachDefaultAbilities(equipment);
                     return equipment;
                 }
-                case WeaponConfig weaponConfig:
+                case SwordLevelConfig swordConfig:
                 {
-                    var gameObject = new GameObject($"Equipment_{weaponConfig.ConfigId}");
-                    var equipment = gameObject.AddComponent<WeaponEquipment>();
-                    equipment.Init(ownerMarble, new WeaponRuntimeData
+                    var equipment = gameObject.GetComponent<SwordEquipment>();
+                    equipment.Init(ownerMarble, new SwordRuntimeData
                     {
-                        ConfigId = weaponConfig.ConfigId,
-                        Slot = (EquipmentSlot)weaponConfig.Slot,
+                        ConfigId = config.ConfigId,
+                        Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
-                        Attack = weaponConfig.Attack,
-                        IsDamageByVelocity = weaponConfig.IsDamageByVelocity,
-                        Cooldown = weaponConfig.Cooldown,
+                        Attack = swordConfig.Attack,
+                        IsDamageByVelocity = swordConfig.IsDamageByVelocity,
+                        Cooldown = swordConfig.Cooldown,
                     });
                     AttachDefaultAbilities(equipment);
                     return equipment;
@@ -75,22 +84,22 @@ namespace GameLogic.Equipment
 
         private static void AttachDefaultAbilities(ArmorEquipment equipment)
         {
-            equipment.AddAbility(new ArmorMountAbility());
-            equipment.AddAbility(new ArmorReduceDamageAbility());
-            equipment.AddAbility(new ArmorReceiveDamageAbility());
+            equipment.AddAbility(new EquipmentMountAbility());
+            // equipment.AddAbility(new ArmorReduceDamageAbility());
+            // equipment.AddAbility(new ArmorAbsorbDamageAbility());
         }
 
-        private static void AttachDefaultAbilities(WeaponEquipment equipment)
+        private static void AttachDefaultAbilities(SwordEquipment equipment)
         {
-            equipment.AddAbility(new WeaponMountAbility());
+            equipment.AddAbility(new EquipmentMountAbility());
             equipment.AddAbility(new WeaponCooldownAbility());
-            equipment.AddAbility(new WeaponCollisionDamageAbility());
+            equipment.AddAbility(new WeaponCalculateDamageAbility());
             equipment.AddAbility(new WeaponCollisionAttackAbility());
         }
 
         private static void AttachDefaultAbilities(BowEquipment equipment)
         {
-            equipment.AddAbility(new BowMountAbility());
+            equipment.AddAbility(new EquipmentMountAbility());
             equipment.AddAbility(new WeaponCooldownAbility());
             equipment.AddAbility(new BowFindTargetAbility());
             equipment.AddAbility(new BowAimAbility());

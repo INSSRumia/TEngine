@@ -6,7 +6,7 @@ namespace GameLogic.Marble
 {
     public static class MarbleFactory
     {
-        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Marbles");
+        private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Prefabs/Marbles/");
 
         public static Marble CreateMarble(string id, int camp, int level = 0)
         {
@@ -31,7 +31,7 @@ namespace GameLogic.Marble
                 Defense = levelData.Defense,
                 DamageMultiplier = 1f,
                 HealMultiplier = 1f,
-                ShieldMultiplier = 1f,
+                ShieldHealMultiplier = 1f,
                 Scale = levelData.Scale,
                 Mass = levelData.Mass,
                 TargetVelocity = levelData.Speed,
@@ -54,7 +54,8 @@ namespace GameLogic.Marble
 
         private static Marble CreateMarbleInternal(string id)
         {
-            var prefab = GameModule.Resource.LoadGameObject(_path + "\\" + id);
+            var prefab = GameModule.Resource.LoadGameObject(_path + "Marble");
+            // var prefab = GameModule.Resource.LoadGameObject(_path + id);
             var marble = GameObject.Instantiate(prefab);
             return marble.GetComponent<Marble>();
         }
@@ -77,7 +78,7 @@ namespace GameLogic.Marble
             marbleComponent.AddAbility(new MarbleSyncMassAbility());
             marbleComponent.AddAbility(new MarbleDamagePipelineAbility());
             marbleComponent.AddAbility(new MarbleHealPipelineAbility());
-            marbleComponent.AddAbility(new MarbleShieldPipelineAbility());
+            marbleComponent.AddAbility(new MarbleShieldHealPipelineAbility());
             marbleComponent.AddAbility(new MarbleReceiveDamageAbility());
             marbleComponent.AddAbility(new MarbleAddHealAbility());
             marbleComponent.AddAbility(new MarbleAddExpAbility());
@@ -90,12 +91,13 @@ namespace GameLogic.Marble
 
         private static void AttachEquipment(Marble marbleComponent, GameConfig.GameConfig.MarbleLevelConfig levelData)
         {
-            if (marbleComponent == null || levelData?.LstEquipmentId == null)
+            if (marbleComponent == null || levelData?.LstEquipment == null)
                 return;
 
-            foreach (var equipmentConfig in levelData.LstEquipmentId)
+            foreach (var config in levelData.LstEquipment)
             {
-                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig);
+                var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(config.ConfigId);
+                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (EquipmentSlot)config.Slot);
             }
         }
     }
