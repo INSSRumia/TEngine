@@ -1,14 +1,24 @@
 using System.Collections.Generic;
 using GameConfig;
-using GameLogic.GamePlay.Combat;
 using TEngine;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
-    public static class EquipmentFactory
+    public static partial class EquipmentFactory
     {
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
+
+        private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>
+        {
+            new DefaultEquipmentCreatorForConfig(),
+        };
+        public static void RegisterEquipmentCreatorForConfig(IEquipmentCreatorForConfig creator)
+        {
+            _lstEquipmentCreatorsForConfig.Add(creator);
+            // 降序排序
+            _lstEquipmentCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        }
 
         public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
         {
@@ -24,68 +34,25 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId);
 
-            Equipment equipment = null;
-            switch (levelConfig)
+            Equipment equipment = gameObject.GetComponent<Equipment>();
+            if(equipment == null)
             {
-                case ArmorLevelConfig armorConfig:
+                Log.Error($"Equipment 组件缺失: {config.ConfigId}");
+                return null;
+            }
+
+            foreach (var creator in _lstEquipmentCreatorsForConfig)
+            {
+                var runtimeData = creator.CreateEquipmentRuntimeData(config, levelConfig, slot);
+                if (runtimeData != null)
                 {
-                    var armorEquipment = gameObject.GetComponent<ArmorEquipment>();
-                    armorEquipment.Init(ownerMarble, new ArmorRuntimeData
-                    {
-                        ConfigId = config.ConfigId,
-                        Slot = slot,
-                        IsEquipped = true,
-                        IsBroken = false,
-                        Hp = armorConfig.Hp,
-                        MaxHp = armorConfig.Hp,
-                        Defense = armorConfig.Defense,
-                    });
-                    AttachDefaultAbilities(armorEquipment);
-                    AttachOptionalAbilities(armorEquipment, armorConfig);
-                    equipment = armorEquipment;
-                    break;
-                }
-                case BowLevelConfig bowConfig:
-                {
-                    var bowEquipment = gameObject.GetComponent<BowEquipment>();
-                    bowEquipment.Init(ownerMarble, new BowRuntimeData
-                    {
-                        ConfigId = config.ConfigId,
-                        Slot = slot,
-                        IsEquipped = true,
-                        IsBroken = false,
-                        Cooldown = bowConfig.Cooldown,
-                        RotateSpeed = bowConfig.RotateSpeed,
-                        ShootType = bowConfig.ShootType,
-                        ArrowCount = bowConfig.ArrowCount,
-                        ArrowInterval = bowConfig.ArrowInterval,
-                        ArrowAngleStep = bowConfig.ArrowAngleStep,
-                        AimAngle = bowConfig.AimAngle,
-                    });
-                    AttachDefaultAbilities(bowEquipment);
-                    AttachOptionalAbilities(bowEquipment, bowConfig);
-                    equipment = bowEquipment;
-                    break;
-                }
-                case SwordLevelConfig swordConfig:
-                {
-                    var swordEquipment = gameObject.GetComponent<SwordEquipment>();
-                    swordEquipment.Init(ownerMarble, new SwordRuntimeData
-                    {
-                        ConfigId = config.ConfigId,
-                        Slot = slot,
-                        IsEquipped = true,
-                        IsBroken = false,
-                        Attack = swordConfig.Attack,
-                        IsDamageByVelocity = swordConfig.IsDamageByVelocity,
-                        Cooldown = swordConfig.Cooldown,
-                    });
-                    AttachDefaultAbilities(swordEquipment);
-                    AttachOptionalAbilities(swordEquipment, swordConfig);
-                    equipment = swordEquipment;
+                    equipment.Init(ownerMarble, runtimeData);
+                    creator.AttachDefaultAbilities(equipment);
                     break;
                 }
             }
+
+            AttachOptionalAbilities(equipment, levelConfig);
 
             if (equipment != null)
             {
@@ -108,31 +75,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             }
         }
 
-        private static void AttachDefaultAbilities(ArmorEquipment equipment)
-        {
-            equipment.AddAbility(new EquipmentMountAbility());
-            // equipment.AddAbility(new ArmorReduceDamageAbility());
-            // equipment.AddAbility(new ArmorAbsorbDamageAbility());
-        }
-
-        private static void AttachDefaultAbilities(SwordEquipment equipment)
-        {
-            equipment.AddAbility(new EquipmentMountAbility());
-            equipment.AddAbility(new WeaponCooldownAbility());
-            equipment.AddAbility(new WeaponCalculateDamageAbility());
-            equipment.AddAbility(new SwordCollisionAttackAbility());
-        }
-
-        private static void AttachDefaultAbilities(BowEquipment equipment)
-        {
-            equipment.AddAbility(new EquipmentMountAbility());
-            equipment.AddAbility(new WeaponCooldownAbility());
-            equipment.AddAbility(new WeaponCalculateDamageAbility());
-            equipment.AddAbility(new BowAimAbility());
-            equipment.AddAbility(new BowShootAbility());
-        }
-
-        private static void AttachOptionalAbilities(ArmorEquipment equipment, ArmorLevelConfig levelConfig)
+        private static void AttachOptionalAbilities(Equipment equipment, EquipmentLevelConfig levelConfig)
         {
             if (levelConfig?.LstAbility == null)
                 return;
@@ -146,84 +89,16 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     equipment.AddAbility(ability);
                 }
             }
+
         }
 
-        private static void AttachOptionalAbilities(BowEquipment equipment, BowLevelConfig levelConfig)
+        private static List<IEquipmentAbilityCreatorForConfig> _lstEquipmentAbilityCreatorsForConfig = new List<IEquipmentAbilityCreatorForConfig>
         {
-            if (levelConfig?.LstAbility == null)
-                return;
-
-            foreach (var config in levelConfig.LstAbility)
-            {
-                var ability = CreateAbilityFromConfig(equipment, config);
-                if (ability != null)
-                {
-                    ability.Priority = config.Priority;
-                    equipment.AddAbility(ability);
-                }
-            }
-        }
-
-        private static void AttachOptionalAbilities(SwordEquipment equipment, SwordLevelConfig levelConfig)
-        {
-            if (levelConfig?.LstAbility == null)
-                return;
-
-            foreach (var config in levelConfig.LstAbility)
-            {
-                var ability = CreateAbilityFromConfig(equipment, config);
-                if (ability != null)
-                {
-                    ability.Priority = config.Priority;
-                    equipment.AddAbility(ability);
-                }
-            }
-        }
-
-        private static List<IArmorAbilityCreatorForConfig> _lstArmorAbilityCreatorsForConfig = new List<IArmorAbilityCreatorForConfig>
-        {
-            new DefaultArmorAbilityCreatorForConfig(),
+            new DefaultEquipmentAbilityCreatorForConfig(),
         };
-        private static List<IBowAbilityCreatorForConfig> _lstBowAbilityCreatorsForConfig = new List<IBowAbilityCreatorForConfig>
+        private static EquipmentAbility CreateAbilityFromConfig(Equipment equipment, EquipmentAbilityConfig config)
         {
-            new DefaultBowAbilityCreatorForConfig(),
-        };
-        private static List<ISwordAbilityCreatorForConfig> _lstSwordAbilityCreatorsForConfig = new List<ISwordAbilityCreatorForConfig>
-        {
-            new DefaultSwordAbilityCreatorForConfig(),
-        };
-
-        private static Ability<ArmorEquipment> CreateAbilityFromConfig(ArmorEquipment equipment, EquipmentAbilityConfig config)
-        {
-            foreach (var creator in _lstArmorAbilityCreatorsForConfig)
-            {
-                var ability = creator.CreateAbility(equipment, config);
-                if (ability != null)
-                {
-                    ability.Priority = creator.Priority;
-                    equipment.AddAbility(ability);
-                }
-            }
-            return null;
-        }
-
-        private static Ability<BowEquipment> CreateAbilityFromConfig(BowEquipment equipment, EquipmentAbilityConfig config)
-        {
-            foreach (var creator in _lstBowAbilityCreatorsForConfig)
-            {
-                var ability = creator.CreateAbility(equipment, config);
-                if (ability != null)
-                {
-                    ability.Priority = creator.Priority;
-                    equipment.AddAbility(ability);
-                }
-            }
-            return null;
-        }
-
-        private static Ability<SwordEquipment> CreateAbilityFromConfig(SwordEquipment equipment, EquipmentAbilityConfig config)
-        {
-            foreach (var creator in _lstSwordAbilityCreatorsForConfig)
+            foreach (var creator in _lstEquipmentAbilityCreatorsForConfig)
             {
                 var ability = creator.CreateAbility(equipment, config);
                 if (ability != null)
@@ -236,52 +111,123 @@ namespace GameLogic.Gameplay.Combat.Equipment
         }
     }
 
-    public interface IArmorAbilityCreatorForConfig
+    public interface IEquipmentCreatorForConfig
     {
         int Priority { get; set; }
-        Ability<ArmorEquipment> CreateAbility(ArmorEquipment equipment, EquipmentAbilityConfig config);
+        EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EquipmentSlot slot);
+        void AttachDefaultAbilities(Equipment equipment);
     }
-    public class DefaultArmorAbilityCreatorForConfig : IArmorAbilityCreatorForConfig
+    public class DefaultEquipmentCreatorForConfig : IEquipmentCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
-        public Ability<ArmorEquipment> CreateAbility(ArmorEquipment equipment, EquipmentAbilityConfig config)
+        public EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EquipmentSlot slot)
+        {
+            switch (levelConfig)
+            {
+                case ArmorLevelConfig armorConfig:
+                {
+                    return new ArmorRuntimeData
+                    (
+                        configId: config.ConfigId,
+                        instId: 0,
+                        slot: slot,
+                        isEquipped: true,
+                        isBroken: false,
+                        hp: armorConfig.Hp,
+                        maxHp: armorConfig.Hp,
+                        defense: armorConfig.Defense
+                    );
+                }
+                case BowLevelConfig bowConfig:
+                {
+                    return new BowRuntimeData
+                    (
+                        configId: config.ConfigId,
+                        instId: 0,
+                        slot: slot,
+                        isEquipped: true,
+                        isBroken: false,
+                        attack: bowConfig.Attack,
+                        isDamageByVelocity: bowConfig.IsDamageByVelocity,
+                        cooldown: bowConfig.Cooldown,
+                        rotateSpeed: bowConfig.RotateSpeed,
+                        shootType: bowConfig.ShootType,
+                        arrowCount: bowConfig.ArrowCount,
+                        arrowInterval: bowConfig.ArrowInterval,
+                        arrowAngleStep: bowConfig.ArrowAngleStep,
+                        aimAngle: bowConfig.AimAngle,
+                        targetMarbleInstId: 0,
+                        aimDirection: Vector2.zero,
+                        canFire: false
+                    );
+                }
+                case SwordLevelConfig swordConfig:
+                {
+                    return new SwordRuntimeData
+                    (
+                        configId: config.ConfigId,
+                        instId: 0,
+                        slot: slot,
+                        isEquipped: true,
+                        isBroken: false,
+                        attack: swordConfig.Attack,
+                        isDamageByVelocity: swordConfig.IsDamageByVelocity,
+                        cooldown: swordConfig.Cooldown
+                    );
+                }
+            }
+            return null;
+        }
+
+        public void AttachDefaultAbilities(Equipment equipment)
+        {
+            switch (equipment)
+            {
+                case ArmorEquipment armorEquipment:
+                {
+                    armorEquipment.AddAbility(new EquipmentMountAbility());
+                    break;
+                }
+                case BowEquipment bowEquipment:
+                {
+                    bowEquipment.AddAbility(new EquipmentMountAbility());
+                    bowEquipment.AddAbility(new WeaponCooldownAbility());
+                    bowEquipment.AddAbility(new WeaponCalculateDamageAbility());
+                    bowEquipment.AddAbility(new BowAimAbility());
+                    bowEquipment.AddAbility(new BowShootAbility());
+                    break;
+                }
+                case SwordEquipment swordEquipment:
+                {
+                    swordEquipment.AddAbility(new EquipmentMountAbility());
+                    swordEquipment.AddAbility(new WeaponCooldownAbility());
+                    swordEquipment.AddAbility(new WeaponCalculateDamageAbility());
+                    swordEquipment.AddAbility(new SwordCollisionAttackAbility());
+                    break;
+                }
+                default:
+                {
+                    Log.Error($"Equipment 类型错误: {equipment.GetType().Name}");
+                    break;
+                }
+            }
+        }
+    }
+
+    public interface IEquipmentAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        EquipmentAbility CreateAbility(Equipment equipment, EquipmentAbilityConfig config);
+    }
+    public class DefaultEquipmentAbilityCreatorForConfig : IEquipmentAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public EquipmentAbility CreateAbility(Equipment equipment, EquipmentAbilityConfig config)
         {
             return config switch
             {
                 ArmorReduceDamageAbilityConfig => new ArmorReduceDamageAbility(),
                 ArmorAbsorbDamageAbilityConfig => new ArmorAbsorbDamageAbility(),
-                _ => null
-            };
-        }
-    }
-    public interface IBowAbilityCreatorForConfig
-    {
-        int Priority { get; set; }
-        Ability<BowEquipment> CreateAbility(BowEquipment equipment, EquipmentAbilityConfig config);
-    }
-    public class DefaultBowAbilityCreatorForConfig : IBowAbilityCreatorForConfig
-    {
-        public int Priority { get; set; } = int.MinValue;
-        public Ability<BowEquipment> CreateAbility(BowEquipment equipment, EquipmentAbilityConfig config)
-        {
-            return config switch
-            {
-                _ => null
-            };
-        }
-    }
-    public interface ISwordAbilityCreatorForConfig
-    {
-        int Priority { get; set; }
-        Ability<SwordEquipment> CreateAbility(SwordEquipment equipment, EquipmentAbilityConfig config);
-    }
-    public class DefaultSwordAbilityCreatorForConfig : ISwordAbilityCreatorForConfig
-    {
-        public int Priority { get; set; } = int.MinValue;
-        public Ability<SwordEquipment> CreateAbility(SwordEquipment equipment, EquipmentAbilityConfig config)
-        {
-            return config switch
-            {
                 _ => null
             };
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     // 装备挂载到角色身上
-    public class EquipmentMountAbility : EquipmentAbility<Equipment>
+    public class EquipmentMountAbility : EquipmentAbility
     {
         public override void OnAdd()
         {

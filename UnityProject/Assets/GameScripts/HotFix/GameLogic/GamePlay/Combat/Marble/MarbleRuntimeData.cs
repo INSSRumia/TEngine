@@ -92,5 +92,10 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         [ShowInInspector]
         public int TargetMarbleInstId { get; set; }
+
+        public MarbleRuntimeData(string configId, int instId) : base(configId, instId)
+        {
+        }
+
     }
 }

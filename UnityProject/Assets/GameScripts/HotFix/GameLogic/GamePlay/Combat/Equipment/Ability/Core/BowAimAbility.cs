@@ -4,29 +4,42 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
-    public class BowAimAbility : EquipmentAbility<BowEquipment>, IAbilityUpdate
+    public class BowAimAbility : EquipmentAbility, IAbilityUpdate
     {
+        private BowEquipment _owner;
+        public override void OnAdd()
+        {
+            base.OnAdd();
+            if(EquipmentOwner is BowEquipment bowEquipment)
+                _owner = bowEquipment;
+        }
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            _owner = null;
+        }
+
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if (EquipmentOwner == null || EquipmentOwner.RuntimeData == null)
+            if (_owner == null || _owner.RuntimeData == null)
                 return;
 
-            var targetMarble = EquipmentOwner.OwnerMarble.CombatManager?.GetTarget(EquipmentOwner.RuntimeData.TargetMarbleInstId);
+            var targetMarble = _owner.OwnerMarble.CombatManager?.GetTarget(_owner.RuntimeData.TargetMarbleInstId);
             if (targetMarble == null)
                 return;
 
-            var aimDirection = (targetMarble.transform.position - EquipmentOwner.transform.position).normalized;
+            var aimDirection = (targetMarble.transform.position - _owner.transform.position).normalized;
             if (Mathf.Approximately(aimDirection.sqrMagnitude, 0f))
                 return;
 
             var targetAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
-            var currentAngle = EquipmentOwner.transform.eulerAngles.z;
-            var nextAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, EquipmentOwner.RuntimeData.RotateSpeed * elapseSeconds);
+            var currentAngle = _owner.transform.eulerAngles.z;
+            var nextAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, _owner.RuntimeData.RotateSpeed * elapseSeconds);
             EquipmentOwner.transform.rotation = Quaternion.Euler(0f, 0f, nextAngle);
 
-            var currentDir = EquipmentOwner.transform.right;
+            var currentDir = _owner.transform.right;
             var angleDelta = Vector2.Angle(currentDir, aimDirection.normalized);
-            EquipmentOwner.RuntimeData.CanFire = angleDelta <= EquipmentOwner.RuntimeData.AimAngle;
+            _owner.RuntimeData.CanFire = angleDelta <= _owner.RuntimeData.AimAngle;
         }
     }
 }

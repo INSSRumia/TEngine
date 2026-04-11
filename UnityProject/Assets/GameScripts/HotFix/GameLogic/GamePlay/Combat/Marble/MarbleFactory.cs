@@ -19,10 +19,8 @@ namespace GameLogic.Gameplay.Combat.Marble
                 return null;
             }
 
-            var runtimeData = new MarbleRuntimeData
+            var runtimeData = new MarbleRuntimeData(id, 0)
             {
-                ConfigId = id,
-                InstId = 0,
                 Camp = camp,
                 IsAlive = true,
                 Level = level,
