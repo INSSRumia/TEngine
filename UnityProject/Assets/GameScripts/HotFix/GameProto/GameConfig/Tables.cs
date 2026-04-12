@@ -16,11 +16,13 @@ public partial class Tables
 {
     public Gameplay.Combat.TbEquipment TbEquipment {get; }
     public Gameplay.Combat.TbMarble TbMarble {get; }
+    public Gameplay.Combat.TbProjectile TbProjectile {get; }
 
     public Tables(System.Func<string, JSONNode> loader)
     {
         TbEquipment = new Gameplay.Combat.TbEquipment(loader("gameplay_combat_tbequipment"));
         TbMarble = new Gameplay.Combat.TbMarble(loader("gameplay_combat_tbmarble"));
+        TbProjectile = new Gameplay.Combat.TbProjectile(loader("gameplay_combat_tbprojectile"));
         ResolveRef();
     }
     
@@ -28,6 +30,7 @@ public partial class Tables
     {
         TbEquipment.ResolveRef(this);
         TbMarble.ResolveRef(this);
+        TbProjectile.ResolveRef(this);
     }
 }
 

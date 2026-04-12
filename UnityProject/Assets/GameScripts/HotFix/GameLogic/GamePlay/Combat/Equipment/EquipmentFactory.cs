@@ -159,8 +159,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         arrowAngleStep: bowConfig.ArrowAngleStep,
                         aimAngle: bowConfig.AimAngle,
                         targetMarbleInstId: 0,
-                        aimDirection: Vector2.zero,
-                        canFire: false
+                        aimDirection: UnityEngine.Vector2.zero,
+                        canFire: false,
+                        projectileConfigId: bowConfig.ProjectileConfigId,
+                        projectileLevel: bowConfig.ProjectileLevel
                     );
                 }
                 case SwordLevelConfig swordConfig:
@@ -198,7 +200,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     bowEquipment.AddAbility(new WeaponCooldownAbility());
                     bowEquipment.AddAbility(new WeaponCalculateDamageAbility());
                     bowEquipment.AddAbility(new BowAimAbility());
-                    bowEquipment.AddAbility(new BowShootAbility());
+                    bowEquipment.AddAbility(new BowFireAbility());
                     break;
                 }
                 case SwordEquipment swordEquipment:

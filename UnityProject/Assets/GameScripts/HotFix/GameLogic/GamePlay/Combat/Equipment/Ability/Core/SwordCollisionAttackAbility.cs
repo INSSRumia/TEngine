@@ -28,7 +28,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if(target == null)
                 return;
 
-            int targetCamp = -1;
+            int targetCamp = _owner.OwnerMarble.RuntimeData.Camp;
             IReceiveDamage targetReceiveDamage = null;
             switch(target)
             {
@@ -45,18 +45,19 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     return;
             }
 
-            if (targetReceiveDamage == null)
+            if (targetCamp == _owner.OwnerMarble.RuntimeData.Camp)
                 return;
 
-            if (targetCamp == _owner.OwnerMarble.RuntimeData.Camp)
+            if (targetReceiveDamage == null)
                 return;
 
             var cooldownAbility = _owner.GetAbility<WeaponCooldownAbility>();
             if (cooldownAbility == null || !cooldownAbility.TryConsumeCooldown())
                 return;
 
-            var relativeVelocity = collision.relativeVelocity.magnitude;
             var damage = _owner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage() ?? 0;
+            //TODO: 这里需要优化，如果装备是按速度伤害，则需要计算速度伤害,否则直接使用伤害
+            var relativeVelocity = collision.relativeVelocity.magnitude;
             damage = Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * damage);
 
             if (damage <= 0)

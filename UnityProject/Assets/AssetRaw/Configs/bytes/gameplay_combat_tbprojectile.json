@@ -1,0 +1,84 @@
+[
+  {
+    "config_id": "arrow",
+    "lst_level_config": [
+      {
+        "level": 0,
+        "name": "箭",
+        "move_ability": {
+          "speed": 30
+        },
+        "tracking_ability": {
+          "tracking_type": 0,
+          "angular_speed": 0
+        },
+        "damage_ability": {
+          "piercing_count": 0
+        },
+        "lifetime": {
+          "max_lifetime": 5
+        },
+        "lst_ability": []
+      },
+      {
+        "level": 1,
+        "name": "箭",
+        "move_ability": {
+          "speed": 30
+        },
+        "tracking_ability": {
+          "tracking_type": 0,
+          "angular_speed": 0
+        },
+        "damage_ability": {
+          "piercing_count": 0
+        },
+        "lifetime": {
+          "max_lifetime": 5
+        },
+        "lst_ability": []
+      }
+    ]
+  },
+  {
+    "config_id": "fire_ball",
+    "lst_level_config": [
+      {
+        "level": 0,
+        "name": "火球",
+        "move_ability": {
+          "speed": 30
+        },
+        "tracking_ability": {
+          "tracking_type": 0,
+          "angular_speed": 0
+        },
+        "damage_ability": {
+          "piercing_count": 1
+        },
+        "lifetime": {
+          "max_lifetime": 5
+        },
+        "lst_ability": []
+      },
+      {
+        "level": 1,
+        "name": "火球",
+        "move_ability": {
+          "speed": 30
+        },
+        "tracking_ability": {
+          "tracking_type": 0,
+          "angular_speed": 0
+        },
+        "damage_ability": {
+          "piercing_count": 1
+        },
+        "lifetime": {
+          "max_lifetime": 5
+        },
+        "lst_ability": []
+      }
+    ]
+  }
+]

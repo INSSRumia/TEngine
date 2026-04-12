@@ -27,15 +27,6 @@ namespace GameLogic.Gameplay.Combat
         [SerializeField] private float _spawnRadius = 5f;
         [SerializeField] private Vector3 _spawnCenter = Vector3.zero;
 
-        [Header("冲刺验证")]
-        [SerializeField] private float _dashTargetSpeed = 12f;
-        [SerializeField] private float _dashAcceleration = 24f;
-        [SerializeField] private float _dashDuration = 0.75f;
-        [SerializeField] private float _dashCooldown = 2f;
-        [SerializeField] private int _dashPriority = 100;
-        [SerializeField] private bool _dashAutoActivate = true;
-        [SerializeField] private bool _dashLockDirection = true;
-
         private CombatManager _combatManager;
         private readonly List<Marble.Marble> _testSoldiers = new List<Marble.Marble>();
 

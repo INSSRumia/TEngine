@@ -1,0 +1,101 @@
+<module name="Gameplay.Combat">
+    <!--
+    ============================================================
+    发射物移动能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileMoveConfig" valueType="false" sep=",">
+        <!-- 移动速度，单位/秒 -->
+        <var name="speed" type="float" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物伤害能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileDamageConfig" valueType="false" sep=",">
+        <!-- 穿透次数：0 表示不穿透，命中一次后销毁 -->
+        <var name="piercing_count" type="int" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物生命周期能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileLifetimeConfig" valueType="false" sep=",">
+        <!-- 最大存活时间（秒），0 表示无限 -->
+        <var name="max_lifetime" type="int?" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物追踪目标能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileTrackConfig" alias="track_target" valueType="false" sep=",">
+        <!-- 追踪类型 -->
+        <!-- 0: 不追踪 -->
+        <!-- 1: 目标追踪 -->
+        <!-- 2: 固定点追踪 -->
+        <var name="tracking_type" type="EnumProjectileTrackingType" />
+        <var name="angular_speed" type="float" />
+    </bean>
+
+    <enum name="EnumProjectileTrackingType">
+        <var name="None" alias="none" value="0" />
+        <var name="Target" alias="target" value="1" />
+        <var name="Point" alias="point" value="2" />
+    </enum>
+
+    <!--
+    ============================================================
+    发射物 Ability 配置基类
+    ============================================================
+    用于 ProjectileLevelConfig.lst_ability 中的可选 Ability 配置。
+    -->
+    <bean name="ProjectileAbilityConfig" valueType="false" sep=",">
+        <var name="priority" type="int" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物等级配置
+    ============================================================
+    -->
+    <bean name="ProjectileLevelConfig" valueType="false" sep=",">
+        <var name="level" type="int" />
+        <var name="name" type="string" />
+        <!-- 移动能力配置 -->
+        <var name="move_ability" type="ProjectileMoveConfig" />
+        <!-- 追踪能力配置 -->
+        <var name="tracking_ability" type="ProjectileTrackConfig" />
+        <!-- 伤害能力配置 -->
+        <var name="damage_ability" type="ProjectileDamageConfig" />
+        <!-- 生命周期能力配置 -->
+        <var name="lifetime" type="ProjectileLifetimeConfig" />
+        <!--
+        ============================================================
+        可选 Ability 配置列表
+        ============================================================
+        Core 文件夹中的 Ability 由 ProjectileFactory.AttachCoreAbilities() 硬编码添加，
+        无需在此配置。
+        此列表仅用于配置可选 Ability 的参数。
+        -->
+        <var name="lst_ability" type="list, ProjectileAbilityConfig" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物配置入口
+    ============================================================
+    -->
+    <bean name="ProjectileConfig" valueType="false" sep=",">
+        <var name="config_id" type="string" />
+        <var name="lst_level_config" type="list, ProjectileLevelConfig" />
+    </bean>
+
+    <table name="TbProjectile" value="ProjectileConfig" input="projectile.xlsx" index="config_id"/>
+
+</module>

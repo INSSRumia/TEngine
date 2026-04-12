@@ -24,6 +24,7 @@ public abstract partial class AbilityTimingConfig : Luban.BeanBase
         switch ((string)_buf["$type"])
         {
             case "FixedAbilityTimingConfig": return new Gameplay.Combat.FixedAbilityTimingConfig(_buf);
+            case "RandomRangeAbilityTimingConfig": return new Gameplay.Combat.RandomRangeAbilityTimingConfig(_buf);
             default: throw new SerializationException();
         }
     }

@@ -210,6 +210,13 @@ namespace GameLogic.Gameplay.Combat.Marble
             {
                 FixedAbilityTimingConfig fixedConfig =>
                     new FixedDurationAbilityTiming(fixedConfig.Duration, fixedConfig.Cooldown, fixedConfig.AutoActivate),
+                RandomRangeAbilityTimingConfig randomConfig =>
+                    new RandomRangeAbilityTiming(
+                        randomConfig.MinDuration,
+                        randomConfig.MaxDuration,
+                        randomConfig.MinCooldown,
+                        randomConfig.MaxCooldown,
+                        randomConfig.AutoActivate),
                 null => null,
                 _ => null,
             };

@@ -37,6 +37,20 @@
 
     <!--
     ============================================================
+    RandomRangeAbilityTiming 配置
+    ============================================================
+    每轮持续时间与冷却时间都在指定区间内随机取值，可选自动循环触发。
+    -->
+    <bean name="RandomRangeAbilityTimingConfig" alias="random_range_timing" parent="AbilityTimingConfig" valueType="false" sep=",">
+        <var name="min_duration" type="float" />
+        <var name="max_duration" type="float" />
+        <var name="min_cooldown" type="float" />
+        <var name="max_cooldown" type="float" />
+        <var name="auto_activate" type="bool" />
+    </bean>
+
+    <!--
+    ============================================================
     MarbleCloseToTargetAbility 配置
     ============================================================
     可选 Ability：当 Marble 与目标距离小于 CloseDistance 时停止移动。

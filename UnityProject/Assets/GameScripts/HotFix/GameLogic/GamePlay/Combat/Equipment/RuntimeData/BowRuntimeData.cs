@@ -13,6 +13,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public int TargetMarbleInstId { get; set; }
         public Vector2 AimDirection { get; set; }
         public bool CanFire { get; set; }
+        public string ProjectileConfigId { get; set; }
+        public int? ProjectileLevel { get; set; }
         public BowRuntimeData(string configId, 
             int instId, 
             EnumEquipmentSlot slot, 
@@ -29,9 +31,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
             float aimAngle, 
             int targetMarbleInstId, 
             Vector2 aimDirection, 
-            bool canFire) : base(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown)
+            bool canFire,
+            string projectileConfigId,
+            int? projectileLevel) : base(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown)
         {
-            SetData(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown, 0, rotateSpeed, shootType, arrowCount, arrowInterval, arrowAngleStep, aimAngle, targetMarbleInstId, aimDirection, canFire);
+            SetData(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown, 0, rotateSpeed, shootType, arrowCount, arrowInterval, arrowAngleStep, aimAngle, targetMarbleInstId, aimDirection, canFire, projectileConfigId, projectileLevel);
         }
         public void SetData(string configId, 
             int instId, 
@@ -50,7 +54,9 @@ namespace GameLogic.Gameplay.Combat.Equipment
             float aimAngle, 
             int targetMarbleInstId, 
             Vector2 aimDirection, 
-            bool canFire)
+            bool canFire,
+            string projectileConfigId,
+            int? projectileLevel)
         {
             base.SetData(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown, cooldownRemaining);
             RotateSpeed = rotateSpeed;
@@ -62,6 +68,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
             TargetMarbleInstId = targetMarbleInstId;
             AimDirection = aimDirection;
             CanFire = canFire;
+            ProjectileConfigId = projectileConfigId;
+            ProjectileLevel = projectileLevel;
         }
     }
 }

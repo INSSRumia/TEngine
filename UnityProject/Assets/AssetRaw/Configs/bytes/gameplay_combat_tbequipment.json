@@ -50,5 +50,42 @@
         "defense": 0
       }
     ]
+  },
+  {
+    "config_id": "bow",
+    "lst_level_config": [
+      {
+        "$type": "BowLevelConfig",
+        "level": 0,
+        "name": "弓",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 2,
+        "rotate_speed": 360,
+        "shoot_type": 1,
+        "arrow_count": 3,
+        "arrow_interval": 0.2,
+        "arrow_angle_step": 5,
+        "aim_angle": 10,
+        "projectile_config_id": "arrow",
+        "projectile_level": 0
+      },
+      {
+        "$type": "BowLevelConfig",
+        "level": 1,
+        "name": "弓",
+        "lst_ability": [],
+        "is_damage_by_velocity": true,
+        "cooldown": 2,
+        "rotate_speed": 360,
+        "shoot_type": 1,
+        "arrow_count": 3,
+        "arrow_interval": 0.2,
+        "arrow_angle_step": 5,
+        "aim_angle": 10,
+        "projectile_config_id": "arrow",
+        "projectile_level": 0
+      }
+    ]
   }
 ]
