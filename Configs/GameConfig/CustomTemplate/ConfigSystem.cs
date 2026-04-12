@@ -2,7 +2,7 @@ using Luban;
 using GameConfig;
 using TEngine;
 using UnityEngine;
-using SimpleJSON;
+using Luban.SimpleJSON;
 /// <summary>
 /// 配置加载器。
 /// </summary>
