@@ -90,6 +90,10 @@ namespace GameLogic.Gameplay.Combat.Marble
         public float AngularAcceleration { get; set; }
         [ShowInInspector]
         public float TargetAngularVelocity { get; set; }
+
+        [ShowInInspector]
+        public PriorityValueManager<float> TargetAngularVelocityManager { get; } = new PriorityValueManager<float>(new AngularVelocityCombineStrategy());
+
         [ShowInInspector]
         public UnityEngine.Vector2 TargetDirection { get; set; }
 

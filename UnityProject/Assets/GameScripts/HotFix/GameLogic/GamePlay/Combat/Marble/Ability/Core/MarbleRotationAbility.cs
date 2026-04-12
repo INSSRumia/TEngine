@@ -1,17 +1,22 @@
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
-using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleRotationAbility : MarbleAbility, IAbilityFixedUpdate
     {
+        public float TargetAngularSpeed { get; set; } = 360f;
+        public EnumCombineType CombineType { get; set; } = EnumCombineType.Combine;
+
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;
 
-            Owner.RuntimeData.TargetAngularVelocity = 360;
+            Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(
+                InstId, TargetAngularSpeed, Priority, CombineType));
+
+            Owner.RuntimeData.TargetAngularVelocity = Owner.RuntimeData.TargetAngularVelocityManager.GetCombinedValue();
             var targetAngSpd = Owner.RuntimeData.TargetAngularVelocity;
             var curAngSpd = Owner.Rigidbody.angularVelocity;
 
@@ -20,10 +25,8 @@ namespace GameLogic.Gameplay.Combat.Marble
                 targetAngSpd = -targetAngSpd;
 
             // 达到目标转速则停止施加扭矩
-            if (Mathf.Abs(curAngSpd) >= Mathf.Abs(targetAngSpd)){
-                // Log.Info($"[MarbleRotationAbility] 达到目标转速: {targetAngSpd}, 当前转速: {curAngSpd}");
+            if (Mathf.Abs(curAngSpd) >= Mathf.Abs(targetAngSpd))
                 return;
-            }
 
             var sign = targetAngSpd > 0 ? 1 : -1;
             var angAcc = Owner.RuntimeData.AngularAcceleration;

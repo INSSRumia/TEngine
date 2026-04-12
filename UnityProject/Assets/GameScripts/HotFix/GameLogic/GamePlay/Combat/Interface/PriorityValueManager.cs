@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace GameLogic.Gameplay.Combat
@@ -6,9 +5,9 @@ namespace GameLogic.Gameplay.Combat
     public class PriorityValueManager<T> where T : struct
     {
         private readonly List<PriorityValue<T>> _items = new List<PriorityValue<T>>();
-        private readonly ICombineStrategy<T> _strategy;
+        private readonly IPriorityCombineStrategy<T> _strategy;
 
-        public PriorityValueManager(ICombineStrategy<T> strategy)
+        public PriorityValueManager(IPriorityCombineStrategy<T> strategy)
         {
             _strategy = strategy;
         }
@@ -42,14 +41,6 @@ namespace GameLogic.Gameplay.Combat
                 return default;
 
             _items.Sort((a, b) => b.Priority.CompareTo(a.Priority));
-
-            PriorityValue<T> topItem = _items[0];
-            if (topItem.CombineType == EnumCombineType.Override)
-            {
-                _items.Clear();
-                return topItem.Value;
-            }
-
             T result = _strategy.Combine(_items);
             _items.Clear();
             return result;

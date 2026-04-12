@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat
 {
-    public class DirectionCombineStrategy : ICombineStrategy<Vector2>
+    public class DirectionCombineStrategy : IPriorityCombineStrategy<Vector2>
     {
         public Vector2 Combine(List<PriorityValue<Vector2>> items)
         {
@@ -13,6 +13,9 @@ namespace GameLogic.Gameplay.Combat
             Vector2 result = Vector2.zero;
             foreach (var item in items)
             {
+                if(item.CombineType == EnumCombineType.Override)
+                    return item.Value;
+
                 result += item.Value;
             }
 

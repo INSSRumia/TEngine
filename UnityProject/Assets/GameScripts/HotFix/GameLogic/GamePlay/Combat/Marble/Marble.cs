@@ -5,7 +5,7 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class Marble : GameLogic.GamePlay.Combat.ASC<MarbleRuntimeData>
+    public class Marble : ASC<MarbleRuntimeData>
     {
         [SerializeField] private List<Transform> _lstEquipmentPoints = new List<Transform>();
         private readonly Dictionary<EquipmentSlot, Transform> _slotPointMap = new Dictionary<EquipmentSlot, Transform>();
