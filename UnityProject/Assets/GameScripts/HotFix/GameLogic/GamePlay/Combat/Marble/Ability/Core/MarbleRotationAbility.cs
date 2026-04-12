@@ -1,12 +1,11 @@
 using UnityEngine;
-using GameLogic.GamePlay.Combat;
+using GameLogic.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleRotationAbility : MarbleAbility, IAbilityFixedUpdate
     {
         public float TargetAngularSpeed { get; set; } = 360f;
-        public EnumCombineType CombineType { get; set; } = EnumCombineType.Combine;
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
@@ -16,8 +15,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(
                 InstId, TargetAngularSpeed, Priority, CombineType));
 
-            Owner.RuntimeData.TargetAngularVelocity = Owner.RuntimeData.TargetAngularVelocityManager.GetCombinedValue();
-            var targetAngSpd = Owner.RuntimeData.TargetAngularVelocity;
+            var targetAngSpd = Owner.RuntimeData.TargetAngularVelocityManager.GetCombinedValue();
             var curAngSpd = Owner.Rigidbody.angularVelocity;
 
             // 方向对齐：当前旋转方向与目标方向相反时，取反目标速度
@@ -29,7 +27,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 return;
 
             var sign = targetAngSpd > 0 ? 1 : -1;
-            var angAcc = Owner.RuntimeData.AngularAcceleration;
+            var angAcc = Owner.RuntimeData.AngularAccelerationManager.GetCombinedValue();
             var torque = sign * angAcc * Owner.Rigidbody.inertia;
             Owner.Rigidbody.AddTorque(torque, ForceMode2D.Force);
         }

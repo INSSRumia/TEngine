@@ -1,12 +1,14 @@
 using UnityEngine;
+using GameLogic.Gameplay.Combat;
 
-namespace GameLogic.GamePlay.Combat
+namespace GameLogic.Gameplay.Combat
 {
     public abstract class Ability<T> : IAbility
     {
         public virtual int InstId { get; }
         public virtual int Priority { get; set; } = 0;
         public virtual AbilityCategory Category { get; set; } = AbilityCategory.Optional;
+        public virtual EnumCombineType CombineType { get; set; } = EnumCombineType.Combine;
         public T Owner {get; private set;}
 
         public Ability(int instId)

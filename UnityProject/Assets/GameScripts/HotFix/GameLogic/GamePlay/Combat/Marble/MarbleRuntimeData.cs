@@ -1,6 +1,5 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
-using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -82,17 +81,15 @@ namespace GameLogic.Gameplay.Combat.Marble
         public float Scale { get; set; }
         [ShowInInspector]
         public float Mass { get; set; }
-        [ShowInInspector]
-        public float Acceleration { get; set; }
-        [ShowInInspector]
-        public float TargetVelocity { get; set; }
-        [ShowInInspector]
-        public float AngularAcceleration { get; set; }
-        [ShowInInspector]
-        public float TargetAngularVelocity { get; set; }
 
         [ShowInInspector]
-        public PriorityValueManager<float> TargetAngularVelocityManager { get; } = new PriorityValueManager<float>(new AngularVelocityCombineStrategy());
+        public PriorityValueManager<float> AccelerationManager { get; } = new PriorityValueManager<float>(new ScalarMaxCombineStrategy());
+        [ShowInInspector]
+        public PriorityValueManager<float> TargetVelocityManager { get; } = new PriorityValueManager<float>(new ScalarMaxCombineStrategy());
+        [ShowInInspector]
+        public PriorityValueManager<float> AngularAccelerationManager { get; } = new PriorityValueManager<float>(new ScalarMaxCombineStrategy());
+        [ShowInInspector]
+        public PriorityValueManager<float> TargetAngularVelocityManager { get; } = new PriorityValueManager<float>(new ScalarSumCombineStrategy());
 
         [ShowInInspector]
         public UnityEngine.Vector2 TargetDirection { get; set; }

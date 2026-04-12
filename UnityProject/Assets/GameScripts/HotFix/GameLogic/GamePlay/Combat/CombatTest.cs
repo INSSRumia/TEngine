@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using GameLogic.Gameplay.Combat.Marble;
 using Sirenix.OdinInspector;
 
-namespace GameLogic.GamePlay.Combat
+namespace GameLogic.Gameplay.Combat
 {
     /// <summary>
     /// 战斗测试组件 - 用于快速测试战斗逻辑
@@ -27,7 +27,7 @@ namespace GameLogic.GamePlay.Combat
         [SerializeField] private Vector3 _spawnCenter = Vector3.zero;
 
         private CombatManager _combatManager;
-        private readonly List<Marble> _testSoldiers = new List<Marble>();
+        private readonly List<Marble.Marble> _testSoldiers = new List<Marble.Marble>();
 
         private void Awake()
         {

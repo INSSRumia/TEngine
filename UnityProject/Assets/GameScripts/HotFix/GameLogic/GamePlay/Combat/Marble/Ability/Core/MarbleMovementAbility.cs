@@ -1,5 +1,5 @@
 using UnityEngine;
-using GameLogic.GamePlay.Combat;
+using GameLogic.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -15,14 +15,14 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (targetDir.sqrMagnitude < 0.001f)
                 return;
 
-            var targetSpd = Owner.RuntimeData.TargetVelocity;
+            var targetSpd = Owner.RuntimeData.TargetVelocityManager.GetCombinedValue();
             var curSpdAlongDir = Vector2.Dot(Owner.Rigidbody.velocity, targetDir);
 
             if (curSpdAlongDir >= targetSpd)
                 return;
 
             var mass = Owner.Rigidbody.mass;
-            var acc = Owner.RuntimeData.Acceleration;
+            var acc = Owner.RuntimeData.AccelerationManager.GetCombinedValue();
             var force = targetDir * acc * mass;
             Owner.Rigidbody.AddForce(force, ForceMode2D.Force);
         }

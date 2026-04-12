@@ -1,8 +1,6 @@
 using TEngine;
 using UnityEngine;
-using GameLogic.GamePlay.Combat;
 using GameLogic.Gameplay.Combat.Equipment;
-using System;
 using GameConfig;
 using System.Collections.Generic;
 namespace GameLogic.Gameplay.Combat.Marble
@@ -39,9 +37,6 @@ namespace GameLogic.Gameplay.Combat.Marble
                 AttackMultiplier = 1f,
                 Scale = levelData.Scale,
                 Mass = levelData.Mass,
-                TargetVelocity = levelData.Speed,
-                Acceleration = levelData.Speed * 10,
-                AngularAcceleration = 360f,
             };
 
             return CreateMarble(runtimeData);

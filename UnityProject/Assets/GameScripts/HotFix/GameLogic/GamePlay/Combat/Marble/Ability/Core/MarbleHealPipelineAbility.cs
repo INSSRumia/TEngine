@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using TEngine;
 using UnityEngine;
-using GameLogic.GamePlay.Combat;
+using GameLogic.Gameplay.Combat;
 using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble

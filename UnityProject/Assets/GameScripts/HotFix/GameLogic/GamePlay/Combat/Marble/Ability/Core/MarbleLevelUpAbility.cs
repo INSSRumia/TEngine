@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GameLogic.GamePlay.Combat;
+using GameLogic.Gameplay.Combat;
 using GameLogic.Gameplay.Combat.Equipment;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -42,7 +42,6 @@ namespace GameLogic.Gameplay.Combat.Marble
             runtimeData.Attack = nextLevelData.Attack;
             runtimeData.Scale = nextLevelData.Scale;
             runtimeData.Mass = nextLevelData.Mass;
-            runtimeData.TargetVelocity = nextLevelData.Speed;
 
             Owner.GetAbility<MarbleSyncScaleAbility>()?.Sync();
             Owner.GetAbility<MarbleSyncMassAbility>()?.Sync();

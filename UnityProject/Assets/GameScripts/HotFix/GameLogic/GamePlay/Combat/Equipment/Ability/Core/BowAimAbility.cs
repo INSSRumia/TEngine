@@ -1,6 +1,4 @@
 using UnityEngine;
-using GameLogic.Gameplay.Combat.Marble;
-using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {

@@ -1,4 +1,5 @@
-namespace GameLogic.GamePlay.Combat
+
+namespace GameLogic.Gameplay.Combat
 {
     public enum AbilityCategory
     {
@@ -12,6 +13,7 @@ namespace GameLogic.GamePlay.Combat
         int InstId { get; }
         int Priority { get; set;}
         AbilityCategory Category { get; set;}
+        EnumCombineType CombineType { get; set;}
         void OnAdd();
         void OnRemove();
     }

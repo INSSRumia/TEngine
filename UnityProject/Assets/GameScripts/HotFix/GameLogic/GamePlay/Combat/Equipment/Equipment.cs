@@ -1,6 +1,3 @@
-using GameLogic.Gameplay.Combat.Marble;
-using GameLogic.GamePlay.Combat;
-using UnityEngine;
 using Sirenix.OdinInspector;
 
 namespace GameLogic.Gameplay.Combat.Equipment

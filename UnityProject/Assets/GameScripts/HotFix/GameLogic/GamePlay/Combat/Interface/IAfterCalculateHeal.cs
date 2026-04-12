@@ -1,4 +1,4 @@
-namespace GameLogic.GamePlay.Combat
+namespace GameLogic.Gameplay.Combat
 {
     public interface IAfterCalculateHeal
     {

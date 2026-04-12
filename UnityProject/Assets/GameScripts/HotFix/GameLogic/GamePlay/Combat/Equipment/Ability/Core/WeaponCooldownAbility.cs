@@ -1,6 +1,3 @@
-using GameLogic.Gameplay.Combat.Marble;
-using GameLogic.GamePlay.Combat;
-
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class WeaponCooldownAbility : EquipmentAbility, IAbilityUpdate

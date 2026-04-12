@@ -1,24 +1,21 @@
 using TEngine;
 using UnityEngine;
 using System.Collections.Generic;
-using System;
-using GameLogic.Gameplay.Combat.Marble;
-
-namespace GameLogic.GamePlay.Combat
+namespace GameLogic.Gameplay.Combat
 {
     public interface ICombatManager
     {
-        Marble GetNearestEnemy(Marble marble);
-        Marble GetTarget(int instId);
-        void Register(Marble marble);
-        void Unregister(Marble marble);
-        bool IsEnemy(Marble a, Marble b);
-        IReadOnlyList<Marble> GetAllActiveMarbles();
+        Marble.Marble GetNearestEnemy(Marble.Marble marble);
+        Marble.Marble GetTarget(int instId);
+        void Register(Marble.Marble marble);
+        void Unregister(Marble.Marble marble);
+        bool IsEnemy(Marble.Marble a, Marble.Marble b);
+        IReadOnlyList<Marble.Marble> GetAllActiveMarbles();
     }
 
     public class CombatManager : ICombatManager
     {
-        private readonly List<Marble> _activeMarbles = new List<Marble>();
+        private readonly List<Marble.Marble> _activeMarbles = new List<Marble.Marble>();
         private int _nextInstId = 1;
 
         public CombatManager()
@@ -28,7 +25,7 @@ namespace GameLogic.GamePlay.Combat
 
         public static CombatManager Instance { get; private set; }
 
-        public void Register(Marble marble)
+        public void Register(Marble.Marble marble)
         {
             if (marble == null || marble.RuntimeData == null)
                 return;
@@ -41,18 +38,18 @@ namespace GameLogic.GamePlay.Combat
             }
         }
 
-        public void Unregister(Marble marble)
+        public void Unregister(Marble.Marble marble)
         {
             if (marble != null)
                 _activeMarbles.Remove(marble);
         }
 
-        public Marble GetNearestEnemy(Marble marble)
+        public Marble.Marble GetNearestEnemy(Marble.Marble marble)
         {
             if (marble?.RuntimeData == null)
                 return null;
 
-            Marble nearest = null;
+            Marble.Marble nearest = null;
             float minDist = float.MaxValue;
             var selfCamp = marble.RuntimeData.Camp;
 
@@ -75,7 +72,7 @@ namespace GameLogic.GamePlay.Combat
             return nearest;
         }
 
-        public Marble GetTarget(int instId)
+        public Marble.Marble GetTarget(int instId)
         {
             foreach (var marble in _activeMarbles)
             {
@@ -85,14 +82,14 @@ namespace GameLogic.GamePlay.Combat
             return null;
         }
 
-        public bool IsEnemy(Marble a, Marble b)
+        public bool IsEnemy(Marble.Marble a, Marble.Marble b)
         {
             if (a?.RuntimeData == null || b?.RuntimeData == null)
                 return false;
             return a.RuntimeData.Camp != b.RuntimeData.Camp;
         }
 
-        public IReadOnlyList<Marble> GetAllActiveMarbles()
+        public IReadOnlyList<Marble.Marble> GetAllActiveMarbles()
         {
             return _activeMarbles;
         }

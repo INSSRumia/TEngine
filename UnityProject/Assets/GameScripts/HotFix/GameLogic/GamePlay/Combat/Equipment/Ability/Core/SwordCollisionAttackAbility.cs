@@ -1,4 +1,3 @@
-using GameLogic.GamePlay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Equipment

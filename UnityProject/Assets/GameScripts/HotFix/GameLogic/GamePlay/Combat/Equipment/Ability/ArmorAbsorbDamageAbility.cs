@@ -1,4 +1,3 @@
-using GameLogic.GamePlay.Combat;
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class ArmorAbsorbDamageAbility : EquipmentAbility, IReceiveDamage

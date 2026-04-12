@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-namespace GameLogic.GamePlay.Combat
+namespace GameLogic.Gameplay.Combat
 {
     public abstract class ASC : MonoBehaviour
     {

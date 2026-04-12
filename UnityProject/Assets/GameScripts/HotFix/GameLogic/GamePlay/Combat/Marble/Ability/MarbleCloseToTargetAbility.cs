@@ -1,4 +1,4 @@
-using GameLogic.GamePlay.Combat;
+using GameLogic.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
