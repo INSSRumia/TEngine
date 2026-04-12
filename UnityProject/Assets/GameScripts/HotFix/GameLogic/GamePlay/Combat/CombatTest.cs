@@ -112,33 +112,6 @@ namespace GameLogic.Gameplay.Combat
             Log.Warning($"[CombatTest] 阵营1存活: {camp1Alive}, 阵营2存活: {camp2Alive}");
         }
 
-        [Button("给阵营1附加冲刺能力")]
-        public void AddDashAbilityToCamp1()
-        {
-            foreach (var marble in _testSoldiers)
-            {
-                if (marble?.RuntimeData == null || marble.RuntimeData.Camp != _camp1Camp)
-                    continue;
-
-                if (marble.GetAbility<MarbleDashAbility>() != null)
-                    continue;
-
-                marble.AddAbility(new MarbleDashAbility
-                {
-                    Priority = _dashPriority,
-                    CombineType = EnumCombineType.Override,
-                    TargetSpeed = _dashTargetSpeed,
-                    Acceleration = _dashAcceleration,
-                    Duration = _dashDuration,
-                    Cooldown = _dashCooldown,
-                    AutoActivate = _dashAutoActivate,
-                    LockDirectionOnActivate = _dashLockDirection,
-                });
-            }
-
-            Log.Warning("[CombatTest] 已为阵营1附加冲刺能力");
-        }
-
         private void SpawnCampSoldiers(string configId, int camp, int count)
         {
             if (count <= 0)

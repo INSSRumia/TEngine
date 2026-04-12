@@ -6,21 +6,9 @@ namespace GameLogic.Gameplay.Combat.Marble
     {
         public float TargetSpeed { get; set; }
         public float Acceleration { get; set; }
-        public float Duration { get; set; }
-        public float Cooldown { get; set; }
-        public bool AutoActivate { get; set; } = true;
         public bool LockDirectionOnActivate { get; set; } = true;
 
         private Vector2 _lockedDirection;
-
-        public override void OnAdd()
-        {
-            base.OnAdd();
-            if (Timing == null)
-            {
-                SetTiming(new FixedDurationAbilityTiming(Duration, Cooldown, AutoActivate));
-            }
-        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
