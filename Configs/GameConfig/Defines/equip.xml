@@ -1,10 +1,18 @@
-<module name="">
+<module name="Gameplay.Combat">
+    <enum name="EnumEquipmentSlot">
+        <var name="Top" alias="top" value="0" />
+        <var name="Left" alias="left" value="1" />
+        <var name="Right" alias="right" value="2" />
+        <var name="Bottom" alias="bottom" value="3" />
+        <var name="Middle" alias="middle" value="4" />
+    </enum>
+
     <bean name="EquipAttachConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="level" type="int" />
         <!-- # 装备位于marble的哪个位置
         # 0: top, 1: left, 2: right, 3: bottom 4: middle -->
-        <var name="slot" type="int" />
+        <var name="slot" type="EnumEquipmentSlot" />
     </bean>
 
     <bean name="EquipmentConfig" valueType="false" sep=",">

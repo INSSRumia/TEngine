@@ -15,7 +15,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public bool CanFire { get; set; }
         public BowRuntimeData(string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int? attack, 
@@ -35,7 +35,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         }
         public void SetData(string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int? attack, 

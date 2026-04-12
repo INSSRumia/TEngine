@@ -14,13 +14,13 @@ namespace GameConfig
 {
 public partial class Tables
 {
-    public TbEquipment TbEquipment {get; }
-    public TbMarble TbMarble {get; }
+    public Gameplay.Combat.TbEquipment TbEquipment {get; }
+    public Gameplay.Combat.TbMarble TbMarble {get; }
 
     public Tables(System.Func<string, JSONNode> loader)
     {
-        TbEquipment = new TbEquipment(loader("tbequipment"));
-        TbMarble = new TbMarble(loader("tbmarble"));
+        TbEquipment = new Gameplay.Combat.TbEquipment(loader("gameplay_combat_tbequipment"));
+        TbMarble = new Gameplay.Combat.TbMarble(loader("gameplay_combat_tbmarble"));
         ResolveRef();
     }
     

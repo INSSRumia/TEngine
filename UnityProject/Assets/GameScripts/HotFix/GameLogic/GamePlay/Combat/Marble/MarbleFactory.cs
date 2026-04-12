@@ -1,8 +1,8 @@
 using TEngine;
-using UnityEngine;
 using GameLogic.Gameplay.Combat.Equipment;
-using GameConfig;
+using GameConfig.Gameplay.Combat;
 using System.Collections.Generic;
+
 namespace GameLogic.Gameplay.Combat.Marble
 {
     public static partial class MarbleFactory
@@ -143,7 +143,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             foreach (var config in levelData.LstEquipment)
             {
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(config.ConfigId);
-                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (EquipmentSlot)config.Slot);
+                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (GameLogic.Gameplay.Combat.Equipment.EnumEquipmentSlot)config.Slot);
             }
         }
     }

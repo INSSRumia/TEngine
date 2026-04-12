@@ -1,4 +1,8 @@
-<module name="">
+<module name="Gameplay.Combat">
+    <enum name="EnumCombineType">
+        <var name="Combine" alias="combine" value="0" />
+        <var name="Override" alias="override" value="1" />
+    </enum>
     <!--
     ============================================================
     Marble Ability 配置基类
@@ -7,6 +11,7 @@
     -->
     <bean name="MarbleAbilityConfig" valueType="false" sep=",">
         <var name="priority" type="int" />
+        <var name="combine_type" type="EnumCombineType" />
     </bean>
 
     <!--

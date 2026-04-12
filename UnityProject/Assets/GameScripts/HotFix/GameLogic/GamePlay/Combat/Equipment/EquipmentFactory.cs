@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using GameConfig;
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 
@@ -22,7 +22,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             _lstEquipmentCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
-        public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EquipmentSlot slot)
+        public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EnumEquipmentSlot slot)
         {
             if (ownerMarble == null || config == null)
                 return null;
@@ -116,13 +116,13 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public interface IEquipmentCreatorForConfig
     {
         int Priority { get; set; }
-        EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EquipmentSlot slot);
+        EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EnumEquipmentSlot slot);
         void AttachDefaultAbilities(Equipment equipment);
     }
     public class DefaultEquipmentCreatorForConfig : IEquipmentCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
-        public EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EquipmentSlot slot)
+        public EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EnumEquipmentSlot slot)
         {
             switch (levelConfig)
             {

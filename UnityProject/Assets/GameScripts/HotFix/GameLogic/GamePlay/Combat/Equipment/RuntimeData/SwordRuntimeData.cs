@@ -4,7 +4,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         public SwordRuntimeData(string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int? attack, 
@@ -17,7 +17,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public new void SetData(
             string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int? attack, 

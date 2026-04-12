@@ -2,14 +2,14 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class EquipmentRuntimeData : RuntimeData
     {
-        public EquipmentSlot Slot { get; set; }
+        public EnumEquipmentSlot Slot { get; set; }
         public bool IsEquipped { get; set; }
         public bool IsBroken { get; set; }
 
         public EquipmentRuntimeData(
             string configId, 
             int instId, 
-            EquipmentSlot slot,
+            EnumEquipmentSlot slot,
             bool isEquipped,
             bool isBroken) : base(configId, instId)
         {
@@ -19,7 +19,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public void SetData(
             string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken)
         {

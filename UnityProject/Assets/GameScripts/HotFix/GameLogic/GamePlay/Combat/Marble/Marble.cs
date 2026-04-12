@@ -7,9 +7,9 @@ namespace GameLogic.Gameplay.Combat.Marble
     public class Marble : ASC<MarbleRuntimeData>
     {
         [SerializeField] private List<Transform> _lstEquipmentPoints = new List<Transform>();
-        private readonly Dictionary<EquipmentSlot, Transform> _slotPointMap = new Dictionary<EquipmentSlot, Transform>();
-        private readonly Dictionary<EquipmentSlot, Equipment.Equipment> _equipmentMap = new Dictionary<EquipmentSlot, Equipment.Equipment>();
-        public IReadOnlyDictionary<EquipmentSlot, Equipment.Equipment> EquipmentMap => _equipmentMap;
+        private readonly Dictionary<EnumEquipmentSlot, Transform> _slotPointMap = new Dictionary<EnumEquipmentSlot, Transform>();
+        private readonly Dictionary<EnumEquipmentSlot, Equipment.Equipment> _equipmentMap = new Dictionary<EnumEquipmentSlot, Equipment.Equipment>();
+        public IReadOnlyDictionary<EnumEquipmentSlot, Equipment.Equipment> EquipmentMap => _equipmentMap;
 
         protected override void Awake()
         {
@@ -20,18 +20,18 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             for(int i = 0; i < _lstEquipmentPoints.Count; i++)
             {
-                _slotPointMap[(EquipmentSlot)i] = _lstEquipmentPoints[i];
+                _slotPointMap[(EnumEquipmentSlot)i] = _lstEquipmentPoints[i];
             }
         }
 
-        public Transform GetEquipmentSlotPoint(EquipmentSlot slot)
+        public Transform GetEquipmentSlotPoint(EnumEquipmentSlot slot)
         {
             if (_slotPointMap.TryGetValue(slot, out var point) && point != null)
                 return point;
             return null;
         }
 
-        public Equipment.Equipment GetEquipment(EquipmentSlot slot)
+        public Equipment.Equipment GetEquipment(EnumEquipmentSlot slot)
         {
             return _equipmentMap.TryGetValue(slot, out var equipment) ? equipment : null;
         }
@@ -52,12 +52,12 @@ namespace GameLogic.Gameplay.Combat.Marble
             _equipmentMap[slot] = equipment;
         }
 
-        public void UnregisterEquipment(EquipmentSlot slot)
+        public void UnregisterEquipment(EnumEquipmentSlot slot)
         {
             _equipmentMap.Remove(slot);
         }
 
-        public void DestroyEquipment(EquipmentSlot slot)
+        public void DestroyEquipment(EnumEquipmentSlot slot)
         {
             if (_equipmentMap.TryGetValue(slot, out var equipment) && equipment != null)
             {

@@ -7,7 +7,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public int Defense { get; set; }
         public ArmorRuntimeData(string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int hp, 
@@ -19,7 +19,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public void SetData(
             string configId, 
             int instId, 
-            EquipmentSlot slot, 
+            EnumEquipmentSlot slot, 
             bool isEquipped, 
             bool isBroken, 
             int hp, 

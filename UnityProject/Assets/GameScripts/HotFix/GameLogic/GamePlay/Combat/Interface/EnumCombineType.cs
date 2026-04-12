@@ -2,7 +2,7 @@ namespace GameLogic.Gameplay.Combat
 {
     public enum EnumCombineType
     {
-        Override,
-        Combine
+        Combine = 0,
+        Override = 1
     }
 }

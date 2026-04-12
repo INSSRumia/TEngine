@@ -80,8 +80,8 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (levelConfig == null || levelConfig.LstEquipment == null)
                 return;
 
-            var currentSlots = new HashSet<EquipmentSlot>();
-            foreach (EquipmentSlot slot in System.Enum.GetValues(typeof(EquipmentSlot)))
+            var currentSlots = new HashSet<EnumEquipmentSlot>();
+            foreach (EnumEquipmentSlot slot in System.Enum.GetValues(typeof(EnumEquipmentSlot)))
             {
                 var equipment = Owner.GetEquipment(slot);
                 if (equipment != null)
@@ -99,7 +99,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             {
                 var configId = equipConfig.ConfigId;
                 var level = equipConfig.Level;
-                var slot = (EquipmentSlot)equipConfig.Slot;
+                var slot = (EnumEquipmentSlot)equipConfig.Slot;
 
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(configId);
                 if (equipmentConfig != null)
