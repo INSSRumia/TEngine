@@ -6,7 +6,7 @@ using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public partial class MarbleShieldHealPipelineAbility : Ability<Marble>, IReceiveShield
+    public partial class MarbleShieldHealPipelineAbility : MarbleAbility, IReceiveShield
     {
         public enum ShieldStage
         {

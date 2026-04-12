@@ -7,6 +7,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public static partial class EquipmentFactory
     {
+        private static int _instIdCounter = 0;
+        public static int GetNextInstId => _instIdCounter++;
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
 
         private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>

@@ -1,21 +1,19 @@
 using UnityEngine;
 using GameLogic.GamePlay.Combat;
-using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleMovementAbility : Ability<Marble>, IAbilityFixedUpdate
+    public class MarbleMovementAbility : MarbleAbility, IAbilityFixedUpdate
     {
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;
 
+            Owner.RuntimeData.TargetDirection = Owner.RuntimeData.TargetDirectionManager.GetCombinedValue();
             var targetDir = Owner.RuntimeData.TargetDirection;
             if (targetDir.sqrMagnitude < 0.001f)
                 return;
-
-            targetDir.Normalize();
 
             var targetSpd = Owner.RuntimeData.TargetVelocity;
             var curSpdAlongDir = Vector2.Dot(Owner.Rigidbody.velocity, targetDir);

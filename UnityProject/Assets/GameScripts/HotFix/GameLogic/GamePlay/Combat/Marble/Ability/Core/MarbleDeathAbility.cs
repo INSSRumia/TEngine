@@ -6,7 +6,7 @@ using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleDeathAbility : Ability<Marble>
+    public class MarbleDeathAbility : MarbleAbility
     {
         public void Execute()
         {
@@ -31,7 +31,6 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private void HandleDeath()
         {
-            //TODO: 处理死亡逻辑
             foreach (var equipment in Owner.EquipmentMap)
                 equipment.Value.GetAbility<EquipmentBrokenAbility>()?.Execute();
             Owner.RemoveAllAbilities();

@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleGetTargetAbility : Ability<Marble>, IAbilityFixedUpdate
+    public class MarbleGetTargetAbility : MarbleAbility, IAbilityFixedUpdate
     {
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

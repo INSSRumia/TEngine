@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleAddHealAbility : Ability<Marble>, IReceiveHeal
+    public class MarbleAddHealAbility : MarbleAbility, IReceiveHeal
     {
         public void ReceiveHeal(int value, ASC source = null)
         {

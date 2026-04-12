@@ -9,6 +9,7 @@ namespace GameLogic.GamePlay.Combat
 
     public interface IAbility
     {
+        int InstId { get; }
         int Priority { get; set;}
         AbilityCategory Category { get; set;}
         void OnAdd();

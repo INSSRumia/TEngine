@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleReceiveDamageAbility : Ability<Marble>, IReceiveDamage
+    public class MarbleReceiveDamageAbility : MarbleAbility, IReceiveDamage
     {
         public void ReceiveDamage(int value, ASC source = null)
         {

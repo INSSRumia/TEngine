@@ -4,7 +4,7 @@ using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleRotationAbility : Ability<Marble>, IAbilityFixedUpdate
+    public class MarbleRotationAbility : MarbleAbility, IAbilityFixedUpdate
     {
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

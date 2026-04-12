@@ -1,4 +1,7 @@
 using Sirenix.OdinInspector;
+using UnityEngine;
+using GameLogic.GamePlay.Combat;
+
 namespace GameLogic.Gameplay.Combat.Marble
 {
     /// <summary>
@@ -89,6 +92,9 @@ namespace GameLogic.Gameplay.Combat.Marble
         public float TargetAngularVelocity { get; set; }
         [ShowInInspector]
         public UnityEngine.Vector2 TargetDirection { get; set; }
+
+        [ShowInInspector]
+        public PriorityValueManager<Vector2> TargetDirectionManager { get; } = new PriorityValueManager<Vector2>(new DirectionCombineStrategy());
 
         [ShowInInspector]
         public int TargetMarbleInstId { get; set; }

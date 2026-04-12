@@ -4,7 +4,7 @@ using GameLogic.GamePlay.Combat;
 namespace GameLogic.Gameplay.Combat.Marble
 {
     [System.Obsolete]
-    public class MarbleHandleDamageAbility : Ability<Marble>,
+    public class MarbleHandleDamageAbility : MarbleAbility,
         IAfterApplyDamage,
         IAfterApplyHeal,
         IAfterApplyShield

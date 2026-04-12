@@ -4,7 +4,7 @@ using GameLogic.Gameplay.Combat.Equipment;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleLevelUpAbility : Ability<Marble>
+    public class MarbleLevelUpAbility : MarbleAbility
     {
         public void Resolve()
         {

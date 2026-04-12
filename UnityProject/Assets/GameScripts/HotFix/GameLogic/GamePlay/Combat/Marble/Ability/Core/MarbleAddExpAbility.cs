@@ -2,7 +2,7 @@ using GameLogic.GamePlay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
-    public class MarbleAddExpAbility : Ability<Marble>
+    public class MarbleAddExpAbility : MarbleAbility
     {
         public void AddExp(int value)
         {

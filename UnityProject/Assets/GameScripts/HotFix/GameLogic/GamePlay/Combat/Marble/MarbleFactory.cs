@@ -9,6 +9,8 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public static partial class MarbleFactory
     {
+        private static int _instIdCounter = 0;
+        public static int GetNextInstId => _instIdCounter++;
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Marbles/Marble");
 
         public static Marble CreateMarble(string id, int camp, int level = 0)
