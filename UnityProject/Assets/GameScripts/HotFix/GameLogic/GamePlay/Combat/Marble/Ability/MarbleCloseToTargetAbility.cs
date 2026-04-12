@@ -5,8 +5,9 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleCloseToTargetAbility : MarbleAbility, IAbilityFixedUpdate
     {
-        public float CloseDistance { get; set; } = 25f;
-        public EnumCombineType CombineType { get; set; } = EnumCombineType.Combine;
+        public float CloseDistance { get; set; }
+        public float TargetSpeed { get; set; }
+        public float Acceleration { get; set; }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
@@ -26,6 +27,8 @@ namespace GameLogic.Gameplay.Combat.Marble
 
             Vector2 direction = (target.transform.position - Owner.transform.position).normalized;
             Owner.RuntimeData.TargetDirectionManager.Add(new PriorityValue<Vector2>(InstId, direction, Priority, CombineType));
+            Owner.RuntimeData.TargetVelocityManager.Add(new PriorityValue<float>(InstId, TargetSpeed, Priority, CombineType));
+            Owner.RuntimeData.AccelerationManager.Add(new PriorityValue<float>(InstId, Acceleration, Priority, CombineType));
         }
     }
 }

@@ -18,6 +18,8 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
     public MarbleCloseToTargetAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
         { if(!_buf["close_distance"].IsNumber) { throw new SerializationException(); }  CloseDistance = _buf["close_distance"]; }
+        { if(!_buf["target_speed"].IsNumber) { throw new SerializationException(); }  TargetSpeed = _buf["target_speed"]; }
+        { if(!_buf["acceleration"].IsNumber) { throw new SerializationException(); }  Acceleration = _buf["acceleration"]; }
     }
 
     public static MarbleCloseToTargetAbilityConfig DeserializeMarbleCloseToTargetAbilityConfig(JSONNode _buf)
@@ -26,6 +28,8 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
     }
 
     public readonly float CloseDistance;
+    public readonly float TargetSpeed;
+    public readonly float Acceleration;
    
     public const int __ID__ = -2077236585;
     public override int GetTypeId() => __ID__;
@@ -41,6 +45,8 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
         + "priority:" + Priority + ","
         + "combineType:" + CombineType + ","
         + "closeDistance:" + CloseDistance + ","
+        + "targetSpeed:" + TargetSpeed + ","
+        + "acceleration:" + Acceleration + ","
         + "}";
     }
 }

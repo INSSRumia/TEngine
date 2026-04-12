@@ -26,6 +26,7 @@ public abstract partial class MarbleAbilityConfig : Luban.BeanBase
         switch ((string)_buf["$type"])
         {
             case "MarbleCloseToTargetAbilityConfig": return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
+            case "MarbleDefaultRotateAbilityConfig": return new Gameplay.Combat.MarbleDefaultRotateAbilityConfig(_buf);
             default: throw new SerializationException();
         }
     }

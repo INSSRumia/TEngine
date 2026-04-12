@@ -30,7 +30,16 @@
             "$type": "MarbleCloseToTargetAbilityConfig",
             "priority": 1000,
             "combine_type": 0,
-            "close_distance": 5
+            "close_distance": 5,
+            "target_speed": 10,
+            "acceleration": 10
+          },
+          {
+            "$type": "MarbleDefaultRotateAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "target_angular_speed": 180,
+            "angular_acceleration": 180
           }
         ]
       },
@@ -61,7 +70,16 @@
             "$type": "MarbleCloseToTargetAbilityConfig",
             "priority": 1000,
             "combine_type": 0,
-            "close_distance": 5
+            "close_distance": 5,
+            "target_speed": 10,
+            "acceleration": 10
+          },
+          {
+            "$type": "MarbleDefaultRotateAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "target_angular_speed": 180,
+            "angular_acceleration": 180
           }
         ]
       }

@@ -23,6 +23,19 @@
     <bean name="MarbleCloseToTargetAbilityConfig" alias="close_to_target" parent="MarbleAbilityConfig" valueType="false" sep=",">
         <!-- # 触发停止移动的判定距离-->
         <var name="close_distance" type="float" />
+        <var name="target_speed" type="float" />
+        <var name="acceleration" type="float" />
+    </bean>
+
+    <!--
+    ============================================================
+    MarbleDefaultRotateAbility 配置
+    ============================================================
+    可选 Ability：默认旋转能力。
+    -->
+    <bean name="MarbleDefaultRotateAbilityConfig" alias="default_rotate" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="target_angular_speed" type="float" />
+        <var name="angular_acceleration" type="float" />
     </bean>
 
     <!--

@@ -162,7 +162,22 @@ namespace GameLogic.Gameplay.Combat.Marble
             return config switch
             {
                 MarbleCloseToTargetAbilityConfig closeConfig =>
-                    new MarbleCloseToTargetAbility { CloseDistance = closeConfig.CloseDistance },
+                    new MarbleCloseToTargetAbility 
+                    { 
+                        Priority = closeConfig.Priority,
+                        CombineType = (EnumCombineType)closeConfig.CombineType,
+                        CloseDistance = closeConfig.CloseDistance, 
+                        TargetSpeed = closeConfig.TargetSpeed, 
+                        Acceleration = closeConfig.Acceleration,
+                    },
+                MarbleDefaultRotateAbilityConfig defaultRotateConfig =>
+                    new MarbleDefaultRotateAbility 
+                    { 
+                        Priority = defaultRotateConfig.Priority,
+                        CombineType = (EnumCombineType)defaultRotateConfig.CombineType,
+                        TargetAngularSpeed = defaultRotateConfig.TargetAngularSpeed,
+                        AngularAcceleration = defaultRotateConfig.AngularAcceleration,
+                    },
                 _ => null
             };
         }
