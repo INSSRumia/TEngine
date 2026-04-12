@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using Luban;
-using SimpleJSON;
+using Luban.SimpleJSON;
 
 
 namespace GameConfig.Gameplay.Combat
@@ -20,8 +20,9 @@ public partial class TbMarble
     
     public TbMarble(JSONNode _buf)
     {
-        _dataMap = new System.Collections.Generic.Dictionary<string, Gameplay.Combat.MarbleConfig>();
-        _dataList = new System.Collections.Generic.List<Gameplay.Combat.MarbleConfig>();
+        int count = _buf.Count;
+        _dataMap = new System.Collections.Generic.Dictionary<string, Gameplay.Combat.MarbleConfig>(count);
+        _dataList = new System.Collections.Generic.List<Gameplay.Combat.MarbleConfig>(count);
         
         foreach(JSONNode _ele in _buf.Children)
         {
@@ -32,10 +33,10 @@ public partial class TbMarble
         }
     }
 
-    public System.Collections.Generic.Dictionary<string, Gameplay.Combat.MarbleConfig> DataMap => _dataMap;
-    public System.Collections.Generic.List<Gameplay.Combat.MarbleConfig> DataList => _dataList;
+    public System.Collections.Generic.IReadOnlyDictionary<string, Gameplay.Combat.MarbleConfig> DataMap => _dataMap;
+    public System.Collections.Generic.IReadOnlyList<Gameplay.Combat.MarbleConfig> DataList => _dataList;
 
-    public Gameplay.Combat.MarbleConfig GetOrDefault(string key) => _dataMap.TryGetValue(key, out var v) ? v : null;
+    public Gameplay.Combat.MarbleConfig GetOrDefault(string key) => _dataMap.TryGetValue(key, out var v) ? v : default;
     public Gameplay.Combat.MarbleConfig Get(string key) => _dataMap[key];
     public Gameplay.Combat.MarbleConfig this[string key] => _dataMap[key];
 

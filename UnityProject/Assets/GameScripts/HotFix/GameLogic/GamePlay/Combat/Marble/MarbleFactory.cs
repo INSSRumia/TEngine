@@ -162,23 +162,56 @@ namespace GameLogic.Gameplay.Combat.Marble
             return config switch
             {
                 MarbleCloseToTargetAbilityConfig closeConfig =>
-                    new MarbleCloseToTargetAbility 
-                    { 
+                    new MarbleCloseToTargetAbility
+                    {
                         Priority = closeConfig.Priority,
                         CombineType = (EnumCombineType)closeConfig.CombineType,
-                        CloseDistance = closeConfig.CloseDistance, 
-                        TargetSpeed = closeConfig.TargetSpeed, 
+                        CloseDistance = closeConfig.CloseDistance,
+                        TargetSpeed = closeConfig.TargetSpeed,
                         Acceleration = closeConfig.Acceleration,
                     },
                 MarbleDefaultRotateAbilityConfig defaultRotateConfig =>
-                    new MarbleDefaultRotateAbility 
-                    { 
+                    new MarbleDefaultRotateAbility
+                    {
                         Priority = defaultRotateConfig.Priority,
                         CombineType = (EnumCombineType)defaultRotateConfig.CombineType,
                         TargetAngularSpeed = defaultRotateConfig.TargetAngularSpeed,
                         AngularAcceleration = defaultRotateConfig.AngularAcceleration,
                     },
+                MarbleDashAbilityConfig dashConfig =>
+                    CreateDashAbility(dashConfig),
                 _ => null
+            };
+        }
+
+        private static MarbleDashAbility CreateDashAbility(MarbleDashAbilityConfig dashConfig)
+        {
+            var ability = new MarbleDashAbility
+            {
+                Priority = dashConfig.Priority,
+                CombineType = (EnumCombineType)dashConfig.CombineType,
+                TargetSpeed = dashConfig.TargetSpeed,
+                Acceleration = dashConfig.Acceleration,
+                LockDirectionOnActivate = dashConfig.LockDirectionOnActivate,
+            };
+
+            var timing = CreateTimingFromConfig(dashConfig.Timing);
+            if (timing != null)
+            {
+                ability.InitializeTiming(timing);
+            }
+
+            return ability;
+        }
+
+        private static IAbilityTiming CreateTimingFromConfig(AbilityTimingConfig config)
+        {
+            return config switch
+            {
+                FixedAbilityTimingConfig fixedConfig =>
+                    new FixedDurationAbilityTiming(fixedConfig.Duration, fixedConfig.Cooldown, fixedConfig.AutoActivate),
+                null => null,
+                _ => null,
             };
         }
     }

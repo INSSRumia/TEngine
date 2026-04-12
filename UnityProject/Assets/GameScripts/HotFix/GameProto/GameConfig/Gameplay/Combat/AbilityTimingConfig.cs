@@ -13,30 +13,30 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ArmorReduceDamageAbilityConfig : EquipmentAbilityConfig
+public abstract partial class AbilityTimingConfig : Luban.BeanBase
 {
-    public ArmorReduceDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public AbilityTimingConfig(JSONNode _buf) 
     {
     }
 
-    public static ArmorReduceDamageAbilityConfig DeserializeArmorReduceDamageAbilityConfig(JSONNode _buf)
+    public static AbilityTimingConfig DeserializeAbilityTimingConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ArmorReduceDamageAbilityConfig(_buf);
+        switch ((string)_buf["$type"])
+        {
+            case "FixedAbilityTimingConfig": return new Gameplay.Combat.FixedAbilityTimingConfig(_buf);
+            default: throw new SerializationException();
+        }
     }
 
    
-    public const int __ID__ = -558355798;
-    public override int GetTypeId() => __ID__;
 
-    public override void ResolveRef(Tables tables)
+    public virtual void ResolveRef(Tables tables)
     {
-        base.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
-        + "priority:" + Priority + ","
         + "}";
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using GameLogic.Gameplay.Combat.Marble;
 using Sirenix.OdinInspector;
+using GameLogic.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat
 {
@@ -25,6 +26,15 @@ namespace GameLogic.Gameplay.Combat
         [Header("生成设置")]
         [SerializeField] private float _spawnRadius = 5f;
         [SerializeField] private Vector3 _spawnCenter = Vector3.zero;
+
+        [Header("冲刺验证")]
+        [SerializeField] private float _dashTargetSpeed = 12f;
+        [SerializeField] private float _dashAcceleration = 24f;
+        [SerializeField] private float _dashDuration = 0.75f;
+        [SerializeField] private float _dashCooldown = 2f;
+        [SerializeField] private int _dashPriority = 100;
+        [SerializeField] private bool _dashAutoActivate = true;
+        [SerializeField] private bool _dashLockDirection = true;
 
         private CombatManager _combatManager;
         private readonly List<Marble.Marble> _testSoldiers = new List<Marble.Marble>();
@@ -100,6 +110,33 @@ namespace GameLogic.Gameplay.Combat
             }
 
             Log.Warning($"[CombatTest] 阵营1存活: {camp1Alive}, 阵营2存活: {camp2Alive}");
+        }
+
+        [Button("给阵营1附加冲刺能力")]
+        public void AddDashAbilityToCamp1()
+        {
+            foreach (var marble in _testSoldiers)
+            {
+                if (marble?.RuntimeData == null || marble.RuntimeData.Camp != _camp1Camp)
+                    continue;
+
+                if (marble.GetAbility<MarbleDashAbility>() != null)
+                    continue;
+
+                marble.AddAbility(new MarbleDashAbility
+                {
+                    Priority = _dashPriority,
+                    CombineType = EnumCombineType.Override,
+                    TargetSpeed = _dashTargetSpeed,
+                    Acceleration = _dashAcceleration,
+                    Duration = _dashDuration,
+                    Cooldown = _dashCooldown,
+                    AutoActivate = _dashAutoActivate,
+                    LockDirectionOnActivate = _dashLockDirection,
+                });
+            }
+
+            Log.Warning("[CombatTest] 已为阵营1附加冲刺能力");
         }
 
         private void SpawnCampSoldiers(string configId, int camp, int count)

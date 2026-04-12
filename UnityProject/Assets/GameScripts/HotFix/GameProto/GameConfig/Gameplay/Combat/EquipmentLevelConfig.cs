@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using Luban;
-using SimpleJSON;
+using Luban.SimpleJSON;
 
 
 namespace GameConfig.Gameplay.Combat
@@ -52,6 +52,5 @@ public abstract partial class EquipmentLevelConfig : Luban.BeanBase
         + "}";
     }
 }
-
 }
 

@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using Luban;
-using SimpleJSON;
+using Luban.SimpleJSON;
 
 
 namespace GameConfig.Gameplay.Combat
@@ -20,8 +20,9 @@ public partial class TbEquipment
     
     public TbEquipment(JSONNode _buf)
     {
-        _dataMap = new System.Collections.Generic.Dictionary<string, Gameplay.Combat.EquipmentConfig>();
-        _dataList = new System.Collections.Generic.List<Gameplay.Combat.EquipmentConfig>();
+        int count = _buf.Count;
+        _dataMap = new System.Collections.Generic.Dictionary<string, Gameplay.Combat.EquipmentConfig>(count);
+        _dataList = new System.Collections.Generic.List<Gameplay.Combat.EquipmentConfig>(count);
         
         foreach(JSONNode _ele in _buf.Children)
         {
@@ -32,10 +33,10 @@ public partial class TbEquipment
         }
     }
 
-    public System.Collections.Generic.Dictionary<string, Gameplay.Combat.EquipmentConfig> DataMap => _dataMap;
-    public System.Collections.Generic.List<Gameplay.Combat.EquipmentConfig> DataList => _dataList;
+    public System.Collections.Generic.IReadOnlyDictionary<string, Gameplay.Combat.EquipmentConfig> DataMap => _dataMap;
+    public System.Collections.Generic.IReadOnlyList<Gameplay.Combat.EquipmentConfig> DataList => _dataList;
 
-    public Gameplay.Combat.EquipmentConfig GetOrDefault(string key) => _dataMap.TryGetValue(key, out var v) ? v : null;
+    public Gameplay.Combat.EquipmentConfig GetOrDefault(string key) => _dataMap.TryGetValue(key, out var v) ? v : default;
     public Gameplay.Combat.EquipmentConfig Get(string key) => _dataMap[key];
     public Gameplay.Combat.EquipmentConfig this[string key] => _dataMap[key];
 

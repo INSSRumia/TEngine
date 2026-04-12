@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using Luban;
-using SimpleJSON;
+using Luban.SimpleJSON;
 
 
 namespace GameConfig.Gameplay.Combat
@@ -73,6 +73,5 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
         + "}";
     }
 }
-
 }
 

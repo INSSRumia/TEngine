@@ -13,30 +13,33 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConfig
+public sealed partial class MarbleDashAbilityConfig : MarbleAbilityConfig
 {
-    public MarbleCloseToTargetAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public MarbleDashAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["close_distance"].IsNumber) { throw new SerializationException(); }  CloseDistance = _buf["close_distance"]; }
         { if(!_buf["target_speed"].IsNumber) { throw new SerializationException(); }  TargetSpeed = _buf["target_speed"]; }
         { if(!_buf["acceleration"].IsNumber) { throw new SerializationException(); }  Acceleration = _buf["acceleration"]; }
+        { if(!_buf["lock_direction_on_activate"].IsBoolean) { throw new SerializationException(); }  LockDirectionOnActivate = _buf["lock_direction_on_activate"]; }
+        { if(!_buf["timing"].IsObject) { throw new SerializationException(); }  Timing = global::GameConfig.Gameplay.Combat.AbilityTimingConfig.DeserializeAbilityTimingConfig(_buf["timing"]);  }
     }
 
-    public static MarbleCloseToTargetAbilityConfig DeserializeMarbleCloseToTargetAbilityConfig(JSONNode _buf)
+    public static MarbleDashAbilityConfig DeserializeMarbleDashAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
+        return new Gameplay.Combat.MarbleDashAbilityConfig(_buf);
     }
 
-    public readonly float CloseDistance;
     public readonly float TargetSpeed;
     public readonly float Acceleration;
+    public readonly bool LockDirectionOnActivate;
+    public readonly Gameplay.Combat.AbilityTimingConfig Timing;
    
-    public const int __ID__ = -2077236585;
+    public const int __ID__ = -893813621;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        Timing?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -44,9 +47,10 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
         return "{ "
         + "priority:" + Priority + ","
         + "combineType:" + CombineType + ","
-        + "closeDistance:" + CloseDistance + ","
         + "targetSpeed:" + TargetSpeed + ","
         + "acceleration:" + Acceleration + ","
+        + "lockDirectionOnActivate:" + LockDirectionOnActivate + ","
+        + "timing:" + Timing + ","
         + "}";
     }
 }

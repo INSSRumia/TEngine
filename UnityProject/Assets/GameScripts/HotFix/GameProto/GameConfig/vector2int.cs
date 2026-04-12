@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 using Luban;
-using SimpleJSON;
+using Luban.SimpleJSON;
 
 
 namespace GameConfig
@@ -42,6 +42,5 @@ public partial struct vector2int
         + "}";
     }
 }
-
 }
 

@@ -40,6 +40,20 @@
             "combine_type": 0,
             "target_angular_speed": 180,
             "angular_acceleration": 180
+          },
+          {
+            "$type": "MarbleDashAbilityConfig",
+            "priority": 2000,
+            "combine_type": 0,
+            "target_speed": 20,
+            "acceleration": 20,
+            "lock_direction_on_activate": false,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 1,
+              "cooldown": 3,
+              "auto_activate": true
+            }
           }
         ]
       },
@@ -80,6 +94,20 @@
             "combine_type": 0,
             "target_angular_speed": 180,
             "angular_acceleration": 180
+          },
+          {
+            "$type": "MarbleDashAbilityConfig",
+            "priority": 2000,
+            "combine_type": 0,
+            "target_speed": 20,
+            "acceleration": 20,
+            "lock_direction_on_activate": false,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 1,
+              "cooldown": 3,
+              "auto_activate": true
+            }
           }
         ]
       }
