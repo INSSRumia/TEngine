@@ -25,4 +25,4 @@ Tools/GameEventSourceGenerator/SourceGenerator/obj
 openspec/
 Configs/GameConfig/Datas/~$equip.xlsx
 Configs/GameConfig/Datas/~$marble.xlsx
-UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/Ability/Core/BowFireAbility.cs
+Configs/GameConfig/Datas/~$projectile.xlsx

@@ -6,27 +6,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public bool IsEquipped { get; set; }
         public bool IsBroken { get; set; }
 
-        public EquipmentRuntimeData(
-            string configId, 
-            int instId, 
-            EnumEquipmentSlot slot,
-            bool isEquipped,
-            bool isBroken) : base(configId, instId)
-        {
-            SetData(configId, instId, slot, isEquipped, isBroken);
-        }
-
-        public void SetData(
-            string configId, 
-            int instId, 
-            EnumEquipmentSlot slot, 
-            bool isEquipped, 
-            bool isBroken)
-        {
-            base.SetData(configId, instId);
-            Slot = slot;
-            IsEquipped = isEquipped;
-            IsBroken = isBroken;
-        }
+        public EquipmentRuntimeData(string configId, int level) : base(configId, level, EquipmentFactory.GetNextInstId) { }
     }
 }

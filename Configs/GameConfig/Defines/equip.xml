@@ -121,9 +121,9 @@
         <!-- # 瞄准角度，设弓指向目标的向量为a, 弓的前方方向为b, 则当a与b的夹角小于aim_angle时，弓允许发射。 -->
         <var name="aim_angle" type="float" />
         <!-- # 关联的发射物配置ID，指向 TbProjectile -->
-        <var name="projectile_config_id" type="string?" />
+        <var name="projectile_config_id" type="string" />
         <!-- # 发射物等级 -->
-        <var name="projectile_level" type="int?" />
+        <var name="projectile_level" type="int" />
     </bean>
 
     <table name="TbEquipment" value="EquipmentConfig" input="equip.xlsx" index="config_id"/>

@@ -9,6 +9,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         private static int _instIdCounter = 0;
         public static int GetNextInstId => _instIdCounter++;
+
+        private static int _instAbilityIdCounter = 0;
+        public static int GetNextInstAbilityId => _instAbilityIdCounter++;
+
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
 
         private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>
@@ -128,56 +132,49 @@ namespace GameLogic.Gameplay.Combat.Equipment
             {
                 case ArmorLevelConfig armorConfig:
                 {
-                    return new ArmorRuntimeData
-                    (
-                        configId: config.ConfigId,
-                        instId: 0,
-                        slot: slot,
-                        isEquipped: true,
-                        isBroken: false,
-                        hp: armorConfig.Hp,
-                        maxHp: armorConfig.Hp,
-                        defense: armorConfig.Defense
-                    );
+                    return new ArmorRuntimeData(config.ConfigId, levelConfig.Level)
+                    {
+                        Slot = slot,
+                        IsEquipped = true,
+                        IsBroken = false,
+                        Hp = armorConfig.Hp,
+                        MaxHp = armorConfig.Hp,
+                        Defense = armorConfig.Defense
+                    };
                 }
                 case BowLevelConfig bowConfig:
                 {
-                    return new BowRuntimeData
-                    (
-                        configId: config.ConfigId,
-                        instId: 0,
-                        slot: slot,
-                        isEquipped: true,
-                        isBroken: false,
-                        attack: bowConfig.Attack,
-                        isDamageByVelocity: bowConfig.IsDamageByVelocity,
-                        cooldown: bowConfig.Cooldown,
-                        rotateSpeed: bowConfig.RotateSpeed,
-                        shootType: bowConfig.ShootType,
-                        arrowCount: bowConfig.ArrowCount,
-                        arrowInterval: bowConfig.ArrowInterval,
-                        arrowAngleStep: bowConfig.ArrowAngleStep,
-                        aimAngle: bowConfig.AimAngle,
-                        targetMarbleInstId: 0,
-                        aimDirection: UnityEngine.Vector2.zero,
-                        canFire: false,
-                        projectileConfigId: bowConfig.ProjectileConfigId,
-                        projectileLevel: bowConfig.ProjectileLevel
-                    );
+                    return new BowRuntimeData(config.ConfigId, levelConfig.Level)
+                    {
+                        Slot = slot,
+                        IsEquipped =  true,
+                        IsBroken = false,
+                        Attack = bowConfig.Attack,
+                        IsDamageByVelocity = bowConfig.IsDamageByVelocity,
+                        Cooldown = bowConfig.Cooldown,
+                        RotateSpeed = bowConfig.RotateSpeed,
+                        ShootType = bowConfig.ShootType,
+                        ArrowCount = bowConfig.ArrowCount,
+                        ArrowInterval = bowConfig.ArrowInterval,
+                        ArrowAngleStep = bowConfig.ArrowAngleStep,
+                        AimAngle = bowConfig.AimAngle,
+                        AimDirection = UnityEngine.Vector2.zero,
+                        CanFire = false,
+                        ProjectileConfigId = bowConfig.ProjectileConfigId,
+                        ProjectileLevel = bowConfig.ProjectileLevel
+                    };
                 }
                 case SwordLevelConfig swordConfig:
                 {
-                    return new SwordRuntimeData
-                    (
-                        configId: config.ConfigId,
-                        instId: 0,
-                        slot: slot,
-                        isEquipped: true,
-                        isBroken: false,
-                        attack: swordConfig.Attack,
-                        isDamageByVelocity: swordConfig.IsDamageByVelocity,
-                        cooldown: swordConfig.Cooldown
-                    );
+                    return new SwordRuntimeData(config.ConfigId, levelConfig.Level)
+                    {
+                        Slot = slot,
+                        IsEquipped = true,
+                        IsBroken = false,
+                        Attack = swordConfig.Attack,
+                        IsDamageByVelocity = swordConfig.IsDamageByVelocity,
+                        Cooldown = swordConfig.Cooldown
+                    };
                 }
             }
             return null;

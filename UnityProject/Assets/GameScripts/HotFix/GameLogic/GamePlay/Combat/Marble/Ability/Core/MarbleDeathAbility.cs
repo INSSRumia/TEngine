@@ -31,8 +31,9 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private void HandleDeath()
         {
-            foreach (var equipment in Owner.EquipmentMap)
-                equipment.Value.GetAbility<EquipmentBrokenAbility>()?.Execute();
+            foreach (var equipment in Owner.EquipmentMap){
+                equipment.Value.RuntimeData.IsBroken = true;
+            }
             Owner.RemoveAllAbilities();
 
             if(Owner.Rigidbody != null)

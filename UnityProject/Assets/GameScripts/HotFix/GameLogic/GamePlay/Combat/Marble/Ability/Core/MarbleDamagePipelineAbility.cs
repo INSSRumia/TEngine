@@ -110,10 +110,6 @@ namespace GameLogic.Gameplay.Combat.Marble
                     foreach (var ability in lstAfterApplyDamageAbilities)
                         ability.AfterApplyDamage(this);
                     ListPool<IAfterApplyDamage>.Release(lstAfterApplyDamageAbilities);
-
-                    var marbleDeadAbility = Owner.GetAbility<MarbleDeathAbility>();
-                    if (marbleDeadAbility != null)
-                        marbleDeadAbility.Execute();
                 }
 
                 context.Stage = DamageStage.Completed;
@@ -136,9 +132,6 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private void ApplyDamage(int damage)
         {
-            int defense = Owner.RuntimeData.Defense;
-            if(damage <= defense) return;
-
             int shield = Owner.RuntimeData.Shield;
             if(shield > 0)
             {

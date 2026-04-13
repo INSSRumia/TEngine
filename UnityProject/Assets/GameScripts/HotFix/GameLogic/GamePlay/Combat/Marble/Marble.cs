@@ -16,6 +16,16 @@ namespace GameLogic.Gameplay.Combat.Marble
             base.Awake();
             InitEquipmentSlotPoint();
         }
+
+        public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
+        {
+            base.OnUpdate(elapseSeconds, realElapseSeconds);
+            if(RuntimeData.Hp <= 0)
+            {
+                GetAbility<MarbleDeathAbility>()?.Execute();
+            }
+        }
+
         private void InitEquipmentSlotPoint()
         {
             for(int i = 0; i < _lstEquipmentPoints.Count; i++)

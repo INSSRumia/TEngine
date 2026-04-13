@@ -373,11 +373,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9fb286dccc0b724aaf1a0d2ba801be6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camp1ConfigId: solider
-  _camp1Count: 3
+  _camp1ConfigId: archer
+  _camp1Count: 1
   _camp1Camp: 1
-  _camp2ConfigId: solider
-  _camp2Count: 3
+  _camp2ConfigId: archer
+  _camp2Count: 1
   _camp2Camp: 2
   _spawnRadius: 5
   _spawnCenter: {x: 0, y: 0, z: 0}

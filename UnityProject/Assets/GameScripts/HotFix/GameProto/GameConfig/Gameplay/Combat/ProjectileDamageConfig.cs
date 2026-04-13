@@ -17,6 +17,7 @@ public sealed partial class ProjectileDamageConfig : Luban.BeanBase
 {
     public ProjectileDamageConfig(JSONNode _buf) 
     {
+        { if(!_buf["is_damage_by_velocity"].IsBoolean) { throw new SerializationException(); }  IsDamageByVelocity = _buf["is_damage_by_velocity"]; }
         { if(!_buf["piercing_count"].IsNumber) { throw new SerializationException(); }  PiercingCount = _buf["piercing_count"]; }
     }
 
@@ -25,6 +26,7 @@ public sealed partial class ProjectileDamageConfig : Luban.BeanBase
         return new Gameplay.Combat.ProjectileDamageConfig(_buf);
     }
 
+    public readonly bool IsDamageByVelocity;
     public readonly int PiercingCount;
    
     public const int __ID__ = 565252780;
@@ -37,6 +39,7 @@ public sealed partial class ProjectileDamageConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
+        + "isDamageByVelocity:" + IsDamageByVelocity + ","
         + "piercingCount:" + PiercingCount + ","
         + "}";
     }

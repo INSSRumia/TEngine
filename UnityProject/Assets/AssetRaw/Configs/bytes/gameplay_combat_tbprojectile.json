@@ -8,17 +8,19 @@
         "move_ability": {
           "speed": 30
         },
-        "tracking_ability": {
-          "tracking_type": 0,
-          "angular_speed": 0
-        },
         "damage_ability": {
-          "piercing_count": 0
+          "is_damage_by_velocity": true,
+          "piercing_count": 1
         },
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": []
+        "lst_ability": [
+          {
+            "$type": "ProjectileNoTrackingConfig",
+            "priority": 1000
+          }
+        ]
       },
       {
         "level": 1,
@@ -26,17 +28,19 @@
         "move_ability": {
           "speed": 30
         },
-        "tracking_ability": {
-          "tracking_type": 0,
-          "angular_speed": 0
-        },
         "damage_ability": {
-          "piercing_count": 0
+          "is_damage_by_velocity": true,
+          "piercing_count": 1
         },
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": []
+        "lst_ability": [
+          {
+            "$type": "ProjectileNoTrackingConfig",
+            "priority": 1000
+          }
+        ]
       }
     ]
   },
@@ -49,17 +53,19 @@
         "move_ability": {
           "speed": 30
         },
-        "tracking_ability": {
-          "tracking_type": 0,
-          "angular_speed": 0
-        },
         "damage_ability": {
-          "piercing_count": 1
+          "is_damage_by_velocity": true,
+          "piercing_count": 0
         },
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": []
+        "lst_ability": [
+          {
+            "$type": "ProjectileNoTrackingConfig",
+            "priority": 1000
+          }
+        ]
       },
       {
         "level": 1,
@@ -67,17 +73,19 @@
         "move_ability": {
           "speed": 30
         },
-        "tracking_ability": {
-          "tracking_type": 0,
-          "angular_speed": 0
-        },
         "damage_ability": {
-          "piercing_count": 1
+          "is_damage_by_velocity": true,
+          "piercing_count": 0
         },
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": []
+        "lst_ability": [
+          {
+            "$type": "ProjectileNoTrackingConfig",
+            "priority": 1000
+          }
+        ]
       }
     ]
   }

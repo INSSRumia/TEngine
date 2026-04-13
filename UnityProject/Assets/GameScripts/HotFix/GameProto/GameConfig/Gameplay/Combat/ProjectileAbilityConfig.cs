@@ -13,7 +13,7 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileAbilityConfig : Luban.BeanBase
+public abstract partial class ProjectileAbilityConfig : Luban.BeanBase
 {
     public ProjectileAbilityConfig(JSONNode _buf) 
     {
@@ -22,15 +22,19 @@ public sealed partial class ProjectileAbilityConfig : Luban.BeanBase
 
     public static ProjectileAbilityConfig DeserializeProjectileAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ProjectileAbilityConfig(_buf);
+        switch ((string)_buf["$type"])
+        {
+            case "ProjectileNoTrackingConfig": return new Gameplay.Combat.ProjectileNoTrackingConfig(_buf);
+            case "ProjectileTrackTargetConfig": return new Gameplay.Combat.ProjectileTrackTargetConfig(_buf);
+            case "ProjectileTrackPointConfig": return new Gameplay.Combat.ProjectileTrackPointConfig(_buf);
+            default: throw new SerializationException();
+        }
     }
 
     public readonly int Priority;
    
-    public const int __ID__ = -1737074351;
-    public override int GetTypeId() => __ID__;
 
-    public  void ResolveRef(Tables tables)
+    public virtual void ResolveRef(Tables tables)
     {
     }
 

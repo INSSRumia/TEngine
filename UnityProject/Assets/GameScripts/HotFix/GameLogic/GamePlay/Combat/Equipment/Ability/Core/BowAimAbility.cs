@@ -22,7 +22,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (_owner == null || _owner.RuntimeData == null)
                 return;
 
-            var targetMarble = _owner.OwnerMarble.CombatManager?.GetTarget(_owner.RuntimeData.TargetMarbleInstId);
+            var targetMarble = _owner.OwnerMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.TargetMarbleInstId);
             if (targetMarble == null)
                 return;
 
@@ -35,7 +35,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var nextAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, _owner.RuntimeData.RotateSpeed * elapseSeconds);
             EquipmentOwner.transform.rotation = Quaternion.Euler(0f, 0f, nextAngle);
 
-            var currentDir = _owner.transform.right;
+            var currentDir = (Vector2)_owner.transform.right;
             var angleDelta = Vector2.Angle(currentDir, aimDirection.normalized);
             _owner.RuntimeData.CanFire = angleDelta <= _owner.RuntimeData.AimAngle;
         }

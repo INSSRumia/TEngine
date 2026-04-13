@@ -112,5 +112,67 @@
         ]
       }
     ]
+  },
+  {
+    "config_id": "archer",
+    "name": "弓兵",
+    "lst_level_config": [
+      {
+        "level": 0,
+        "upgrade_exp": 100,
+        "attack": 10,
+        "hp": 100,
+        "shield": 100,
+        "defense": 5,
+        "speed": 8,
+        "mass": 1,
+        "scale": 1,
+        "lst_equipment": [
+          {
+            "config_id": "bow",
+            "level": 0,
+            "slot": 2
+          }
+        ],
+        "lst_ability": [
+          {
+            "$type": "MarbleCloseToTargetAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "close_distance": 8,
+            "target_speed": 10,
+            "acceleration": 10
+          }
+        ]
+      },
+      {
+        "level": 1,
+        "upgrade_exp": 150,
+        "attack": 10,
+        "hp": 150,
+        "shield": 150,
+        "defense": 5,
+        "speed": 8,
+        "mass": 1,
+        "scale": 1,
+        "lst_equipment": [
+          {
+            "config_id": "bow",
+            "level": 1,
+            "slot": 2
+          }
+        ],
+        "lst_ability": [
+          {
+            "$type": "MarbleCloseToTargetAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "close_distance": 8,
+            "target_speed": 10,
+            "acceleration": 10
+          }
+        ]
+      }
+    ]
   }
 ]

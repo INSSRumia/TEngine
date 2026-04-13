@@ -35,7 +35,7 @@ namespace GameLogic.Gameplay.Combat
 
         protected Vector2 GetCurrentDirection()
         {
-            return Owner.transform.forward;
+            return Owner.transform.right;
         }
     }
 }

@@ -5,31 +5,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public int Hp { get; set; }
         public int MaxHp { get; set; }
         public int Defense { get; set; }
-        public ArmorRuntimeData(string configId, 
-            int instId, 
-            EnumEquipmentSlot slot, 
-            bool isEquipped, 
-            bool isBroken, 
-            int hp, 
-            int maxHp, 
-            int defense) : base(configId, instId, slot, isEquipped, isBroken)
-        {
-            SetData(configId, instId, slot, isEquipped, isBroken, hp, maxHp, defense);
-        }
-        public void SetData(
-            string configId, 
-            int instId, 
-            EnumEquipmentSlot slot, 
-            bool isEquipped, 
-            bool isBroken, 
-            int hp, 
-            int maxHp, 
-            int defense)
-        {
-            base.SetData(configId, instId, slot, isEquipped, isBroken);
-            Hp = hp;
-            MaxHp = maxHp;
-            Defense = defense;
-        }
+        public ArmorRuntimeData(string configId, int level) : base(configId, level) { }
     }
 }

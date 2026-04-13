@@ -23,8 +23,8 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
         { if(!_buf["arrow_interval"].IsNumber) { throw new SerializationException(); }  ArrowInterval = _buf["arrow_interval"]; }
         { if(!_buf["arrow_angle_step"].IsNumber) { throw new SerializationException(); }  ArrowAngleStep = _buf["arrow_angle_step"]; }
         { if(!_buf["aim_angle"].IsNumber) { throw new SerializationException(); }  AimAngle = _buf["aim_angle"]; }
-        { var _j = _buf["projectile_config_id"]; if (_j.Tag != JSONNodeType.None && _j.Tag != JSONNodeType.NullValue) { { if(!_j.IsString) { throw new SerializationException(); }  ProjectileConfigId = _j; } } else { ProjectileConfigId = null; } }
-        { var _j = _buf["projectile_level"]; if (_j.Tag != JSONNodeType.None && _j.Tag != JSONNodeType.NullValue) { { if(!_j.IsNumber) { throw new SerializationException(); }  ProjectileLevel = _j; } } else { ProjectileLevel = null; } }
+        { if(!_buf["projectile_config_id"].IsString) { throw new SerializationException(); }  ProjectileConfigId = _buf["projectile_config_id"]; }
+        { if(!_buf["projectile_level"].IsNumber) { throw new SerializationException(); }  ProjectileLevel = _buf["projectile_level"]; }
     }
 
     public static BowLevelConfig DeserializeBowLevelConfig(JSONNode _buf)
@@ -39,7 +39,7 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
     public readonly float ArrowAngleStep;
     public readonly float AimAngle;
     public readonly string ProjectileConfigId;
-    public readonly int? ProjectileLevel;
+    public readonly int ProjectileLevel;
    
     public const int __ID__ = -1363365810;
     public override int GetTypeId() => __ID__;

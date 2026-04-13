@@ -12,7 +12,7 @@ namespace GameLogic.Gameplay.Combat
             Owner.RuntimeData.CurrentLifetime += elapseSeconds;
             if (Owner.RuntimeData.CurrentLifetime >= MaxLifetime)
             {
-                Owner.Despawn();
+                Owner.RuntimeData.IsFinishedLifetime = true;
             }
         }
     }

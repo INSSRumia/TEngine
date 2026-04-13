@@ -13,33 +13,32 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileTrackConfig : Luban.BeanBase
+public sealed partial class ProjectileTrackPointConfig : ProjectileAbilityConfig
 {
-    public ProjectileTrackConfig(JSONNode _buf) 
+    public ProjectileTrackPointConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["tracking_type"].IsNumber) { throw new SerializationException(); }  TrackingType = (Gameplay.Combat.EnumProjectileTrackingType)_buf["tracking_type"].AsInt; }
         { if(!_buf["angular_speed"].IsNumber) { throw new SerializationException(); }  AngularSpeed = _buf["angular_speed"]; }
     }
 
-    public static ProjectileTrackConfig DeserializeProjectileTrackConfig(JSONNode _buf)
+    public static ProjectileTrackPointConfig DeserializeProjectileTrackPointConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ProjectileTrackConfig(_buf);
+        return new Gameplay.Combat.ProjectileTrackPointConfig(_buf);
     }
 
-    public readonly Gameplay.Combat.EnumProjectileTrackingType TrackingType;
     public readonly float AngularSpeed;
    
-    public const int __ID__ = 1814660594;
+    public const int __ID__ = 1326220354;
     public override int GetTypeId() => __ID__;
 
-    public  void ResolveRef(Tables tables)
+    public override void ResolveRef(Tables tables)
     {
+        base.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
-        + "trackingType:" + TrackingType + ","
+        + "priority:" + Priority + ","
         + "angularSpeed:" + AngularSpeed + ","
         + "}";
     }

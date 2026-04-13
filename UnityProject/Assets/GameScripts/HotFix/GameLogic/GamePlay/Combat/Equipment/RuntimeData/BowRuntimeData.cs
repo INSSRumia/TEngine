@@ -10,66 +10,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public float ArrowInterval { get; set; }
         public float ArrowAngleStep { get; set; }
         public float AimAngle { get; set; }
-        public int TargetMarbleInstId { get; set; }
         public Vector2 AimDirection { get; set; }
         public bool CanFire { get; set; }
         public string ProjectileConfigId { get; set; }
-        public int? ProjectileLevel { get; set; }
-        public BowRuntimeData(string configId, 
-            int instId, 
-            EnumEquipmentSlot slot, 
-            bool isEquipped, 
-            bool isBroken, 
-            int? attack, 
-            bool isDamageByVelocity, 
-            float cooldown, 
-            float rotateSpeed, 
-            int shootType, 
-            int arrowCount, 
-            float arrowInterval, 
-            float arrowAngleStep, 
-            float aimAngle, 
-            int targetMarbleInstId, 
-            Vector2 aimDirection, 
-            bool canFire,
-            string projectileConfigId,
-            int? projectileLevel) : base(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown)
-        {
-            SetData(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown, 0, rotateSpeed, shootType, arrowCount, arrowInterval, arrowAngleStep, aimAngle, targetMarbleInstId, aimDirection, canFire, projectileConfigId, projectileLevel);
-        }
-        public void SetData(string configId, 
-            int instId, 
-            EnumEquipmentSlot slot, 
-            bool isEquipped, 
-            bool isBroken, 
-            int? attack, 
-            bool isDamageByVelocity, 
-            float cooldown, 
-            float cooldownRemaining,
-            float rotateSpeed, 
-            int shootType, 
-            int arrowCount, 
-            float arrowInterval, 
-            float arrowAngleStep, 
-            float aimAngle, 
-            int targetMarbleInstId, 
-            Vector2 aimDirection, 
-            bool canFire,
-            string projectileConfigId,
-            int? projectileLevel)
-        {
-            base.SetData(configId, instId, slot, isEquipped, isBroken, attack, isDamageByVelocity, cooldown, cooldownRemaining);
-            RotateSpeed = rotateSpeed;
-            ShootType = shootType;
-            ArrowCount = arrowCount;
-            ArrowInterval = arrowInterval;
-            ArrowAngleStep = arrowAngleStep;
-            AimAngle = aimAngle;
-            TargetMarbleInstId = targetMarbleInstId;
-            AimDirection = aimDirection;
-            CanFire = canFire;
-            ProjectileConfigId = projectileConfigId;
-            ProjectileLevel = projectileLevel;
-        }
+        public int ProjectileLevel { get; set; }
+        public BowRuntimeData(string configId, int level) : base(configId, level) { }
     }
 }

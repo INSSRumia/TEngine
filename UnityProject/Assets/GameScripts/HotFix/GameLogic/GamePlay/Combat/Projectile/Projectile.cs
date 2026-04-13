@@ -13,12 +13,14 @@ namespace GameLogic.Gameplay.Combat
             _combatManager = GameLogic.Gameplay.Combat.CombatManager.Instance;
         }
 
-        public void Despawn()
+        public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if (this == null || gameObject == null)
-                return;
-            RemoveAllAbilities();
-            Destroy(gameObject);
+            base.OnUpdate(elapseSeconds, realElapseSeconds);
+
+            if (RuntimeData.IsFinishedLifetime)
+            {
+                ProjectileFactory.Recycle(this);
+            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)

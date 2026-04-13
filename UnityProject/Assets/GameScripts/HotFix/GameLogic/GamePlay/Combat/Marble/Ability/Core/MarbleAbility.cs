@@ -8,6 +8,6 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleAbility : Ability<Marble>
     {
-        public MarbleAbility() : base(MarbleFactory.GetNextInstId) { }
+        public MarbleAbility() : base(MarbleFactory.GetNextInstAbilityId) { }
     }
 }

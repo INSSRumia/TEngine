@@ -10,6 +10,7 @@ namespace GameLogic.Gameplay.Combat
         public int TargetMarbleInstId { get; set; }
         public Vector2 TargetPoint { get; set; }
         public float CurrentLifetime { get; set; }
+        public bool IsFinishedLifetime { get; set; } = false;
         public int Damage { get; set; }
         public int RemainPiercingCount { get; set; }
         public Vector2 StartPosition { get; set; }
@@ -17,7 +18,7 @@ namespace GameLogic.Gameplay.Combat
 
         private readonly HashSet<int> _hitTargets = new HashSet<int>();
 
-        public ProjectileRuntimeData(string configId, int instId) : base(configId, instId)
+        public ProjectileRuntimeData(string configId, int level) : base(configId, level, ProjectileFactory.GetNextInstId)
         {
         }
 

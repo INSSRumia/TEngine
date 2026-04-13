@@ -141,7 +141,7 @@ namespace GameLogic.Gameplay.Combat
             OnFixedUpdate(Time.fixedDeltaTime, Time.fixedUnscaledDeltaTime);
         }
 
-        public void OnUpdate(float elapseSeconds, float realElapseSeconds)
+        public virtual void OnUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (RuntimeData == null)
                 return;
@@ -155,7 +155,7 @@ namespace GameLogic.Gameplay.Combat
             }
         }
 
-        public void OnFixedUpdate(float elapseSeconds, float realElapseSeconds)
+        public virtual void OnFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             foreach (var ability in _lstFixedUpdateAbility)
             {

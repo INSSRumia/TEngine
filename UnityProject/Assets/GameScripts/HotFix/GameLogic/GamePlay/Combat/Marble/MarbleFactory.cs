@@ -7,8 +7,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public static partial class MarbleFactory
     {
-        private static int _instIdCounter = 0;
+        private static int _instIdCounter = 1;
+        private static int _instAbilityIdCounter = 1;
         public static int GetNextInstId => _instIdCounter++;
+        public static int GetNextInstAbilityId => _instAbilityIdCounter++;
+
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Marbles/Marble");
 
         public static Marble CreateMarble(string id, int camp, int level = 0)
@@ -19,7 +22,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 return null;
             }
 
-            var runtimeData = new MarbleRuntimeData(id, 0)
+            var runtimeData = new MarbleRuntimeData(id, level)
             {
                 Camp = camp,
                 IsAlive = true,
@@ -88,7 +91,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             AttachCoreAbility(marbleComponent, new MarbleRotationAbility());
         }
 
-        private static void AttachCoreAbility(Marble marble, Ability<Marble> ability)
+        private static void AttachCoreAbility(Marble marble, MarbleAbility ability)
         {
             ability.Category = AbilityCategory.Core;
             marble.AddAbility(ability);
@@ -121,7 +124,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             _lstAbilityCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
-        public static Ability<Marble> CreateAbilityFromConfig(MarbleAbilityConfig config)
+        public static MarbleAbility CreateAbilityFromConfig(MarbleAbilityConfig config)
         {
             foreach (var creator in _lstAbilityCreatorsForConfig)
             {
@@ -143,7 +146,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             foreach (var config in levelData.LstEquipment)
             {
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(config.ConfigId);
-                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (GameLogic.Gameplay.Combat.Equipment.EnumEquipmentSlot)config.Slot);
+                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (Equipment.EnumEquipmentSlot)config.Slot);
             }
         }
     }
@@ -151,13 +154,13 @@ namespace GameLogic.Gameplay.Combat.Marble
     public interface IMarbleAbilityCreatorForConfig
     {
         int Priority { get; set; }
-        Ability<Marble> CreateAbility(MarbleAbilityConfig config);
+        MarbleAbility CreateAbility(MarbleAbilityConfig config);
     }
 
     public class DefaultMarbleAbilityCreatorForConfig : IMarbleAbilityCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
-        public Ability<Marble> CreateAbility(MarbleAbilityConfig config)
+        public MarbleAbility CreateAbility(MarbleAbilityConfig config)
         {
             return config switch
             {

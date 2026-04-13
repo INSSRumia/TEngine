@@ -31,7 +31,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             }
 
             _owner.RuntimeData.Hp = 0;
-            _owner.GetAbility<EquipmentBrokenAbility>()?.Execute();
+            _owner.RuntimeData.IsBroken = true;
         }
     }
 }

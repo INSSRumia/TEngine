@@ -12,5 +12,14 @@ namespace GameLogic.Gameplay.Combat.Equipment
             OwnerMarble = ownerMarble;
             base.Init(runtimeData);
         }
+
+        public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
+        {
+            base.OnUpdate(elapseSeconds, realElapseSeconds);
+            if(RuntimeData.IsBroken)
+            {
+                GetAbility<EquipmentBrokenAbility>()?.Execute();
+            }
+        }
     }
 }

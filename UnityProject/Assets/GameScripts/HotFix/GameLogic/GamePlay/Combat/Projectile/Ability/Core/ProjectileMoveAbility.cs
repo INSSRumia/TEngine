@@ -13,8 +13,8 @@ namespace GameLogic.Gameplay.Combat
 
             Owner.Rigidbody.velocity = targetDir * MoveSpeed;
 
-            var angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
-            Owner.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            // var angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
+            // Owner.transform.rotation = Quaternion.Euler(0f, 0f, angle);
         }
     }
 }

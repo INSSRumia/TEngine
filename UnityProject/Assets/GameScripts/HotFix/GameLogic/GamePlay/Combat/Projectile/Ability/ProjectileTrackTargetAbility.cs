@@ -7,9 +7,6 @@ namespace GameLogic.Gameplay.Combat
         protected override Vector2 ResolveDirection(float elapseSeconds)
         {
             var currentDirection = GetCurrentDirection();
-            if (Owner == null || Owner.CombatManager == null)
-                return currentDirection;
-
             var target = Owner.CombatManager.GetTarget(Owner.RuntimeData.TargetMarbleInstId);
             if (target == null || target.RuntimeData == null || !target.RuntimeData.IsAlive)
                 return currentDirection;

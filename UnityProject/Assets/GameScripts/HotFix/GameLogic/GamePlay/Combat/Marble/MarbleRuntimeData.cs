@@ -69,9 +69,6 @@ namespace GameLogic.Gameplay.Combat.Marble
         public float DefenseMultiplier { get; set; } = 1f;
         #endregion
 
-
-        [ShowInInspector]
-        public int Level { get; set; }
         [ShowInInspector]
         public int Exp { get; set; }
         [ShowInInspector]
@@ -100,7 +97,7 @@ namespace GameLogic.Gameplay.Combat.Marble
         [ShowInInspector]
         public int TargetMarbleInstId { get; set; }
 
-        public MarbleRuntimeData(string configId, int instId) : base(configId, instId)
+        public MarbleRuntimeData(string configId, int level) : base(configId, level, MarbleFactory.GetNextInstId)
         {
         }
 

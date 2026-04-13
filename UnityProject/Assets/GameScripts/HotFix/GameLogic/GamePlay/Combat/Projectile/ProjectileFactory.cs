@@ -8,9 +8,12 @@ namespace GameLogic.Gameplay.Combat
         private static int _instIdCounter = 0;
         public static int GetNextInstId => _instIdCounter++;
 
+        private static int _instAbilityIdCounter = 0;
+        public static int GetNextInstAbilityId => _instAbilityIdCounter++;
+
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Projectiles/");
 
-        public static Projectile Spawn(
+        public static Projectile CreateProjectile(
             string configId,
             int level,
             Marble.Marble sourceMarble,
@@ -40,22 +43,30 @@ namespace GameLogic.Gameplay.Combat
                 return null;
             }
 
-            string path = _path + configId;
-            var obj = GameModule.Resource.LoadGameObject(path);
-            if (obj == null)
-                return null;
-
-            var instance = Object.Instantiate(obj, spawnPosition, rotation);
-            var projectile = instance.GetComponent<Projectile>();
+            var projectile = CreateProjectileInternal(configId);
 
             if (projectile == null)
             {
-                Log.Error($"[ProjectileFactory] Projectile component not found on prefab: {path}");
-                Object.Destroy(instance);
+                Log.Error($"[ProjectileFactory] Projectile component not found on prefab: {configId}");
                 return null;
             }
 
-            var runtimeData = new ProjectileRuntimeData(configId, GetNextInstId)
+            projectile.transform.position = spawnPosition;
+            projectile.transform.rotation = rotation;
+
+            var runtimeData = CreateProjectileRuntimeData(configId, level, sourceMarble, targetMarble, targetPoint, spawnPosition, rotation, damage);
+
+            projectile.Init(runtimeData);
+
+            AttachDefaultAbilities(projectile, levelConfig);
+            AttachOptionalAbilities(projectile, levelConfig);
+
+            return projectile;
+        }
+
+        private static ProjectileRuntimeData CreateProjectileRuntimeData(string configId, int level, Marble.Marble sourceMarble, Marble.Marble targetMarble, Vector2 targetPoint, Vector2 spawnPosition, Quaternion rotation, int damage)
+        {
+            return new ProjectileRuntimeData(configId, level)
             {
                 SourceCamp = sourceMarble.RuntimeData.Camp,
                 SourceMarbleInstId = sourceMarble.RuntimeData.InstId,
@@ -64,63 +75,112 @@ namespace GameLogic.Gameplay.Combat
                 CurrentLifetime = 0f,
                 Damage = damage,
                 StartPosition = spawnPosition,
-                TargetDirection = rotation * Vector2.up,
+                TargetDirection = rotation * Vector2.right,
             };
-
-            projectile.Init(runtimeData);
-
-            AttachCoreAbilities(projectile, levelConfig);
-
-            foreach (var abilityConfig in levelConfig.LstAbility)
-            {
-                var ability = CreateAbilityFromConfig(abilityConfig);
-                if (ability != null)
-                    projectile.AddAbility(ability);
-            }
-
-            return projectile;
         }
 
-        public static void Despawn(Projectile projectile)
+        private static Projectile CreateProjectileInternal(string configId)
+        {
+            var path = _path + configId;
+            var obj = GameModule.Resource.LoadGameObject(path);
+            if (obj == null)
+            {
+                Log.Error($"[ProjectileFactory] Projectile prefab not found: {path}");
+                return null;
+            }
+            return obj.GetComponent<Projectile>();
+        }
+
+        public static void Recycle(Projectile projectile)
         {
             if (projectile == null)
                 return;
-            projectile.Despawn();
+            projectile.RemoveAllAbilities();
+            GameObject.Destroy(projectile.gameObject);
         }
 
-        private static void AttachCoreAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
+        private static void AttachDefaultAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
         {
             var moveAbility = new ProjectileMoveAbility();
-            projectile.AddAbility(moveAbility);
-            AttachTrackingAbility(projectile, levelConfig.TrackingAbility);
+            moveAbility.MoveSpeed = levelConfig.MoveAbility.Speed;
+            AttachCoreAbility(projectile, moveAbility);
 
             var damageAbility = new ProjectileDamageAbility();
             damageAbility.MaxPiercingCount = levelConfig.DamageAbility?.PiercingCount ?? 0;
             damageAbility.SourceMarble = projectile.RuntimeData.SourceMarbleInstId;
-            projectile.AddAbility(damageAbility);
+            damageAbility.IsDamageByVelocity = levelConfig.DamageAbility?.IsDamageByVelocity ?? false;
+            AttachCoreAbility(projectile, damageAbility);
 
             var lifetimeAbility = new ProjectileLifetimeAbility();
             lifetimeAbility.MaxLifetime = levelConfig.Lifetime?.MaxLifetime ?? 0f;
-            projectile.AddAbility(lifetimeAbility);
-        }
+            AttachCoreAbility(projectile, lifetimeAbility);
 
-        private static void AttachTrackingAbility(Projectile projectile, ProjectileTrackConfig trackConfig)
-        {
-            ProjectileTrackingAbility trackingAbility =  (trackConfig.TrackingType) switch
+            void AttachCoreAbility(Projectile projectile, ProjectileAbility ability)
             {
-                EnumProjectileTrackingType.Target => new ProjectileTrackTargetAbility(),
-                EnumProjectileTrackingType.Point => new ProjectileTrackPointAbility(),
-                _ => new ProjectileNoTrackingAbility(),
-            };
-
-            trackingAbility.RotateSpeed = trackConfig.AngularSpeed;
-            projectile.AddAbility(trackingAbility);
+                ability.Category = AbilityCategory.Core;
+                projectile.AddAbility(ability);
+            }
         }
 
-        private static Ability<Projectile> CreateAbilityFromConfig(ProjectileAbilityConfig config)
+        private static void AttachOptionalAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
+        {
+            if(levelConfig?.LstAbility == null)
+                return;
+
+            foreach (var config in levelConfig.LstAbility)
+            {
+                var ability = CreateAbilityFromConfig(config);
+                if (ability != null)
+                {
+                    ability.Priority = config.Priority;
+                    projectile.AddAbility(ability);
+                }
+            }
+        }
+
+
+        private readonly static System.Collections.Generic.List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new ()
+        {
+            new DefaultProjectileAbilityCreatorForConfig(),
+        };
+
+        public static void RegisterAbilityCreatorForConfig(IProjectileAbilityCreatorForConfig creator)
+        {
+            _lstAbilityCreatorsForConfig.Add(creator);
+            _lstAbilityCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        }
+
+        public static ProjectileAbility CreateAbilityFromConfig(ProjectileAbilityConfig config)
+        {
+            foreach (var creator in _lstAbilityCreatorsForConfig)
+            {
+                var ability = creator.CreateAbility(config);
+                if (ability != null)
+                {
+                    return ability;
+                }
+            }
+            Log.Error($"Projectile ability creator for config not found: {config.GetType().Name}");
+            return null;
+        }
+    }
+
+    public interface IProjectileAbilityCreatorForConfig
+    {
+        int Priority { get; set; }
+        ProjectileAbility CreateAbility(ProjectileAbilityConfig config);
+    }
+
+    public class DefaultProjectileAbilityCreatorForConfig : IProjectileAbilityCreatorForConfig
+    {
+        public int Priority { get; set; } = int.MinValue;
+        public ProjectileAbility CreateAbility(ProjectileAbilityConfig config)
         {
             return config switch
             {
+                ProjectileNoTrackingConfig _=> new ProjectileNoTrackingAbility(),
+                ProjectileTrackTargetConfig _=> new ProjectileTrackTargetAbility(),
+                ProjectileTrackPointConfig _=> new ProjectileTrackPointAbility(),
                 _ => null
             };
         }
