@@ -17,7 +17,7 @@
         "sword_collision_attack": {
           "priority": 0,
           "is_damage_by_velocity": true,
-          "velocity_damage_factor": 0.05
+          "velocity_damage_factor": 0.2
         }
       },
       {
@@ -35,7 +35,7 @@
         "sword_collision_attack": {
           "priority": 0,
           "is_damage_by_velocity": true,
-          "velocity_damage_factor": 0.05
+          "velocity_damage_factor": 0.2
         }
       }
     ]

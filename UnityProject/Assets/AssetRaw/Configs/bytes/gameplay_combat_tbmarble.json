@@ -49,9 +49,11 @@
             "acceleration": 20,
             "lock_direction_on_activate": false,
             "timing": {
-              "$type": "FixedAbilityTimingConfig",
-              "duration": 1,
-              "cooldown": 3,
+              "$type": "RandomRangeAbilityTimingConfig",
+              "min_duration": 1,
+              "max_duration": 1,
+              "min_cooldown": 1,
+              "max_cooldown": 3,
               "auto_activate": true
             }
           }
@@ -103,9 +105,11 @@
             "acceleration": 20,
             "lock_direction_on_activate": false,
             "timing": {
-              "$type": "FixedAbilityTimingConfig",
-              "duration": 1,
-              "cooldown": 3,
+              "$type": "RandomRangeAbilityTimingConfig",
+              "min_duration": 1,
+              "max_duration": 1,
+              "min_cooldown": 1,
+              "max_cooldown": 3,
               "auto_activate": true
             }
           }
