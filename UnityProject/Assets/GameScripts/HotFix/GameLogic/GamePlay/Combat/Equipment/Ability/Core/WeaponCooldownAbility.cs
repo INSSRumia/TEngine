@@ -3,6 +3,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public class WeaponCooldownAbility : EquipmentAbility, IAbilityUpdate
     {
         private WeaponEquipment _owner;
+        public float Cooldown {get; private set;}
+        public WeaponCooldownAbility(float cooldown)
+        {
+            Cooldown = cooldown;
+        }
         public override void OnAdd()
         {
             base.OnAdd();
@@ -16,10 +21,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         }
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if (_owner == null || _owner.RuntimeData == null)
-                return;
-
-            if (_owner.RuntimeData.CooldownRemaining <= 0f)
+            if (_owner.RuntimeData.IsBroken)
                 return;
 
             _owner.RuntimeData.CooldownRemaining -= elapseSeconds;
@@ -29,13 +31,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
         public bool TryConsumeCooldown()
         {
-            if (_owner == null || _owner.RuntimeData == null)
-                return false;
-
-            if (_owner.RuntimeData.CooldownRemaining > 0f)
-                return false;
-
-            _owner.RuntimeData.CooldownRemaining = _owner.RuntimeData.Cooldown;
+            _owner.RuntimeData.CooldownRemaining = Cooldown;
             return true;
         }
     }

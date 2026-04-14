@@ -7,16 +7,36 @@
         "level": 0,
         "name": "剑",
         "lst_ability": [],
-        "is_damage_by_velocity": true,
-        "cooldown": 0.1
+        "calculate_damage": {
+          "priority": 0
+        },
+        "cooldown": {
+          "priority": 0,
+          "cooldown": 0.1
+        },
+        "sword_collision_attack": {
+          "priority": 0,
+          "is_damage_by_velocity": true,
+          "velocity_damage_factor": 0.05
+        }
       },
       {
         "$type": "SwordLevelConfig",
         "level": 1,
         "name": "剑",
         "lst_ability": [],
-        "is_damage_by_velocity": true,
-        "cooldown": 0.1
+        "calculate_damage": {
+          "priority": 0
+        },
+        "cooldown": {
+          "priority": 0,
+          "cooldown": 0.1
+        },
+        "sword_collision_attack": {
+          "priority": 0,
+          "is_damage_by_velocity": true,
+          "velocity_damage_factor": 0.05
+        }
       }
     ]
   },
@@ -27,27 +47,25 @@
         "$type": "ArmorLevelConfig",
         "level": 0,
         "name": "盾",
-        "lst_ability": [
-          {
-            "$type": "ArmorAbsorbDamageAbilityConfig",
-            "priority": 0
-          }
-        ],
-        "hp": 100,
-        "defense": 0
+        "lst_ability": [],
+        "armor": {
+          "$type": "ArmorAbsorbDamageAbilityConfig",
+          "priority": 0,
+          "hp": 100,
+          "defense": 0
+        }
       },
       {
         "$type": "ArmorLevelConfig",
         "level": 1,
         "name": "盾",
-        "lst_ability": [
-          {
-            "$type": "ArmorAbsorbDamageAbilityConfig",
-            "priority": 0
-          }
-        ],
-        "hp": 200,
-        "defense": 0
+        "lst_ability": [],
+        "armor": {
+          "$type": "ArmorAbsorbDamageAbilityConfig",
+          "priority": 0,
+          "hp": 200,
+          "defense": 0
+        }
       }
     ]
   },
@@ -59,32 +77,54 @@
         "level": 0,
         "name": "弓",
         "lst_ability": [],
-        "is_damage_by_velocity": true,
-        "cooldown": 5,
-        "rotate_speed": 360,
-        "shoot_type": 0,
-        "arrow_count": 3,
-        "arrow_interval": 0.1,
-        "arrow_angle_step": 5,
-        "aim_angle": 10,
-        "projectile_config_id": "arrow",
-        "projectile_level": 0
+        "calculate_damage": {
+          "priority": 0
+        },
+        "cooldown": {
+          "priority": 0,
+          "cooldown": 5
+        },
+        "bow_aim": {
+          "priority": 0,
+          "rotate_speed": 360,
+          "aim_angle": 10
+        },
+        "bow_fire": {
+          "priority": 0,
+          "arrow_count": 3,
+          "arrow_interval": 0.1,
+          "arrow_angle_step": 5,
+          "shoot_type": 1,
+          "projectile_config_id": "arrow",
+          "projectile_level": 0
+        }
       },
       {
         "$type": "BowLevelConfig",
         "level": 1,
         "name": "弓",
         "lst_ability": [],
-        "is_damage_by_velocity": true,
-        "cooldown": 5,
-        "rotate_speed": 360,
-        "shoot_type": 0,
-        "arrow_count": 3,
-        "arrow_interval": 0.1,
-        "arrow_angle_step": 5,
-        "aim_angle": 10,
-        "projectile_config_id": "arrow",
-        "projectile_level": 0
+        "calculate_damage": {
+          "priority": 0
+        },
+        "cooldown": {
+          "priority": 0,
+          "cooldown": 5
+        },
+        "bow_aim": {
+          "priority": 0,
+          "rotate_speed": 360,
+          "aim_angle": 10
+        },
+        "bow_fire": {
+          "priority": 0,
+          "arrow_count": 3,
+          "arrow_interval": 0.1,
+          "arrow_angle_step": 5,
+          "shoot_type": 1,
+          "projectile_config_id": "arrow",
+          "projectile_level": 0
+        }
       }
     ]
   }

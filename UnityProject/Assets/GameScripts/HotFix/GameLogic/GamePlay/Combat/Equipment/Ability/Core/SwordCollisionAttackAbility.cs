@@ -5,6 +5,13 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public class SwordCollisionAttackAbility : EquipmentAbility
     {
         private SwordEquipment _owner;
+        public bool IsDamageByVelocity {get; private set;}
+        public float VelocityDamageFactor {get; private set;}
+        public SwordCollisionAttackAbility(bool isDamageByVelocity, float velocityDamageFactor)
+        {
+            IsDamageByVelocity = isDamageByVelocity;
+            VelocityDamageFactor = velocityDamageFactor;
+        }
         public override void OnAdd()
         {
             base.OnAdd();
@@ -18,7 +25,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
             _owner = null;
         }
 
-        public float VelocityDamageFactor { get; set; } = 1f;
         public void HandleCollision(Collision2D collision)
         {
             if (collision == null || _owner == null || _owner.OwnerMarble == null || _owner.RuntimeData == null)
@@ -57,8 +63,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             var damage = _owner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage() ?? 0;
             //TODO: 这里需要优化，如果装备是按速度伤害，则需要计算速度伤害,否则直接使用伤害
-            var relativeVelocity = collision.relativeVelocity.magnitude;
-            damage = Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * damage);
+            if(IsDamageByVelocity)
+            {
+                var relativeVelocity = collision.relativeVelocity.magnitude;
+                damage = Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * damage);
+            }
 
             if (damage <= 0)
                 return;

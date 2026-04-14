@@ -13,23 +13,21 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityConfig
+public sealed partial class WeaponCooldownAbilityConfig : EquipmentAbilityConfig
 {
-    public ArmorAbsorbDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public WeaponCooldownAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
-        { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
+        { if(!_buf["cooldown"].IsNumber) { throw new SerializationException(); }  Cooldown = _buf["cooldown"]; }
     }
 
-    public static ArmorAbsorbDamageAbilityConfig DeserializeArmorAbsorbDamageAbilityConfig(JSONNode _buf)
+    public static WeaponCooldownAbilityConfig DeserializeWeaponCooldownAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ArmorAbsorbDamageAbilityConfig(_buf);
+        return new Gameplay.Combat.WeaponCooldownAbilityConfig(_buf);
     }
 
-    public readonly int Hp;
-    public readonly int Defense;
+    public readonly float Cooldown;
    
-    public const int __ID__ = 1532287875;
+    public const int __ID__ = -934850733;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
@@ -41,8 +39,7 @@ public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityCon
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "hp:" + Hp + ","
-        + "defense:" + Defense + ","
+        + "cooldown:" + Cooldown + ","
         + "}";
     }
 }

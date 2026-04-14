@@ -10,6 +10,7 @@
         },
         "damage_ability": {
           "is_damage_by_velocity": true,
+          "velocity_damage_factor": 0.05,
           "piercing_count": 1
         },
         "lifetime": {
@@ -30,6 +31,7 @@
         },
         "damage_ability": {
           "is_damage_by_velocity": true,
+          "velocity_damage_factor": 0.05,
           "piercing_count": 1
         },
         "lifetime": {
@@ -55,7 +57,8 @@
         },
         "damage_ability": {
           "is_damage_by_velocity": true,
-          "piercing_count": 0
+          "velocity_damage_factor": 0.05,
+          "piercing_count": 1
         },
         "lifetime": {
           "max_lifetime": 5
@@ -75,7 +78,8 @@
         },
         "damage_ability": {
           "is_damage_by_velocity": true,
-          "piercing_count": 0
+          "velocity_damage_factor": 0.05,
+          "piercing_count": 1
         },
         "lifetime": {
           "max_lifetime": 5

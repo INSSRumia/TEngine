@@ -53,17 +53,12 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 if (runtimeData != null)
                 {
                     equipment.Init(ownerMarble, runtimeData);
-                    creator.AttachDefaultAbilities(equipment);
+                    creator.AttachDefaultAbilities(equipment, levelConfig);
                     break;
                 }
             }
 
             AttachOptionalAbilities(equipment, levelConfig);
-
-            if (equipment != null)
-            {
-                ownerMarble.RegisterEquipment(equipment);
-            }
 
             return equipment;
         }
@@ -121,7 +116,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         int Priority { get; set; }
         EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EnumEquipmentSlot slot);
-        void AttachDefaultAbilities(Equipment equipment);
+        void AttachDefaultAbilities(Equipment equipment, EquipmentLevelConfig levelConfig);
     }
     public class DefaultEquipmentCreatorForConfig : IEquipmentCreatorForConfig
     {
@@ -137,9 +132,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
-                        Hp = armorConfig.Hp,
-                        MaxHp = armorConfig.Hp,
-                        Defense = armorConfig.Defense
+                        // Hp = armorConfig.Armor.,
                     };
                 }
                 case BowLevelConfig bowConfig:
@@ -149,19 +142,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         Slot = slot,
                         IsEquipped =  true,
                         IsBroken = false,
-                        Attack = bowConfig.Attack,
-                        IsDamageByVelocity = bowConfig.IsDamageByVelocity,
-                        Cooldown = bowConfig.Cooldown,
-                        RotateSpeed = bowConfig.RotateSpeed,
-                        ShootType = bowConfig.ShootType,
-                        ArrowCount = bowConfig.ArrowCount,
-                        ArrowInterval = bowConfig.ArrowInterval,
-                        ArrowAngleStep = bowConfig.ArrowAngleStep,
-                        AimAngle = bowConfig.AimAngle,
-                        AimDirection = UnityEngine.Vector2.zero,
                         CanFire = false,
-                        ProjectileConfigId = bowConfig.ProjectileConfigId,
-                        ProjectileLevel = bowConfig.ProjectileLevel
                     };
                 }
                 case SwordLevelConfig swordConfig:
@@ -171,42 +152,68 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
-                        Attack = swordConfig.Attack,
-                        IsDamageByVelocity = swordConfig.IsDamageByVelocity,
-                        Cooldown = swordConfig.Cooldown
                     };
                 }
             }
             return null;
         }
 
-        public void AttachDefaultAbilities(Equipment equipment)
+        public void AttachDefaultAbilities(Equipment equipment, EquipmentLevelConfig levelConfig)
         {
             switch (equipment)
             {
                 case ArmorEquipment armorEquipment:
                 {
-                    armorEquipment.AddAbility(new EquipmentMountAbility());
+                    armorEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
                     armorEquipment.AddAbility(new EquipmentBrokenAbility());
+
+                    var armorConfig = levelConfig as ArmorLevelConfig;
+                    if (armorConfig == null)
+                    {
+                        Log.Error($"ArmorLevelConfig 配置错误: {levelConfig.Level}");
+                        break;
+                    }
+                    switch(armorConfig.Armor)
+                    {
+                        case ArmorReduceDamageAbilityConfig c1 :
+                            armorEquipment.AddAbility(new ArmorReduceDamageAbility(c1.Defense));
+                            break;
+                        case ArmorAbsorbDamageAbilityConfig c2 :
+                            armorEquipment.AddAbility(new ArmorAbsorbDamageAbility(c2.Defense, c2.Hp));
+                            break;
+                    }
+
                     break;
                 }
                 case BowEquipment bowEquipment:
                 {
-                    bowEquipment.AddAbility(new EquipmentMountAbility());
+                    bowEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
                     bowEquipment.AddAbility(new EquipmentBrokenAbility());
-                    bowEquipment.AddAbility(new WeaponCooldownAbility());
-                    bowEquipment.AddAbility(new WeaponCalculateDamageAbility());
-                    bowEquipment.AddAbility(new BowAimAbility());
-                    bowEquipment.AddAbility(new BowFireAbility());
+                    var bowConfig = levelConfig as BowLevelConfig;
+                    if (bowConfig == null)
+                    {
+                        Log.Error($"BowLevelConfig 配置错误: {levelConfig.Level}");
+                        break;
+                    }
+                    bowEquipment.AddAbility(new WeaponCooldownAbility(bowConfig.Cooldown.Cooldown));
+                    bowEquipment.AddAbility(new WeaponCalculateDamageAbility(bowConfig.CalculateDamage.Attack));
+                    bowEquipment.AddAbility(new BowAimAbility(bowConfig.BowAim.RotateSpeed, bowConfig.BowAim.RotateSpeed));
+                    bowEquipment.AddAbility(new BowFireAbility(bowConfig.BowFire.ProjectileConfigId, bowConfig.BowFire.ProjectileLevel, bowConfig.BowFire.ArrowInterval, bowConfig.BowFire.ArrowCount, bowConfig.BowFire.ArrowAngleStep, bowConfig.BowFire.ShootType));
                     break;
                 }
                 case SwordEquipment swordEquipment:
                 {
-                    swordEquipment.AddAbility(new EquipmentMountAbility());
+                    swordEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
                     swordEquipment.AddAbility(new EquipmentBrokenAbility());
-                    swordEquipment.AddAbility(new WeaponCooldownAbility());
-                    swordEquipment.AddAbility(new WeaponCalculateDamageAbility());
-                    swordEquipment.AddAbility(new SwordCollisionAttackAbility());
+                    var swordConfig = levelConfig as SwordLevelConfig;
+                    if (swordConfig == null)
+                    {
+                        Log.Error($"SwordLevelConfig 配置错误: {levelConfig.Level}");
+                        break;
+                    }
+                    swordEquipment.AddAbility(new WeaponCooldownAbility(swordConfig.Cooldown.Cooldown));
+                    swordEquipment.AddAbility(new WeaponCalculateDamageAbility(swordConfig.CalculateDamage.Attack));
+                    swordEquipment.AddAbility(new SwordCollisionAttackAbility(swordConfig.SwordCollisionAttack.IsDamageByVelocity, swordConfig.SwordCollisionAttack.VelocityDamageFactor));
                     break;
                 }
                 default:
@@ -230,8 +237,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
         {
             return config switch
             {
-                ArmorReduceDamageAbilityConfig => new ArmorReduceDamageAbility(),
-                ArmorAbsorbDamageAbilityConfig => new ArmorAbsorbDamageAbility(),
                 _ => null
             };
         }

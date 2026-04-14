@@ -5,6 +5,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public class WeaponCalculateDamageAbility : EquipmentAbility
     {
         private WeaponEquipment _owner;
+        public int? Attack {get; private set;}
+        public WeaponCalculateDamageAbility(int? attack)
+        {
+            Attack = attack;
+        }
         public override void OnAdd()
         {
             base.OnAdd();
@@ -20,16 +25,17 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
         public int CalculateDamage()
         {
-            if (_owner == null || _owner.RuntimeData == null || _owner.RuntimeData.IsBroken)
+            if (_owner.RuntimeData.IsBroken)
                 return 0;
 
-            bool isUseOwnerAttack = _owner.RuntimeData.Attack == null;
-            int attack = isUseOwnerAttack ? _owner.OwnerMarble.RuntimeData.Attack : _owner.RuntimeData.Attack.Value;
+            bool isUseOwnerAttack = Attack == null;
+            int attack = isUseOwnerAttack ? _owner.OwnerMarble.RuntimeData.Attack : Attack.Value;
+            // TODO: Marble应该提供一个计算伤害的核心Ability，计算伤害时应该使用这个Ability
             int attackAddition = _owner.OwnerMarble.RuntimeData.AttackAddition;
             float attackMultiplier = _owner.OwnerMarble.RuntimeData.AttackMultiplier;
             attack = Mathf.RoundToInt((attack + attackAddition) * attackMultiplier);
 
-            return Mathf.Max(0, Mathf.RoundToInt(attack));
+            return Mathf.Max(0, attack);
         }
     }
 }

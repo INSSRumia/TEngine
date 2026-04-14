@@ -13,23 +13,21 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityConfig
+public sealed partial class WeaponCalculateDamageAbilityConfig : EquipmentAbilityConfig
 {
-    public ArmorAbsorbDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public WeaponCalculateDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
-        { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
+        { var _j = _buf["attack"]; if (_j.Tag != JSONNodeType.None && _j.Tag != JSONNodeType.NullValue) { { if(!_j.IsNumber) { throw new SerializationException(); }  Attack = _j; } } else { Attack = null; } }
     }
 
-    public static ArmorAbsorbDamageAbilityConfig DeserializeArmorAbsorbDamageAbilityConfig(JSONNode _buf)
+    public static WeaponCalculateDamageAbilityConfig DeserializeWeaponCalculateDamageAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ArmorAbsorbDamageAbilityConfig(_buf);
+        return new Gameplay.Combat.WeaponCalculateDamageAbilityConfig(_buf);
     }
 
-    public readonly int Hp;
-    public readonly int Defense;
+    public readonly int? Attack;
    
-    public const int __ID__ = 1532287875;
+    public const int __ID__ = 1402799205;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
@@ -41,8 +39,7 @@ public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityCon
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "hp:" + Hp + ","
-        + "defense:" + Defense + ","
+        + "attack:" + Attack + ","
         + "}";
     }
 }

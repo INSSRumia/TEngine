@@ -4,6 +4,10 @@ namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileTrackTargetAbility : ProjectileTrackingAbility
     {
+        public ProjectileTrackTargetAbility(float rotateSpeed) : base(rotateSpeed)
+        {
+        }
+
         protected override Vector2 ResolveDirection(float elapseSeconds)
         {
             var currentDirection = GetCurrentDirection();

@@ -47,12 +47,10 @@ namespace GameLogic.Gameplay.Combat.Marble
         }
 
 
-        public void RegisterEquipment(Equipment.Equipment equipment)
+        public void RegisterEquipment(Equipment.Equipment equipment, EnumEquipmentSlot slot)
         {
             if (equipment == null || equipment.RuntimeData == null)
                 return;
-
-            var slot = equipment.RuntimeData.Slot;
 
             if (_equipmentMap.TryGetValue(slot, out var existingEquipment) && existingEquipment != null && existingEquipment != equipment)
             {

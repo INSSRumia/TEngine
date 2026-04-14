@@ -17,8 +17,7 @@ public sealed partial class ArmorLevelConfig : EquipmentLevelConfig
 {
     public ArmorLevelConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
-        { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
+        { if(!_buf["armor"].IsObject) { throw new SerializationException(); }  Armor = global::GameConfig.Gameplay.Combat.EquipmentAbilityConfig.DeserializeEquipmentAbilityConfig(_buf["armor"]);  }
     }
 
     public static ArmorLevelConfig DeserializeArmorLevelConfig(JSONNode _buf)
@@ -26,8 +25,7 @@ public sealed partial class ArmorLevelConfig : EquipmentLevelConfig
         return new Gameplay.Combat.ArmorLevelConfig(_buf);
     }
 
-    public readonly int Hp;
-    public readonly int Defense;
+    public readonly Gameplay.Combat.EquipmentAbilityConfig Armor;
    
     public const int __ID__ = -1928026823;
     public override int GetTypeId() => __ID__;
@@ -35,6 +33,7 @@ public sealed partial class ArmorLevelConfig : EquipmentLevelConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        Armor?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -43,8 +42,7 @@ public sealed partial class ArmorLevelConfig : EquipmentLevelConfig
         + "level:" + Level + ","
         + "name:" + Name + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
-        + "hp:" + Hp + ","
-        + "defense:" + Defense + ","
+        + "armor:" + Armor + ","
         + "}";
     }
 }

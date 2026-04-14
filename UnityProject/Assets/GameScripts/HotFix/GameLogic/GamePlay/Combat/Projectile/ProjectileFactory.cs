@@ -101,18 +101,13 @@ namespace GameLogic.Gameplay.Combat
 
         private static void AttachDefaultAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
         {
-            var moveAbility = new ProjectileMoveAbility();
-            moveAbility.MoveSpeed = levelConfig.MoveAbility.Speed;
+            var moveAbility = new ProjectileMoveAbility(levelConfig.MoveAbility.Speed);
             AttachCoreAbility(projectile, moveAbility);
 
-            var damageAbility = new ProjectileDamageAbility();
-            damageAbility.MaxPiercingCount = levelConfig.DamageAbility?.PiercingCount ?? 0;
-            damageAbility.SourceMarble = projectile.RuntimeData.SourceMarbleInstId;
-            damageAbility.IsDamageByVelocity = levelConfig.DamageAbility?.IsDamageByVelocity ?? false;
+            var damageAbility = new ProjectileDamageAbility(levelConfig.DamageAbility?.PiercingCount ?? 0, projectile.RuntimeData.SourceMarbleInstId, levelConfig.DamageAbility.IsDamageByVelocity, levelConfig.DamageAbility.VelocityDamageFactor);
             AttachCoreAbility(projectile, damageAbility);
 
-            var lifetimeAbility = new ProjectileLifetimeAbility();
-            lifetimeAbility.MaxLifetime = levelConfig.Lifetime?.MaxLifetime ?? 0f;
+            var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime?.MaxLifetime ?? 0f);
             AttachCoreAbility(projectile, lifetimeAbility);
 
             void AttachCoreAbility(Projectile projectile, ProjectileAbility ability)
@@ -179,8 +174,8 @@ namespace GameLogic.Gameplay.Combat
             return config switch
             {
                 ProjectileNoTrackingConfig _=> new ProjectileNoTrackingAbility(),
-                ProjectileTrackTargetConfig _=> new ProjectileTrackTargetAbility(),
-                ProjectileTrackPointConfig _=> new ProjectileTrackPointAbility(),
+                ProjectileTrackTargetConfig trackTargetConfig => new ProjectileTrackTargetAbility(trackTargetConfig.AngularSpeed),
+                ProjectileTrackPointConfig trackPointConfig => new ProjectileTrackPointAbility(trackPointConfig.AngularSpeed),
                 _ => null
             };
         }

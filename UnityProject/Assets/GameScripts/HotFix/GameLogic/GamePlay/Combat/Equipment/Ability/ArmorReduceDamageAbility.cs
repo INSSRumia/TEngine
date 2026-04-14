@@ -3,6 +3,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public class ArmorReduceDamageAbility : EquipmentAbility, IReceiveDamage
     {
         private ArmorEquipment _owner;
+        public int Defense {get; private set;}
+        public ArmorReduceDamageAbility(int defense)
+        {
+            Defense = defense;
+        }
         public override void OnAdd()
         {
             base.OnAdd();
@@ -16,10 +21,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         }
         public void ReceiveDamage(int damage, ASC source = null)
         {
-            if (damage <= 0 || _owner == null || _owner.RuntimeData == null || _owner.OwnerMarble == null)
+            if (damage <= 0 || _owner.RuntimeData.IsBroken)
                 return;
 
-            damage -= _owner.RuntimeData.Defense;
+            damage -= Defense;
             if(damage <= 0)
                 return;
 

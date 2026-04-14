@@ -24,9 +24,13 @@ public abstract partial class EquipmentAbilityConfig : Luban.BeanBase
     {
         switch ((string)_buf["$type"])
         {
+            case "WeaponCalculateDamageAbilityConfig": return new Gameplay.Combat.WeaponCalculateDamageAbilityConfig(_buf);
+            case "WeaponCooldownAbilityConfig": return new Gameplay.Combat.WeaponCooldownAbilityConfig(_buf);
             case "SwordCollisionAttackAbilityConfig": return new Gameplay.Combat.SwordCollisionAttackAbilityConfig(_buf);
             case "ArmorReduceDamageAbilityConfig": return new Gameplay.Combat.ArmorReduceDamageAbilityConfig(_buf);
             case "ArmorAbsorbDamageAbilityConfig": return new Gameplay.Combat.ArmorAbsorbDamageAbilityConfig(_buf);
+            case "BowAimAbilityConfig": return new Gameplay.Combat.BowAimAbilityConfig(_buf);
+            case "BowFireAbilityConfig": return new Gameplay.Combat.BowFireAbilityConfig(_buf);
             default: throw new SerializationException();
         }
     }

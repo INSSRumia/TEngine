@@ -17,14 +17,8 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
 {
     public BowLevelConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["rotate_speed"].IsNumber) { throw new SerializationException(); }  RotateSpeed = _buf["rotate_speed"]; }
-        { if(!_buf["shoot_type"].IsNumber) { throw new SerializationException(); }  ShootType = _buf["shoot_type"]; }
-        { if(!_buf["arrow_count"].IsNumber) { throw new SerializationException(); }  ArrowCount = _buf["arrow_count"]; }
-        { if(!_buf["arrow_interval"].IsNumber) { throw new SerializationException(); }  ArrowInterval = _buf["arrow_interval"]; }
-        { if(!_buf["arrow_angle_step"].IsNumber) { throw new SerializationException(); }  ArrowAngleStep = _buf["arrow_angle_step"]; }
-        { if(!_buf["aim_angle"].IsNumber) { throw new SerializationException(); }  AimAngle = _buf["aim_angle"]; }
-        { if(!_buf["projectile_config_id"].IsString) { throw new SerializationException(); }  ProjectileConfigId = _buf["projectile_config_id"]; }
-        { if(!_buf["projectile_level"].IsNumber) { throw new SerializationException(); }  ProjectileLevel = _buf["projectile_level"]; }
+        { if(!_buf["bow_aim"].IsObject) { throw new SerializationException(); }  BowAim = global::GameConfig.Gameplay.Combat.BowAimAbilityConfig.DeserializeBowAimAbilityConfig(_buf["bow_aim"]);  }
+        { if(!_buf["bow_fire"].IsObject) { throw new SerializationException(); }  BowFire = global::GameConfig.Gameplay.Combat.BowFireAbilityConfig.DeserializeBowFireAbilityConfig(_buf["bow_fire"]);  }
     }
 
     public static BowLevelConfig DeserializeBowLevelConfig(JSONNode _buf)
@@ -32,14 +26,8 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
         return new Gameplay.Combat.BowLevelConfig(_buf);
     }
 
-    public readonly float RotateSpeed;
-    public readonly int ShootType;
-    public readonly int ArrowCount;
-    public readonly float ArrowInterval;
-    public readonly float ArrowAngleStep;
-    public readonly float AimAngle;
-    public readonly string ProjectileConfigId;
-    public readonly int ProjectileLevel;
+    public readonly Gameplay.Combat.BowAimAbilityConfig BowAim;
+    public readonly Gameplay.Combat.BowFireAbilityConfig BowFire;
    
     public const int __ID__ = -1363365810;
     public override int GetTypeId() => __ID__;
@@ -47,6 +35,8 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        BowAim?.ResolveRef(tables);
+        BowFire?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -55,17 +45,10 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
         + "level:" + Level + ","
         + "name:" + Name + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
-        + "attack:" + Attack + ","
-        + "isDamageByVelocity:" + IsDamageByVelocity + ","
+        + "calculateDamage:" + CalculateDamage + ","
         + "cooldown:" + Cooldown + ","
-        + "rotateSpeed:" + RotateSpeed + ","
-        + "shootType:" + ShootType + ","
-        + "arrowCount:" + ArrowCount + ","
-        + "arrowInterval:" + ArrowInterval + ","
-        + "arrowAngleStep:" + ArrowAngleStep + ","
-        + "aimAngle:" + AimAngle + ","
-        + "projectileConfigId:" + ProjectileConfigId + ","
-        + "projectileLevel:" + ProjectileLevel + ","
+        + "bowAim:" + BowAim + ","
+        + "bowFire:" + BowFire + ","
         + "}";
     }
 }

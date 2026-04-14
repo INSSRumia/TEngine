@@ -17,6 +17,8 @@ public sealed partial class SwordCollisionAttackAbilityConfig : EquipmentAbility
 {
     public SwordCollisionAttackAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["is_damage_by_velocity"].IsBoolean) { throw new SerializationException(); }  IsDamageByVelocity = _buf["is_damage_by_velocity"]; }
+        { if(!_buf["velocity_damage_factor"].IsNumber) { throw new SerializationException(); }  VelocityDamageFactor = _buf["velocity_damage_factor"]; }
     }
 
     public static SwordCollisionAttackAbilityConfig DeserializeSwordCollisionAttackAbilityConfig(JSONNode _buf)
@@ -24,6 +26,8 @@ public sealed partial class SwordCollisionAttackAbilityConfig : EquipmentAbility
         return new Gameplay.Combat.SwordCollisionAttackAbilityConfig(_buf);
     }
 
+    public readonly bool IsDamageByVelocity;
+    public readonly float VelocityDamageFactor;
    
     public const int __ID__ = 1608647133;
     public override int GetTypeId() => __ID__;
@@ -37,6 +41,8 @@ public sealed partial class SwordCollisionAttackAbilityConfig : EquipmentAbility
     {
         return "{ "
         + "priority:" + Priority + ","
+        + "isDamageByVelocity:" + IsDamageByVelocity + ","
+        + "velocityDamageFactor:" + VelocityDamageFactor + ","
         + "}";
     }
 }

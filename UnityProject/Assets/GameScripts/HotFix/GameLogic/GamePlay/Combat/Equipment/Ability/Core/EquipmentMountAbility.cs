@@ -6,6 +6,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
     // 装备挂载到角色身上
     public class EquipmentMountAbility : EquipmentAbility
     {
+        public EnumEquipmentSlot Slot {get; private set;}
+        public EquipmentMountAbility(EnumEquipmentSlot slot)
+        {
+            Slot = slot;
+        }
         public override void OnAdd()
         {
             MountToOwner();
@@ -16,13 +21,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (EquipmentOwner == null || EquipmentOwner.OwnerMarble == null)
                 return;
 
-            var slotPoint = EquipmentOwner.OwnerMarble.GetEquipmentSlotPoint(EquipmentOwner.RuntimeData.Slot);
+            var slotPoint = EquipmentOwner.OwnerMarble.GetEquipmentSlotPoint(Slot);
             EquipmentOwner.transform.SetParent(slotPoint, false);
             EquipmentOwner.transform.localPosition = Vector3.zero;
             EquipmentOwner.transform.localRotation = Quaternion.identity;
 
             BindJoint();
             EquipmentOwner.RuntimeData.IsEquipped = true;
+
+            EquipmentOwner.OwnerMarble.RegisterEquipment(EquipmentOwner, Slot);
             Log.Info($"[EquipmentMountAbility] 装备 {EquipmentOwner.RuntimeData.ConfigId} 挂载到角色 {EquipmentOwner.OwnerMarble.RuntimeData.ConfigId}");
         }
 

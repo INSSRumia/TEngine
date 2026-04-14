@@ -17,9 +17,8 @@ public abstract partial class WeaponLevelConfig : EquipmentLevelConfig
 {
     public WeaponLevelConfig(JSONNode _buf)  : base(_buf) 
     {
-        { var _j = _buf["attack"]; if (_j.Tag != JSONNodeType.None && _j.Tag != JSONNodeType.NullValue) { { if(!_j.IsNumber) { throw new SerializationException(); }  Attack = _j; } } else { Attack = null; } }
-        { if(!_buf["is_damage_by_velocity"].IsBoolean) { throw new SerializationException(); }  IsDamageByVelocity = _buf["is_damage_by_velocity"]; }
-        { if(!_buf["cooldown"].IsNumber) { throw new SerializationException(); }  Cooldown = _buf["cooldown"]; }
+        { if(!_buf["calculate_damage"].IsObject) { throw new SerializationException(); }  CalculateDamage = global::GameConfig.Gameplay.Combat.WeaponCalculateDamageAbilityConfig.DeserializeWeaponCalculateDamageAbilityConfig(_buf["calculate_damage"]);  }
+        { if(!_buf["cooldown"].IsObject) { throw new SerializationException(); }  Cooldown = global::GameConfig.Gameplay.Combat.WeaponCooldownAbilityConfig.DeserializeWeaponCooldownAbilityConfig(_buf["cooldown"]);  }
     }
 
     public static WeaponLevelConfig DeserializeWeaponLevelConfig(JSONNode _buf)
@@ -32,14 +31,15 @@ public abstract partial class WeaponLevelConfig : EquipmentLevelConfig
         }
     }
 
-    public readonly int? Attack;
-    public readonly bool IsDamageByVelocity;
-    public readonly float Cooldown;
+    public readonly Gameplay.Combat.WeaponCalculateDamageAbilityConfig CalculateDamage;
+    public readonly Gameplay.Combat.WeaponCooldownAbilityConfig Cooldown;
    
 
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        CalculateDamage?.ResolveRef(tables);
+        Cooldown?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -48,8 +48,7 @@ public abstract partial class WeaponLevelConfig : EquipmentLevelConfig
         + "level:" + Level + ","
         + "name:" + Name + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
-        + "attack:" + Attack + ","
-        + "isDamageByVelocity:" + IsDamageByVelocity + ","
+        + "calculateDamage:" + CalculateDamage + ","
         + "cooldown:" + Cooldown + ","
         + "}";
     }

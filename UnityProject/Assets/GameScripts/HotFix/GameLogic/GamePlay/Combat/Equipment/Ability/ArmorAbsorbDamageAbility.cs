@@ -3,11 +3,20 @@ namespace GameLogic.Gameplay.Combat.Equipment
     public class ArmorAbsorbDamageAbility : EquipmentAbility, IReceiveDamage
     {
         private ArmorEquipment _owner;
+        public int Defense {get; private set;}
+        public int MaxHp {get; private set;}
+        public ArmorAbsorbDamageAbility(int defense, int maxHp)
+        {
+            Defense = defense;
+            MaxHp = maxHp;
+        }
+
         public override void OnAdd()
         {
             base.OnAdd();
             if(EquipmentOwner is ArmorEquipment armorEquipment)
                 _owner = armorEquipment;
+            _owner.RuntimeData.Hp = MaxHp;
         }
         public override void OnRemove()
         {
@@ -16,10 +25,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         }
         public void ReceiveDamage(int damage, ASC source = null)
         {
-            if (damage <= 0 || _owner == null || _owner.RuntimeData == null || _owner.RuntimeData.IsBroken)
+            if (damage <= 0 || _owner.RuntimeData.IsBroken)
                 return;
 
-            damage -= _owner.RuntimeData.Defense;
+            damage -= Defense;
             if (damage <= 0)
                 return;
 

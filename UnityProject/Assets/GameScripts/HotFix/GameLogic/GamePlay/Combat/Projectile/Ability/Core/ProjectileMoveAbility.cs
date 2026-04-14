@@ -4,7 +4,11 @@ namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileMoveAbility : ProjectileAbility, IAbilityFixedUpdate
     {
-        public float MoveSpeed { get; set; }
+        public float MoveSpeed { get; private set; }
+        public ProjectileMoveAbility(float moveSpeed)
+        {
+            MoveSpeed = moveSpeed;
+        }
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             var targetDir = Owner.RuntimeData.TargetDirection;

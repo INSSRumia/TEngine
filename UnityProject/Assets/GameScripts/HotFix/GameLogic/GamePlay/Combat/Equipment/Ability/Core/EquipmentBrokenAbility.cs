@@ -8,9 +8,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         public void Execute()
         {
-            if (EquipmentOwner == null || EquipmentOwner.RuntimeData == null)
-                return;
-
             EquipmentOwner.RuntimeData.IsBroken = true;
             Log.Info($"[EquipmentBrokenAbility] 装备 {EquipmentOwner.RuntimeData.ConfigId} 损坏");
 

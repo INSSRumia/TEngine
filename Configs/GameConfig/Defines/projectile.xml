@@ -17,6 +17,8 @@
     <bean name="ProjectileDamageConfig" valueType="false" sep=",">
         <!-- 穿透次数：0 表示不穿透，命中一次后销毁 -->
         <var name="is_damage_by_velocity" type="bool" />
+        <!-- 速度伤害倍率 -->
+        <var name="velocity_damage_factor" type="float" />
         <!-- 穿透次数：0 表示不穿透，命中一次后销毁 -->
         <var name="piercing_count" type="int" />
     </bean>

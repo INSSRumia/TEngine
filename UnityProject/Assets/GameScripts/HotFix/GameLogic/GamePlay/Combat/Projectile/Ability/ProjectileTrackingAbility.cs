@@ -4,7 +4,11 @@ namespace GameLogic.Gameplay.Combat
 {
     public abstract class ProjectileTrackingAbility : ProjectileAbility, IAbilityFixedUpdate
     {
-        public float RotateSpeed { get; set; }
+        public float RotateSpeed { get; private set; }
+        public ProjectileTrackingAbility(float rotateSpeed)
+        {
+            RotateSpeed = rotateSpeed;
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

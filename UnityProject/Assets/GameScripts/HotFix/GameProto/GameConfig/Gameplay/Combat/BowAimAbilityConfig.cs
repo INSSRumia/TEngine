@@ -13,23 +13,23 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityConfig
+public sealed partial class BowAimAbilityConfig : EquipmentAbilityConfig
 {
-    public ArmorAbsorbDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public BowAimAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
-        { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
+        { if(!_buf["rotate_speed"].IsNumber) { throw new SerializationException(); }  RotateSpeed = _buf["rotate_speed"]; }
+        { if(!_buf["aim_angle"].IsNumber) { throw new SerializationException(); }  AimAngle = _buf["aim_angle"]; }
     }
 
-    public static ArmorAbsorbDamageAbilityConfig DeserializeArmorAbsorbDamageAbilityConfig(JSONNode _buf)
+    public static BowAimAbilityConfig DeserializeBowAimAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ArmorAbsorbDamageAbilityConfig(_buf);
+        return new Gameplay.Combat.BowAimAbilityConfig(_buf);
     }
 
-    public readonly int Hp;
-    public readonly int Defense;
+    public readonly float RotateSpeed;
+    public readonly float AimAngle;
    
-    public const int __ID__ = 1532287875;
+    public const int __ID__ = 203453535;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
@@ -41,8 +41,8 @@ public sealed partial class ArmorAbsorbDamageAbilityConfig : EquipmentAbilityCon
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "hp:" + Hp + ","
-        + "defense:" + Defense + ","
+        + "rotateSpeed:" + RotateSpeed + ","
+        + "aimAngle:" + AimAngle + ","
         + "}";
     }
 }

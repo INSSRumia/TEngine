@@ -17,6 +17,7 @@ public sealed partial class SwordLevelConfig : WeaponLevelConfig
 {
     public SwordLevelConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["sword_collision_attack"].IsObject) { throw new SerializationException(); }  SwordCollisionAttack = global::GameConfig.Gameplay.Combat.SwordCollisionAttackAbilityConfig.DeserializeSwordCollisionAttackAbilityConfig(_buf["sword_collision_attack"]);  }
     }
 
     public static SwordLevelConfig DeserializeSwordLevelConfig(JSONNode _buf)
@@ -24,6 +25,7 @@ public sealed partial class SwordLevelConfig : WeaponLevelConfig
         return new Gameplay.Combat.SwordLevelConfig(_buf);
     }
 
+    public readonly Gameplay.Combat.SwordCollisionAttackAbilityConfig SwordCollisionAttack;
    
     public const int __ID__ = 1311567291;
     public override int GetTypeId() => __ID__;
@@ -31,6 +33,7 @@ public sealed partial class SwordLevelConfig : WeaponLevelConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        SwordCollisionAttack?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -39,9 +42,9 @@ public sealed partial class SwordLevelConfig : WeaponLevelConfig
         + "level:" + Level + ","
         + "name:" + Name + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
-        + "attack:" + Attack + ","
-        + "isDamageByVelocity:" + IsDamageByVelocity + ","
+        + "calculateDamage:" + CalculateDamage + ","
         + "cooldown:" + Cooldown + ","
+        + "swordCollisionAttack:" + SwordCollisionAttack + ","
         + "}";
     }
 }

@@ -17,6 +17,7 @@ public sealed partial class ArmorReduceDamageAbilityConfig : EquipmentAbilityCon
 {
     public ArmorReduceDamageAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["defense"].IsNumber) { throw new SerializationException(); }  Defense = _buf["defense"]; }
     }
 
     public static ArmorReduceDamageAbilityConfig DeserializeArmorReduceDamageAbilityConfig(JSONNode _buf)
@@ -24,6 +25,7 @@ public sealed partial class ArmorReduceDamageAbilityConfig : EquipmentAbilityCon
         return new Gameplay.Combat.ArmorReduceDamageAbilityConfig(_buf);
     }
 
+    public readonly int Defense;
    
     public const int __ID__ = -558355798;
     public override int GetTypeId() => __ID__;
@@ -37,6 +39,7 @@ public sealed partial class ArmorReduceDamageAbilityConfig : EquipmentAbilityCon
     {
         return "{ "
         + "priority:" + Priority + ","
+        + "defense:" + Defense + ","
         + "}";
     }
 }

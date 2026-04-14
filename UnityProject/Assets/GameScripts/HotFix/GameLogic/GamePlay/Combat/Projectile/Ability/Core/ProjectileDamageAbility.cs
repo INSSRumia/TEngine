@@ -5,9 +5,17 @@ namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileDamageAbility : ProjectileAbility
     {
-        public int MaxPiercingCount { get; set; }
-        public int SourceMarble { get; set; }
-        public bool IsDamageByVelocity { get; set; }
+        public int MaxPiercingCount { get; private set; }
+        public int SourceMarble { get; private set; }
+        public bool IsDamageByVelocity { get; private set; }
+        public float VelocityDamageFactor { get; private set; }
+        public ProjectileDamageAbility(int maxPiercingCount, int sourceMarble, bool isDamageByVelocity, float velocityDamageFactor)
+        {
+            MaxPiercingCount = maxPiercingCount;
+            SourceMarble = sourceMarble;
+            IsDamageByVelocity = isDamageByVelocity;
+            VelocityDamageFactor = velocityDamageFactor;
+        }
 
         public override void OnAdd()
         {
@@ -54,7 +62,7 @@ namespace GameLogic.Gameplay.Combat
             {
                 Vector2 velocity = Owner.Rigidbody.velocity;
                 float relativeVelocity = velocity.magnitude - Vector2.Dot(velocity.normalized, targetRigidbody.velocity);
-                damage = Mathf.RoundToInt(relativeVelocity * damage);
+                damage = Mathf.RoundToInt(relativeVelocity * VelocityDamageFactor * damage);
             }
 
             // // 发射物动量
