@@ -183,6 +183,8 @@ namespace GameLogic.Gameplay.Combat.Marble
                     },
                 MarbleDashAbilityConfig dashConfig =>
                     CreateDashAbility(dashConfig),
+                MarbleFaceTargetDirectionAbilityConfig faceTargetDirectionConfig =>
+                    CreateFaceTargetDirectionAbility(faceTargetDirectionConfig),
                 _ => null
             };
         }
@@ -199,6 +201,26 @@ namespace GameLogic.Gameplay.Combat.Marble
             };
 
             var timing = CreateTimingFromConfig(dashConfig.Timing);
+            if (timing != null)
+            {
+                ability.InitializeTiming(timing);
+            }
+
+            return ability;
+        }
+
+        private static MarbleFaceTargetDirectionAbility CreateFaceTargetDirectionAbility(MarbleFaceTargetDirectionAbilityConfig config)
+        {
+            var ability = new MarbleFaceTargetDirectionAbility
+            {
+                Priority = config.Priority,
+                CombineType = (EnumCombineType)config.CombineType,
+                TargetLocalDirection = config.TargetLocalDirection,
+                TargetAngularSpeed = config.TargetAngularSpeed,
+                AngularAcceleration = config.AngularAcceleration,
+            };
+
+            var timing = CreateTimingFromConfig(config.Timing);
             if (timing != null)
             {
                 ability.InitializeTiming(timing);

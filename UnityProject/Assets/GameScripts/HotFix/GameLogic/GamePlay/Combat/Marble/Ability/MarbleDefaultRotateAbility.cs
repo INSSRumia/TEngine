@@ -1,4 +1,5 @@
 using GameLogic.Gameplay.Combat;
+using TEngine;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -12,8 +13,13 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false)
                 return;
+            // 方向对齐：当前旋转方向与目标方向相反时，取反目标速度
+            var currentAngSpd = Owner.Rigidbody.angularVelocity;
+            var targetAngSpd = TargetAngularSpeed;
+            if (targetAngSpd * currentAngSpd < 0)
+                targetAngSpd = -targetAngSpd;
 
-            Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, TargetAngularSpeed, Priority, CombineType));
+            Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, targetAngSpd, Priority, CombineType));
             Owner.RuntimeData.AngularAccelerationManager.Add(new PriorityValue<float>(InstId, AngularAcceleration, Priority, CombineType));
         }
     }

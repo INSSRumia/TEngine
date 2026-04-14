@@ -146,6 +146,23 @@
             "close_distance": 8,
             "target_speed": 10,
             "acceleration": 10
+          },
+          {
+            "$type": "MarbleFaceTargetDirectionAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "target_local_direction": {
+              "x": 1,
+              "y": 0
+            },
+            "target_angular_speed": 20,
+            "angular_acceleration": 20,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 10000,
+              "cooldown": 1,
+              "auto_activate": true
+            }
           }
         ]
       },
@@ -174,6 +191,23 @@
             "close_distance": 8,
             "target_speed": 10,
             "acceleration": 10
+          },
+          {
+            "$type": "MarbleFaceTargetDirectionAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "target_local_direction": {
+              "x": 1,
+              "y": 0
+            },
+            "target_angular_speed": 60,
+            "angular_acceleration": 60,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 10000,
+              "cooldown": 1,
+              "auto_activate": true
+            }
           }
         ]
       }

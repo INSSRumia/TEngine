@@ -88,6 +88,19 @@
 
     <!--
     ============================================================
+    MarbleFaceTargetDirectionAbility 配置
+    ============================================================
+    定时朝向目标能力：在激活期间持续让 Marble 的指定方向转向敌人。
+    -->
+    <bean name="MarbleFaceTargetDirectionAbilityConfig" alias="face_target_direction" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="target_local_direction" type="vector2" />
+        <var name="target_angular_speed" type="float" />
+        <var name="angular_acceleration" type="float" />
+        <var name="timing" type="AbilityTimingConfig" />
+    </bean>
+
+    <!--
+    ============================================================
     Marble 等级配置
     ============================================================
     -->

@@ -23,7 +23,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
             var mass = Owner.Rigidbody.mass;
             var acc = Owner.RuntimeData.AccelerationManager.GetCombinedValue();
-            var force = targetDir * acc * mass;
+            var force = targetDir * (acc * mass);
             Owner.Rigidbody.AddForce(force, ForceMode2D.Force);
         }
     }

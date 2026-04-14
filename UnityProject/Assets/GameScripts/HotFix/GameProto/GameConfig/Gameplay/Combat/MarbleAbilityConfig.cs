@@ -28,6 +28,7 @@ public abstract partial class MarbleAbilityConfig : Luban.BeanBase
             case "MarbleCloseToTargetAbilityConfig": return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
             case "MarbleDefaultRotateAbilityConfig": return new Gameplay.Combat.MarbleDefaultRotateAbilityConfig(_buf);
             case "MarbleDashAbilityConfig": return new Gameplay.Combat.MarbleDashAbilityConfig(_buf);
+            case "MarbleFaceTargetDirectionAbilityConfig": return new Gameplay.Combat.MarbleFaceTargetDirectionAbilityConfig(_buf);
             default: throw new SerializationException();
         }
     }
