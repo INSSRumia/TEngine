@@ -13,9 +13,9 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileLifetimeConfig : Luban.BeanBase
+public sealed partial class ProjectileLifetimeConfig : ProjectileAbilityConfig
 {
-    public ProjectileLifetimeConfig(JSONNode _buf) 
+    public ProjectileLifetimeConfig(JSONNode _buf)  : base(_buf) 
     {
         { var _j = _buf["max_lifetime"]; if (_j.Tag != JSONNodeType.None && _j.Tag != JSONNodeType.NullValue) { { if(!_j.IsNumber) { throw new SerializationException(); }  MaxLifetime = _j; } } else { MaxLifetime = null; } }
     }
@@ -30,13 +30,15 @@ public sealed partial class ProjectileLifetimeConfig : Luban.BeanBase
     public const int __ID__ = -2074794810;
     public override int GetTypeId() => __ID__;
 
-    public  void ResolveRef(Tables tables)
+    public override void ResolveRef(Tables tables)
     {
+        base.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
+        + "priority:" + Priority + ","
         + "maxLifetime:" + MaxLifetime + ","
         + "}";
     }

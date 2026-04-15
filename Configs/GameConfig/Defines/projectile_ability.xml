@@ -8,6 +8,40 @@
     <bean name="ProjectileAbilityConfig" valueType="false" sep=",">
         <var name="priority" type="int" />
     </bean>
+    
+    <!--
+    ============================================================
+    发射物移动能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileMoveConfig" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <!-- 移动速度，单位/秒 -->
+        <var name="speed" type="float" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物伤害能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileDamageConfig" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <!-- 穿透次数：0 表示不穿透，命中一次后销毁 -->
+        <var name="is_damage_by_velocity" type="bool" />
+        <!-- 速度伤害倍率 -->
+        <var name="velocity_damage_factor" type="float" />
+        <!-- 穿透次数：0 表示不穿透，命中一次后销毁 -->
+        <var name="piercing_count" type="int" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物生命周期能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileLifetimeConfig" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <!-- 最大存活时间（秒），0 表示无限 -->
+        <var name="max_lifetime" type="float?" />
+    </bean>
 
     <!--
     ============================================================

@@ -1,12 +1,15 @@
 using UnityEngine;
 
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat
 {
     public abstract class ProjectileTrackingAbility : ProjectileAbility, IAbilityFixedUpdate
     {
         public float RotateSpeed { get; private set; }
-        public ProjectileTrackingAbility(float rotateSpeed)
+        protected ProjectileTrackingAbility(ProjectileTrackingConfig config, float rotateSpeed)
         {
+            Priority = config.Priority;
             RotateSpeed = rotateSpeed;
         }
 

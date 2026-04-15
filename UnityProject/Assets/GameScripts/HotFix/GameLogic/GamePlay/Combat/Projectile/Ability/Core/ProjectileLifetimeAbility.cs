@@ -7,6 +7,7 @@ namespace GameLogic.Gameplay.Combat
         public float MaxLifetime { get; private set; }
         public ProjectileLifetimeAbility(ProjectileLifetimeConfig config)
         {
+            Priority = config?.Priority ?? 0;
             MaxLifetime = config?.MaxLifetime ?? 0f;
         }
 

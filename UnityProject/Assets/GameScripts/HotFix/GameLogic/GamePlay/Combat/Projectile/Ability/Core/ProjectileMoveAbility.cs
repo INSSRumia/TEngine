@@ -8,6 +8,7 @@ namespace GameLogic.Gameplay.Combat
         public float MoveSpeed { get; private set; }
         public ProjectileMoveAbility(ProjectileMoveConfig config)
         {
+            Priority = config.Priority;
             MoveSpeed = config.Speed;
         }
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)

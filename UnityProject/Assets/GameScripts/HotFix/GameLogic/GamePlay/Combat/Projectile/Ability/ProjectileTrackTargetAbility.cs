@@ -5,7 +5,7 @@ namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileTrackTargetAbility : ProjectileTrackingAbility
     {
-        public ProjectileTrackTargetAbility(ProjectileTrackTargetConfig config) : base(config.AngularSpeed)
+        public ProjectileTrackTargetAbility(ProjectileTrackTargetConfig config) : base(config, config.AngularSpeed)
         {
         }
 

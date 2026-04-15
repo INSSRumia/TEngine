@@ -24,6 +24,9 @@ public abstract partial class ProjectileAbilityConfig : Luban.BeanBase
     {
         switch ((string)_buf["$type"])
         {
+            case "ProjectileMoveConfig": return new Gameplay.Combat.ProjectileMoveConfig(_buf);
+            case "ProjectileDamageConfig": return new Gameplay.Combat.ProjectileDamageConfig(_buf);
+            case "ProjectileLifetimeConfig": return new Gameplay.Combat.ProjectileLifetimeConfig(_buf);
             case "ProjectileNoTrackingConfig": return new Gameplay.Combat.ProjectileNoTrackingConfig(_buf);
             case "ProjectileTrackTargetConfig": return new Gameplay.Combat.ProjectileTrackTargetConfig(_buf);
             case "ProjectileTrackPointConfig": return new Gameplay.Combat.ProjectileTrackPointConfig(_buf);

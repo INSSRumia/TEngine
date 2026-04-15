@@ -11,6 +11,7 @@ namespace GameLogic.Gameplay.Combat
         public float VelocityDamageFactor { get; private set; }
         public ProjectileDamageAbility(ProjectileDamageConfig config, int sourceMarble)
         {
+            Priority = config?.Priority ?? 0;
             MaxPiercingCount = config?.PiercingCount ?? 0;
             SourceMarble = sourceMarble;
             IsDamageByVelocity = config != null && config.IsDamageByVelocity;

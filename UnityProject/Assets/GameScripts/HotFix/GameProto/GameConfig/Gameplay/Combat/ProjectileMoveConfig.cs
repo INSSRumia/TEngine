@@ -13,9 +13,9 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileMoveConfig : Luban.BeanBase
+public sealed partial class ProjectileMoveConfig : ProjectileAbilityConfig
 {
-    public ProjectileMoveConfig(JSONNode _buf) 
+    public ProjectileMoveConfig(JSONNode _buf)  : base(_buf) 
     {
         { if(!_buf["speed"].IsNumber) { throw new SerializationException(); }  Speed = _buf["speed"]; }
     }
@@ -30,13 +30,15 @@ public sealed partial class ProjectileMoveConfig : Luban.BeanBase
     public const int __ID__ = -1179026354;
     public override int GetTypeId() => __ID__;
 
-    public  void ResolveRef(Tables tables)
+    public override void ResolveRef(Tables tables)
     {
+        base.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
+        + "priority:" + Priority + ","
         + "speed:" + Speed + ","
         + "}";
     }
