@@ -1,103 +1,5 @@
 <module name="Gameplay.Combat">
-    <enum name="EnumCombineType">
-        <var name="Combine" alias="combine" value="0" />
-        <var name="Override" alias="override" value="1" />
-    </enum>
-    <!--
-    ============================================================
-    Marble Ability 配置基类
-    ============================================================
-    用于 MarbleLevelConfig.lst_ability 中的可选 Ability 配置。
-    -->
-    <bean name="MarbleAbilityConfig" valueType="false" sep=",">
-        <var name="priority" type="int" />
-        <var name="combine_type" type="EnumCombineType" />
-    </bean>
 
-    <!--
-    ============================================================
-    Ability Timing 配置基类
-    ============================================================
-    用于定时类 Ability 的持续、冷却与触发规则配置。
-    -->
-    <bean name="AbilityTimingConfig" valueType="false" sep=",">
-    </bean>
-
-    <!--
-    ============================================================
-    FixedAbilityTiming 配置
-    ============================================================
-    固定持续时间 + 固定冷却时间，可选自动循环触发。
-    -->
-    <bean name="FixedAbilityTimingConfig" alias="fixed_timing" parent="AbilityTimingConfig" valueType="false" sep=",">
-        <var name="duration" type="float" />
-        <var name="cooldown" type="float" />
-        <var name="auto_activate" type="bool" />
-    </bean>
-
-    <!--
-    ============================================================
-    RandomRangeAbilityTiming 配置
-    ============================================================
-    每轮持续时间与冷却时间都在指定区间内随机取值，可选自动循环触发。
-    -->
-    <bean name="RandomRangeAbilityTimingConfig" alias="random_range_timing" parent="AbilityTimingConfig" valueType="false" sep=",">
-        <var name="min_duration" type="float" />
-        <var name="max_duration" type="float" />
-        <var name="min_cooldown" type="float" />
-        <var name="max_cooldown" type="float" />
-        <var name="auto_activate" type="bool" />
-    </bean>
-
-    <!--
-    ============================================================
-    MarbleCloseToTargetAbility 配置
-    ============================================================
-    可选 Ability：当 Marble 与目标距离小于 CloseDistance 时停止移动。
-    -->
-    <bean name="MarbleCloseToTargetAbilityConfig" alias="close_to_target" parent="MarbleAbilityConfig" valueType="false" sep=",">
-        <!-- # 触发停止移动的判定距离-->
-        <var name="close_distance" type="float" />
-        <var name="target_speed" type="float" />
-        <var name="acceleration" type="float" />
-    </bean>
-
-    <!--
-    ============================================================
-    MarbleDefaultRotateAbility 配置
-    ============================================================
-    可选 Ability：默认旋转能力。
-    -->
-    <bean name="MarbleDefaultRotateAbilityConfig" alias="default_rotate" parent="MarbleAbilityConfig" valueType="false" sep=",">
-        <var name="target_angular_speed" type="float" />
-        <var name="angular_acceleration" type="float" />
-    </bean>
-
-    <!--
-    ============================================================
-    MarbleDashAbility 配置
-    ============================================================
-    定时冲刺能力：激活期内持续提高目标速度和加速度。
-    -->
-    <bean name="MarbleDashAbilityConfig" alias="dash" parent="MarbleAbilityConfig" valueType="false" sep=",">
-        <var name="target_speed" type="float" />
-        <var name="acceleration" type="float" />
-        <var name="lock_direction_on_activate" type="bool" />
-        <var name="timing" type="AbilityTimingConfig" />
-    </bean>
-
-    <!--
-    ============================================================
-    MarbleFaceTargetDirectionAbility 配置
-    ============================================================
-    定时朝向目标能力：在激活期间持续让 Marble 的指定方向转向敌人。
-    -->
-    <bean name="MarbleFaceTargetDirectionAbilityConfig" alias="face_target_direction" parent="MarbleAbilityConfig" valueType="false" sep=",">
-        <var name="target_local_direction" type="vector2" />
-        <var name="target_angular_speed" type="float" />
-        <var name="angular_acceleration" type="float" />
-        <var name="timing" type="AbilityTimingConfig" />
-    </bean>
 
     <!--
     ============================================================
@@ -118,17 +20,7 @@
         <var name="scale" type="float" />
         <var name="lst_equipment" type="list, EquipAttachConfig" />
 
-        <!--
-        ============================================================
-        可选 Ability 配置列表
-        ============================================================
-        Core 文件夹中的 Ability 由 MarbleFactory.AttachDefaultAbilities() 硬编码添加，
-        无需在此配置。
-
-        此列表仅用于配置可选 Ability 的参数。
-        当前支持的类型：
-          - MarbleCloseToTarget : MarbleCloseToTargetAbility，需要 close_distance 参数
-        -->
+        <!-- # 扩展玩法 Ability 配置列表；固定运行骨架参数继续保留为显式字段 -->
         <var name="lst_ability" type="list, MarbleAbilityConfig" />
     </bean>
 

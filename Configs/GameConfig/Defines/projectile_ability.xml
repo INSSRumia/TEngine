@@ -1,0 +1,27 @@
+<module name="Gameplay.Combat">
+    <!--
+    ============================================================
+    发射物 Ability 配置基类
+    ============================================================
+    用于 ProjectileLevelConfig.lst_ability 中的可选 Ability 配置。
+    -->
+    <bean name="ProjectileAbilityConfig" valueType="false" sep=",">
+        <var name="priority" type="int" />
+    </bean>
+
+    <!--
+    ============================================================
+    发射物追踪目标能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileNoTrackingConfig" alias="no_track" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="ProjectileTrackTargetConfig" alias="track_target" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <var name="angular_speed" type="float" />
+    </bean>
+
+    <bean name="ProjectileTrackPointConfig" alias="track_point" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <var name="angular_speed" type="float" />
+    </bean>
+</module>

@@ -17,7 +17,7 @@ public sealed partial class BowAimAbilityConfig : EquipmentAbilityConfig
 {
     public BowAimAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["rotate_speed"].IsNumber) { throw new SerializationException(); }  RotateSpeed = _buf["rotate_speed"]; }
+        { if(!_buf["target_angular_speed"].IsNumber) { throw new SerializationException(); }  TargetAngularSpeed = _buf["target_angular_speed"]; }
         { if(!_buf["aim_angle"].IsNumber) { throw new SerializationException(); }  AimAngle = _buf["aim_angle"]; }
     }
 
@@ -26,7 +26,7 @@ public sealed partial class BowAimAbilityConfig : EquipmentAbilityConfig
         return new Gameplay.Combat.BowAimAbilityConfig(_buf);
     }
 
-    public readonly float RotateSpeed;
+    public readonly float TargetAngularSpeed;
     public readonly float AimAngle;
    
     public const int __ID__ = 203453535;
@@ -41,7 +41,7 @@ public sealed partial class BowAimAbilityConfig : EquipmentAbilityConfig
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "rotateSpeed:" + RotateSpeed + ","
+        + "targetAngularSpeed:" + TargetAngularSpeed + ","
         + "aimAngle:" + AimAngle + ","
         + "}";
     }

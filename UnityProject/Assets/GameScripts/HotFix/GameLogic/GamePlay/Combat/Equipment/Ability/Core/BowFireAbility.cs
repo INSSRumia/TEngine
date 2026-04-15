@@ -1,11 +1,14 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using GameConfig.Gameplay.Combat;
 
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class BowFireAbility : WeaponFireAbility
     {
+        private const EnumBowShootType DefaultShootType = EnumBowShootType.Sequential;
+
         private BowEquipment _bowOwner;
         private Marble.Marble _sourceMarble;
 
@@ -14,8 +17,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public float ArrowInterval {get; private set;}
         public int ArrowCount {get; private set;}
         public float ArrowAngleStep {get; private set;}
-        public int ShootType {get; private set;}
-        public BowFireAbility(string projectileConfigId, int projectileLevel, float arrowInterval, int arrowCount, float arrowAngleStep, int shootType)
+        public EnumBowShootType ShootType {get; private set;}
+        public BowFireAbility(string projectileConfigId, int projectileLevel, float arrowInterval, int arrowCount, float arrowAngleStep, EnumBowShootType shootType)
         {
             ProjectileConfigId = projectileConfigId;
             ProjectileLevel = projectileLevel;
@@ -57,7 +60,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             var target = _sourceMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.TargetMarbleInstId);
 
-            if (ShootType == 1)
+            if (ShootType == EnumBowShootType.Spread)
             {
                 var centerIndex = 0;
                 for (var i = 0; i < ArrowCount; i++)
@@ -76,6 +79,9 @@ namespace GameLogic.Gameplay.Combat.Equipment
             }
             else
             {
+                if (ShootType != DefaultShootType)
+                    return;
+
                 for (var i = 0; i < ArrowCount; i++)
                 {
                     if(Owner.RuntimeData.IsBroken)

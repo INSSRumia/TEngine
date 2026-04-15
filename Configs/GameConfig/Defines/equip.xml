@@ -22,108 +22,6 @@
 
     <!--
     ============================================================
-    Equipment Ability 配置基类
-    ============================================================
-    用于 EquipmentLevelConfig.lst_ability 中的可选 Ability 配置。
-    -->
-    <bean name="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="priority" type="int" />
-    </bean>
-
-    <!--
-    ============================================================
-    WeaponCalculateDamageAbility 配置
-    ============================================================
-    武器伤害计算 Ability：计算武器伤害
-    -->
-    <bean name="WeaponCalculateDamageAbilityConfig" alias="calculate_damage" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="attack" type="int?" />
-    </bean>
-
-    <!--
-    ============================================================
-    WeaponCooldownAbility 配置
-    ============================================================
-    武器冷却 Ability：冷却武器
-    -->
-    <bean name="WeaponCooldownAbilityConfig" alias="cooldown" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="cooldown" type="float" />
-    </bean>
-
-    <!--
-    ============================================================
-    SwordCollisionAttackAbility 配置
-    ============================================================
-    近战武器碰撞攻击 Ability：碰撞时根据相对速度计算伤害。
-    -->
-    <bean name="SwordCollisionAttackAbilityConfig" alias="sword_collision_attack" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="is_damage_by_velocity" type="bool" />
-        <var name="velocity_damage_factor" type="float" />
-    </bean>
-
-    <!--
-    ============================================================
-    ArmorReduceDamageAbility 配置
-    ============================================================
-    护甲减伤 Ability：减伤后剩余伤害转发给 OwnerMarble。
-    -->
-    <bean name="ArmorReduceDamageAbilityConfig" alias="armor_reduce_damage" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="defense" type="int" />
-    </bean>
-
-    <!--
-    ============================================================
-    ArmorAbsorbDamageAbility 配置
-    ============================================================
-    护甲吸收 Ability：护甲自身扣血，被破坏前不扣 Marble 血量。
-    -->
-    <bean name="ArmorAbsorbDamageAbilityConfig" alias="armor_absorb_damage" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="hp" type="int" />
-        <var name="defense" type="int" />
-    </bean>
-
-    <!--
-    ============================================================
-    BowAimAbility 配置
-    ============================================================
-    弓瞄准 Ability：弓瞄准目标
-    -->
-    <bean name="BowAimAbilityConfig" alias="bow_aim" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <var name="rotate_speed" type="float" />
-        <!-- # 瞄准角度 (度) -->
-        <!-- # 例如填10度，则当弓瞄准方向于敌人方向小于10度时，弓就会射击 -->
-        <!-- # 理论上瞄准角度越小，弓的射击精度越高，但是过小的瞄准角度会导致弓旋转时很难停在瞄准范围内，导致弓箭无法发射 -->
-        <!-- # 而且弓不会根据敌人速度预瞄，所以瞄准角度太小时反而命中率可能下降 -->
-        <var name="aim_angle" type="float" />
-    </bean>
-    <!--
-    ============================================================
-    BowFireAbility 配置
-    ============================================================
-    弓射击 Ability：弓射击目标
-    -->
-    <bean name="BowFireAbilityConfig" alias="bow_fire" parent="EquipmentAbilityConfig" valueType="false" sep=",">
-        <!-- # 射击箭矢数量 -->
-        <var name="arrow_count" type="int" />
-        <!-- # 射击箭矢间隔 (秒) -->
-        <!-- # 如果填0，所有箭矢都会叠在一起 -->
-        <!-- # 例如填0.1秒，射出3根箭矢，则每根箭矢的间隔为0.1秒，第一根箭矢的间隔为0秒，第二根箭矢的间隔为0.1秒，第三根箭矢的间隔为0.2秒 -->
-        <var name="arrow_interval" type="float" />
-        <!-- # 射击箭矢角度差距 (度) -->
-        <!-- # 如果填0度，则所有箭矢都会叠在一起 -->
-        <!-- # 无论如何瞄准的方向都会射出一根箭矢，如果箭矢数量为偶数，则左右两边的的箭矢数量不会相等 -->
-        <!-- # 例如填5度，射出3根箭矢，则每根箭矢的角度差距为5度，第一根箭矢的角度为0度，第二根箭矢的角度为5度，第三根箭矢的角度为-5度 -->
-        <var name="arrow_angle_step" type="float" />
-        <!-- # 射击类型：0: 连射 1: 散射 -->
-        <var name="shoot_type" type="int" />
-        <!-- # 关联的发射物配置ID，指向 TbProjectile -->
-        <var name="projectile_config_id" type="string" />
-        <!-- # 发射物等级 -->
-        <var name="projectile_level" type="int" />
-    </bean>
-
-    <!--
-    ============================================================
     EquipmentLevelConfig 基类
     ============================================================
     -->
@@ -131,14 +29,7 @@
         <var name="level" type="int" />
         <var name="name" type="string" />
 
-        <!--
-        ============================================================
-        可选 Ability 配置列表
-        ============================================================
-        此列表用于配置可选 Ability
-        当前支持的类型：
-          - ArmorAbsorbDamage : 护甲吸收
-        -->
+        <!-- # 扩展玩法 Ability 配置列表；核心骨架能力字段保持独立显式配置 -->
         <var name="lst_ability" type="list, EquipmentAbilityConfig" />
     </bean>
 

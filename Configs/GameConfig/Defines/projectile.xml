@@ -30,33 +30,7 @@
     -->
     <bean name="ProjectileLifetimeConfig" valueType="false" sep=",">
         <!-- 最大存活时间（秒），0 表示无限 -->
-        <var name="max_lifetime" type="int?" />
-    </bean>
-
-    <!--
-    ============================================================
-    发射物追踪目标能力配置
-    ============================================================
-    -->
-    <bean name="ProjectileNoTrackingConfig" alias="no_track" parent="ProjectileAbilityConfig" valueType="false" sep=",">
-    </bean>
-
-    <bean name="ProjectileTrackTargetConfig" alias="track_target" parent="ProjectileAbilityConfig" valueType="false" sep=",">
-        <var name="angular_speed" type="float" />
-    </bean>
-
-    <bean name="ProjectileTrackPointConfig" alias="track_point" parent="ProjectileAbilityConfig" valueType="false" sep=",">
-        <var name="angular_speed" type="float" />
-    </bean>
-
-    <!--
-    ============================================================
-    发射物 Ability 配置基类
-    ============================================================
-    用于 ProjectileLevelConfig.lst_ability 中的可选 Ability 配置。
-    -->
-    <bean name="ProjectileAbilityConfig" valueType="false" sep=",">
-        <var name="priority" type="int" />
+        <var name="max_lifetime" type="float?" />
     </bean>
 
     <!--
@@ -73,14 +47,7 @@
         <var name="damage_ability" type="ProjectileDamageConfig" />
         <!-- 生命周期能力配置 -->
         <var name="lifetime" type="ProjectileLifetimeConfig" />
-        <!--
-        ============================================================
-        可选 Ability 配置列表
-        ============================================================
-        Core 文件夹中的 Ability 由 ProjectileFactory.AttachCoreAbilities() 硬编码添加，
-        无需在此配置。
-        此列表仅用于配置可选 Ability 的参数。
-        -->
+        <!-- # 扩展玩法 Ability 配置列表；移动/伤害/生命周期等核心骨架参数保持独立字段 -->
         <var name="lst_ability" type="list, ProjectileAbilityConfig" />
     </bean>
 

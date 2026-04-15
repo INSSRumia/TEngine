@@ -25,7 +25,7 @@ public sealed partial class ProjectileLifetimeConfig : Luban.BeanBase
         return new Gameplay.Combat.ProjectileLifetimeConfig(_buf);
     }
 
-    public readonly int? MaxLifetime;
+    public readonly float? MaxLifetime;
    
     public const int __ID__ = -2074794810;
     public override int GetTypeId() => __ID__;

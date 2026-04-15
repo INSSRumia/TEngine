@@ -218,7 +218,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             AttachEquipmentCoreAbilities(equipment);
             AttachWeaponCoreAbilities(equipment, config);
-            AttachCoreAbility(equipment, new BowAimAbility(config.BowAim.RotateSpeed, config.BowAim.AimAngle));
+            AttachCoreAbility(equipment, new BowAimAbility(config.BowAim.TargetAngularSpeed, config.BowAim.AimAngle));
             AttachCoreAbility(equipment, new BowFireAbility(
                 config.BowFire.ProjectileConfigId,
                 config.BowFire.ProjectileLevel,

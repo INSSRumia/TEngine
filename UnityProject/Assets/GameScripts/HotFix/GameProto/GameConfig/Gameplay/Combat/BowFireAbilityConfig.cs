@@ -20,7 +20,7 @@ public sealed partial class BowFireAbilityConfig : EquipmentAbilityConfig
         { if(!_buf["arrow_count"].IsNumber) { throw new SerializationException(); }  ArrowCount = _buf["arrow_count"]; }
         { if(!_buf["arrow_interval"].IsNumber) { throw new SerializationException(); }  ArrowInterval = _buf["arrow_interval"]; }
         { if(!_buf["arrow_angle_step"].IsNumber) { throw new SerializationException(); }  ArrowAngleStep = _buf["arrow_angle_step"]; }
-        { if(!_buf["shoot_type"].IsNumber) { throw new SerializationException(); }  ShootType = _buf["shoot_type"]; }
+        { if(!_buf["shoot_type"].IsNumber) { throw new SerializationException(); }  ShootType = (Gameplay.Combat.EnumBowShootType)_buf["shoot_type"].AsInt; }
         { if(!_buf["projectile_config_id"].IsString) { throw new SerializationException(); }  ProjectileConfigId = _buf["projectile_config_id"]; }
         { if(!_buf["projectile_level"].IsNumber) { throw new SerializationException(); }  ProjectileLevel = _buf["projectile_level"]; }
     }
@@ -33,7 +33,7 @@ public sealed partial class BowFireAbilityConfig : EquipmentAbilityConfig
     public readonly int ArrowCount;
     public readonly float ArrowInterval;
     public readonly float ArrowAngleStep;
-    public readonly int ShootType;
+    public readonly Gameplay.Combat.EnumBowShootType ShootType;
     public readonly string ProjectileConfigId;
     public readonly int ProjectileLevel;
    
