@@ -1,3 +1,4 @@
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -11,6 +12,16 @@ namespace GameLogic.Gameplay.Combat.Marble
         public Vector2 TargetLocalDirection { get; set; } = Vector2.right;
         public float TargetAngularSpeed { get; set; }
         public float AngularAcceleration { get; set; }
+
+        public MarbleFaceTargetDirectionAbility(MarbleFaceTargetDirectionAbilityConfig config)
+        {
+            Priority = config.Priority;
+            CombineType = (EnumCombineType)config.CombineType;
+            TargetLocalDirection = config.TargetLocalDirection;
+            TargetAngularSpeed = config.TargetAngularSpeed;
+            AngularAcceleration = config.AngularAcceleration;
+            InitializeTiming(AbilityTimingFactory.CreateTiming(config.Timing));
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

@@ -1,3 +1,4 @@
+using GameConfig.Gameplay.Combat;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace GameLogic.Gameplay.Combat
 
         private readonly HashSet<int> _hitTargets = new HashSet<int>();
 
-        public ProjectileRuntimeData(string configId, int level) : base(configId, level, ProjectileFactory.GetNextInstId)
+        public ProjectileRuntimeData(ProjectileConfig config, ProjectileLevelConfig levelConfig) : base(config.ConfigId, levelConfig.Level, ProjectileFactory.GetNextInstId)
         {
         }
 

@@ -14,6 +14,12 @@
         <var name="priority" type="int" />
     </bean>
 
+    <bean name="EquipmentMountAbilityConfig" alias="mount" parent="EquipmentAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="EquipmentBrokenAbilityConfig" alias="broken" parent="EquipmentAbilityConfig" valueType="false" sep=",">
+    </bean>
+
     <!--
     ============================================================
     WeaponCalculateDamageAbility 配置

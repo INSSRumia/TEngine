@@ -1,3 +1,4 @@
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 
@@ -6,6 +7,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
     // 装备损坏
     public class EquipmentBrokenAbility : EquipmentAbility
     {
+        public EquipmentBrokenAbility(EquipmentBrokenAbilityConfig config)
+        {
+        }
+
         public void Execute()
         {
             EquipmentOwner.RuntimeData.IsBroken = true;

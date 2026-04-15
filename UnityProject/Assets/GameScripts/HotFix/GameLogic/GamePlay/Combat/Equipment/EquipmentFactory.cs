@@ -135,27 +135,25 @@ namespace GameLogic.Gameplay.Combat.Equipment
             {
                 case ArmorLevelConfig:
                 {
-                    return new ArmorRuntimeData(config.ConfigId, levelConfig.Level)
+                    return new ArmorRuntimeData(config, (ArmorLevelConfig)levelConfig)
                     {
                         Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
-                        // Hp = armorConfig.Armor.,
                     };
                 }
                 case BowLevelConfig:
                 {
-                    return new BowRuntimeData(config.ConfigId, levelConfig.Level)
+                    return new BowRuntimeData(config, (BowLevelConfig)levelConfig)
                     {
                         Slot = slot,
                         IsEquipped = true,
                         IsBroken = false,
-                        CanFire = false,
                     };
                 }
                 case SwordLevelConfig:
                 {
-                    return new SwordRuntimeData(config.ConfigId, levelConfig.Level)
+                    return new SwordRuntimeData(config, (SwordLevelConfig)levelConfig)
                     {
                         Slot = slot,
                         IsEquipped = true,
@@ -195,15 +193,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return;
             }
 
-            AttachEquipmentCoreAbilities(equipment);
+            AttachEquipmentCoreAbilities(equipment, config);
 
             switch (config.Armor)
             {
                 case ArmorReduceDamageAbilityConfig reduceDamageConfig:
-                    AttachCoreAbility(equipment, new ArmorReduceDamageAbility(reduceDamageConfig.Defense));
+                    AttachCoreAbility(equipment, new ArmorReduceDamageAbility(reduceDamageConfig));
                     break;
                 case ArmorAbsorbDamageAbilityConfig absorbDamageConfig:
-                    AttachCoreAbility(equipment, new ArmorAbsorbDamageAbility(absorbDamageConfig.Defense, absorbDamageConfig.Hp));
+                    AttachCoreAbility(equipment, new ArmorAbsorbDamageAbility(absorbDamageConfig));
                     break;
             }
         }
@@ -216,16 +214,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return;
             }
 
-            AttachEquipmentCoreAbilities(equipment);
+            AttachEquipmentCoreAbilities(equipment, config);
             AttachWeaponCoreAbilities(equipment, config);
-            AttachCoreAbility(equipment, new BowAimAbility(config.BowAim.TargetAngularSpeed, config.BowAim.AimAngle));
-            AttachCoreAbility(equipment, new BowFireAbility(
-                config.BowFire.ProjectileConfigId,
-                config.BowFire.ProjectileLevel,
-                config.BowFire.ArrowInterval,
-                config.BowFire.ArrowCount,
-                config.BowFire.ArrowAngleStep,
-                config.BowFire.ShootType));
+            AttachCoreAbility(equipment, new BowAimAbility(config.BowAim));
+            AttachCoreAbility(equipment, new BowFireAbility(config.BowFire));
         }
 
         private static void AttachSwordDefaultAbilities(SwordEquipment equipment, SwordLevelConfig config)
@@ -236,23 +228,21 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return;
             }
 
-            AttachEquipmentCoreAbilities(equipment);
+            AttachEquipmentCoreAbilities(equipment, config);
             AttachWeaponCoreAbilities(equipment, config);
-            AttachCoreAbility(equipment, new SwordCollisionAttackAbility(
-                config.SwordCollisionAttack.IsDamageByVelocity,
-                config.SwordCollisionAttack.VelocityDamageFactor));
+            AttachCoreAbility(equipment, new SwordCollisionAttackAbility(config.SwordCollisionAttack));
         }
 
-        private static void AttachEquipmentCoreAbilities(Equipment equipment)
+        private static void AttachEquipmentCoreAbilities(Equipment equipment, EquipmentLevelConfig config)
         {
-            AttachCoreAbility(equipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
-            AttachCoreAbility(equipment, new EquipmentBrokenAbility());
+            AttachCoreAbility(equipment, new EquipmentMountAbility(config.Mount, equipment.RuntimeData.Slot));
+            AttachCoreAbility(equipment, new EquipmentBrokenAbility(config.Broken));
         }
 
         private static void AttachWeaponCoreAbilities(WeaponEquipment equipment, WeaponLevelConfig config)
         {
-            AttachCoreAbility(equipment, new WeaponCooldownAbility(config.Cooldown.Cooldown));
-            AttachCoreAbility(equipment, new WeaponCalculateDamageAbility(config.CalculateDamage.Attack));
+            AttachCoreAbility(equipment, new WeaponCooldownAbility(config.Cooldown));
+            AttachCoreAbility(equipment, new WeaponCalculateDamageAbility(config.CalculateDamage));
         }
 
         private static void AttachCoreAbility(Equipment equipment, EquipmentAbility ability)

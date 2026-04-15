@@ -6,6 +6,12 @@
         "$type": "SwordLevelConfig",
         "level": 0,
         "name": "剑",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "calculate_damage": {
           "priority": 0
@@ -24,6 +30,12 @@
         "$type": "SwordLevelConfig",
         "level": 1,
         "name": "剑",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "calculate_damage": {
           "priority": 0
@@ -47,6 +59,12 @@
         "$type": "ArmorLevelConfig",
         "level": 0,
         "name": "盾",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "armor": {
           "$type": "ArmorAbsorbDamageAbilityConfig",
@@ -59,6 +77,12 @@
         "$type": "ArmorLevelConfig",
         "level": 1,
         "name": "盾",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "armor": {
           "$type": "ArmorAbsorbDamageAbilityConfig",
@@ -76,6 +100,12 @@
         "$type": "BowLevelConfig",
         "level": 0,
         "name": "弓",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "calculate_damage": {
           "priority": 0
@@ -103,6 +133,12 @@
         "$type": "BowLevelConfig",
         "level": 1,
         "name": "弓",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
         "lst_ability": [],
         "calculate_damage": {
           "priority": 0

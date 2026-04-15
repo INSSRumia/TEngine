@@ -1,4 +1,5 @@
 using UnityEngine;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
@@ -7,10 +8,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         private SwordEquipment _owner;
         public bool IsDamageByVelocity {get; private set;}
         public float VelocityDamageFactor {get; private set;}
-        public SwordCollisionAttackAbility(bool isDamageByVelocity, float velocityDamageFactor)
+        public SwordCollisionAttackAbility(SwordCollisionAttackAbilityConfig config)
         {
-            IsDamageByVelocity = isDamageByVelocity;
-            VelocityDamageFactor = velocityDamageFactor;
+            IsDamageByVelocity = config.IsDamageByVelocity;
+            VelocityDamageFactor = config.VelocityDamageFactor;
         }
         public override void OnAdd()
         {

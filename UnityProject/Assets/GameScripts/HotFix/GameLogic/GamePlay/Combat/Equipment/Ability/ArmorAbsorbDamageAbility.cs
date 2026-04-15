@@ -1,3 +1,5 @@
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class ArmorAbsorbDamageAbility : EquipmentAbility, IReceiveDamage
@@ -5,10 +7,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         private ArmorEquipment _owner;
         public int Defense {get; private set;}
         public int MaxHp {get; private set;}
-        public ArmorAbsorbDamageAbility(int defense, int maxHp)
+        public ArmorAbsorbDamageAbility(ArmorAbsorbDamageAbilityConfig config)
         {
-            Defense = defense;
-            MaxHp = maxHp;
+            Defense = config.Defense;
+            MaxHp = config.Hp;
         }
 
         public override void OnAdd()

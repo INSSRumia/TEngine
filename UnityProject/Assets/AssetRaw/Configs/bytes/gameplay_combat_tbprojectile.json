@@ -16,12 +16,11 @@
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": [
-          {
-            "$type": "ProjectileNoTrackingConfig",
-            "priority": 1000
-          }
-        ]
+        "tracking": {
+          "$type": "ProjectileNoTrackingConfig",
+          "priority": 1000
+        },
+        "lst_ability": []
       },
       {
         "level": 1,
@@ -37,12 +36,11 @@
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": [
-          {
-            "$type": "ProjectileNoTrackingConfig",
-            "priority": 1000
-          }
-        ]
+        "tracking": {
+          "$type": "ProjectileNoTrackingConfig",
+          "priority": 1000
+        },
+        "lst_ability": []
       }
     ]
   },
@@ -63,12 +61,11 @@
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": [
-          {
-            "$type": "ProjectileNoTrackingConfig",
-            "priority": 1000
-          }
-        ]
+        "tracking": {
+          "$type": "ProjectileNoTrackingConfig",
+          "priority": 1000
+        },
+        "lst_ability": []
       },
       {
         "level": 1,
@@ -84,12 +81,11 @@
         "lifetime": {
           "max_lifetime": 5
         },
-        "lst_ability": [
-          {
-            "$type": "ProjectileNoTrackingConfig",
-            "priority": 1000
-          }
-        ]
+        "tracking": {
+          "$type": "ProjectileNoTrackingConfig",
+          "priority": 1000
+        },
+        "lst_ability": []
       }
     ]
   }

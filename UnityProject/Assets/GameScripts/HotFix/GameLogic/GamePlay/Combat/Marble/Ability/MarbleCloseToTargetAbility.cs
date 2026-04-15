@@ -1,4 +1,5 @@
 using GameLogic.Gameplay.Combat;
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -8,6 +9,15 @@ namespace GameLogic.Gameplay.Combat.Marble
         public float CloseDistance { get; set; }
         public float TargetSpeed { get; set; }
         public float Acceleration { get; set; }
+
+        public MarbleCloseToTargetAbility(MarbleCloseToTargetAbilityConfig config)
+        {
+            Priority = config.Priority;
+            CombineType = (EnumCombineType)config.CombineType;
+            CloseDistance = config.CloseDistance;
+            TargetSpeed = config.TargetSpeed;
+            Acceleration = config.Acceleration;
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

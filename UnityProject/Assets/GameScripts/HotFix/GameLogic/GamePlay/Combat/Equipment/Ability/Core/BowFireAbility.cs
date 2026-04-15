@@ -18,14 +18,14 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public int ArrowCount {get; private set;}
         public float ArrowAngleStep {get; private set;}
         public EnumBowShootType ShootType {get; private set;}
-        public BowFireAbility(string projectileConfigId, int projectileLevel, float arrowInterval, int arrowCount, float arrowAngleStep, EnumBowShootType shootType)
+        public BowFireAbility(BowFireAbilityConfig config)
         {
-            ProjectileConfigId = projectileConfigId;
-            ProjectileLevel = projectileLevel;
-            ArrowInterval = arrowInterval;
-            ArrowCount = arrowCount;
-            ArrowAngleStep = arrowAngleStep;
-            ShootType = shootType;
+            ProjectileConfigId = config.ProjectileConfigId;
+            ProjectileLevel = config.ProjectileLevel;
+            ArrowInterval = config.ArrowInterval;
+            ArrowCount = config.ArrowCount;
+            ArrowAngleStep = config.ArrowAngleStep;
+            ShootType = config.ShootType;
         }
 
         public override void OnAdd()

@@ -28,6 +28,8 @@
     <bean name="EquipmentLevelConfig" alias="equip" valueType="false" sep=",">
         <var name="level" type="int" />
         <var name="name" type="string" />
+        <var name="mount" type="EquipmentMountAbilityConfig" />
+        <var name="broken" type="EquipmentBrokenAbilityConfig" />
 
         <!-- # 扩展玩法 Ability 配置列表；核心骨架能力字段保持独立显式配置 -->
         <var name="lst_ability" type="list, EquipmentAbilityConfig" />

@@ -1,4 +1,5 @@
 using GameLogic.Gameplay.Combat;
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 
@@ -8,6 +9,14 @@ namespace GameLogic.Gameplay.Combat.Marble
     {
         public float TargetAngularSpeed { get; set; }
         public float AngularAcceleration { get; set; }
+
+        public MarbleDefaultRotateAbility(MarbleDefaultRotateAbilityConfig config)
+        {
+            Priority = config.Priority;
+            CombineType = (EnumCombineType)config.CombineType;
+            TargetAngularSpeed = config.TargetAngularSpeed;
+            AngularAcceleration = config.AngularAcceleration;
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

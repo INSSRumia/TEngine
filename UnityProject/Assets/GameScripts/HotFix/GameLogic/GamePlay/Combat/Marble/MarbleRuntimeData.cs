@@ -1,5 +1,6 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -97,8 +98,23 @@ namespace GameLogic.Gameplay.Combat.Marble
         [ShowInInspector]
         public int TargetMarbleInstId { get; set; }
 
-        public MarbleRuntimeData(string configId, int level) : base(configId, level, MarbleFactory.GetNextInstId)
+        public MarbleRuntimeData(MarbleConfig config, MarbleLevelConfig levelConfig) : base(config.ConfigId, levelConfig.Level, MarbleFactory.GetNextInstId)
         {
+            IsAlive = true;
+            Level = levelConfig.Level;
+            UpgradeExp = levelConfig.UpgradeExp;
+            MaxHp = levelConfig.Hp;
+            Hp = levelConfig.Hp;
+            MaxShield = levelConfig.Shield;
+            Shield = levelConfig.Shield;
+            Defense = levelConfig.Defense;
+            Attack = levelConfig.Attack;
+            DamageMultiplier = 1f;
+            HealMultiplier = 1f;
+            ShieldHealMultiplier = 1f;
+            AttackMultiplier = 1f;
+            Scale = levelConfig.Scale;
+            Mass = levelConfig.Mass;
         }
 
     }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         private List<HingeJoint2D> _joints = new List<HingeJoint2D>();
 
         public EnumEquipmentSlot Slot {get; private set;}
-        public EquipmentMountAbility(EnumEquipmentSlot slot)
+        public EquipmentMountAbility(EquipmentMountAbilityConfig config, EnumEquipmentSlot slot)
         {
             Slot = slot;
         }

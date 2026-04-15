@@ -47,6 +47,8 @@
         <var name="damage_ability" type="ProjectileDamageConfig" />
         <!-- 生命周期能力配置 -->
         <var name="lifetime" type="ProjectileLifetimeConfig" />
+        <!-- 追踪模式配置 -->
+        <var name="tracking" type="ProjectileTrackingConfig" />
         <!-- # 扩展玩法 Ability 配置列表；移动/伤害/生命周期等核心骨架参数保持独立字段 -->
         <var name="lst_ability" type="list, ProjectileAbilityConfig" />
     </bean>

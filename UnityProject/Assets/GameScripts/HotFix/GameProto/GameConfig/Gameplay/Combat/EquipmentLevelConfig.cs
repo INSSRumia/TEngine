@@ -19,6 +19,8 @@ public abstract partial class EquipmentLevelConfig : Luban.BeanBase
     {
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
         { if(!_buf["name"].IsString) { throw new SerializationException(); }  Name = _buf["name"]; }
+        { if(!_buf["mount"].IsObject) { throw new SerializationException(); }  Mount = global::GameConfig.Gameplay.Combat.EquipmentMountAbilityConfig.DeserializeEquipmentMountAbilityConfig(_buf["mount"]);  }
+        { if(!_buf["broken"].IsObject) { throw new SerializationException(); }  Broken = global::GameConfig.Gameplay.Combat.EquipmentBrokenAbilityConfig.DeserializeEquipmentBrokenAbilityConfig(_buf["broken"]);  }
         { var __json0 = _buf["lst_ability"]; if(!__json0.IsArray) { throw new SerializationException(); } LstAbility = new System.Collections.Generic.List<Gameplay.Combat.EquipmentAbilityConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Combat.EquipmentAbilityConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Combat.EquipmentAbilityConfig.DeserializeEquipmentAbilityConfig(__e0);  }  LstAbility.Add(__v0); }   }
     }
 
@@ -35,11 +37,15 @@ public abstract partial class EquipmentLevelConfig : Luban.BeanBase
 
     public readonly int Level;
     public readonly string Name;
+    public readonly Gameplay.Combat.EquipmentMountAbilityConfig Mount;
+    public readonly Gameplay.Combat.EquipmentBrokenAbilityConfig Broken;
     public readonly System.Collections.Generic.List<Gameplay.Combat.EquipmentAbilityConfig> LstAbility;
    
 
     public virtual void ResolveRef(Tables tables)
     {
+        Mount?.ResolveRef(tables);
+        Broken?.ResolveRef(tables);
         foreach (var _e in LstAbility) { _e?.ResolveRef(tables); }
     }
 
@@ -48,6 +54,8 @@ public abstract partial class EquipmentLevelConfig : Luban.BeanBase
         return "{ "
         + "level:" + Level + ","
         + "name:" + Name + ","
+        + "mount:" + Mount + ","
+        + "broken:" + Broken + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
         + "}";
     }

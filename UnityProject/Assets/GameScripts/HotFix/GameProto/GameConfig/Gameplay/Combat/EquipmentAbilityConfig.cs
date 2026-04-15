@@ -24,6 +24,8 @@ public abstract partial class EquipmentAbilityConfig : Luban.BeanBase
     {
         switch ((string)_buf["$type"])
         {
+            case "EquipmentMountAbilityConfig": return new Gameplay.Combat.EquipmentMountAbilityConfig(_buf);
+            case "EquipmentBrokenAbilityConfig": return new Gameplay.Combat.EquipmentBrokenAbilityConfig(_buf);
             case "WeaponCalculateDamageAbilityConfig": return new Gameplay.Combat.WeaponCalculateDamageAbilityConfig(_buf);
             case "WeaponCooldownAbilityConfig": return new Gameplay.Combat.WeaponCooldownAbilityConfig(_buf);
             case "SwordCollisionAttackAbilityConfig": return new Gameplay.Combat.SwordCollisionAttackAbilityConfig(_buf);

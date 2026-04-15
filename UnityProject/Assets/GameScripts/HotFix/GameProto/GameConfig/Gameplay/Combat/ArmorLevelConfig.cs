@@ -41,6 +41,8 @@ public sealed partial class ArmorLevelConfig : EquipmentLevelConfig
         return "{ "
         + "level:" + Level + ","
         + "name:" + Name + ","
+        + "mount:" + Mount + ","
+        + "broken:" + Broken + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
         + "armor:" + Armor + ","
         + "}";

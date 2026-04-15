@@ -14,14 +14,18 @@
     发射物追踪目标能力配置
     ============================================================
     -->
-    <bean name="ProjectileNoTrackingConfig" alias="no_track" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+
+    <bean name="ProjectileTrackingConfig" parent="ProjectileAbilityConfig" valueType="false" sep=",">
     </bean>
 
-    <bean name="ProjectileTrackTargetConfig" alias="track_target" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+    <bean name="ProjectileNoTrackingConfig" alias="no_track" parent="ProjectileTrackingConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="ProjectileTrackTargetConfig" alias="track_target" parent="ProjectileTrackingConfig" valueType="false" sep=",">
         <var name="angular_speed" type="float" />
     </bean>
 
-    <bean name="ProjectileTrackPointConfig" alias="track_point" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+    <bean name="ProjectileTrackPointConfig" alias="track_point" parent="ProjectileTrackingConfig" valueType="false" sep=",">
         <var name="angular_speed" type="float" />
     </bean>
 </module>

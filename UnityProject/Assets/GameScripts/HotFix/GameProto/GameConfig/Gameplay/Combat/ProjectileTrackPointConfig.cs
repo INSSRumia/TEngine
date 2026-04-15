@@ -13,7 +13,7 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileTrackPointConfig : ProjectileAbilityConfig
+public sealed partial class ProjectileTrackPointConfig : ProjectileTrackingConfig
 {
     public ProjectileTrackPointConfig(JSONNode _buf)  : base(_buf) 
     {

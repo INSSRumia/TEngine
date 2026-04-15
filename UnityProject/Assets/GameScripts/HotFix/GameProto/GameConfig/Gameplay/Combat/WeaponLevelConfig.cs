@@ -47,6 +47,8 @@ public abstract partial class WeaponLevelConfig : EquipmentLevelConfig
         return "{ "
         + "level:" + Level + ","
         + "name:" + Name + ","
+        + "mount:" + Mount + ","
+        + "broken:" + Broken + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
         + "calculateDamage:" + CalculateDamage + ","
         + "cooldown:" + Cooldown + ","

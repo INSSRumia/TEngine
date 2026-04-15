@@ -13,21 +13,19 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ProjectileTrackTargetConfig : ProjectileTrackingConfig
+public sealed partial class EquipmentBrokenAbilityConfig : EquipmentAbilityConfig
 {
-    public ProjectileTrackTargetConfig(JSONNode _buf)  : base(_buf) 
+    public EquipmentBrokenAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["angular_speed"].IsNumber) { throw new SerializationException(); }  AngularSpeed = _buf["angular_speed"]; }
     }
 
-    public static ProjectileTrackTargetConfig DeserializeProjectileTrackTargetConfig(JSONNode _buf)
+    public static EquipmentBrokenAbilityConfig DeserializeEquipmentBrokenAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.ProjectileTrackTargetConfig(_buf);
+        return new Gameplay.Combat.EquipmentBrokenAbilityConfig(_buf);
     }
 
-    public readonly float AngularSpeed;
    
-    public const int __ID__ = -732238109;
+    public const int __ID__ = 765660123;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
@@ -39,7 +37,6 @@ public sealed partial class ProjectileTrackTargetConfig : ProjectileTrackingConf
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "angularSpeed:" + AngularSpeed + ","
         + "}";
     }
 }

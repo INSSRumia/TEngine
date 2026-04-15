@@ -44,6 +44,8 @@ public sealed partial class BowLevelConfig : WeaponLevelConfig
         return "{ "
         + "level:" + Level + ","
         + "name:" + Name + ","
+        + "mount:" + Mount + ","
+        + "broken:" + Broken + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
         + "calculateDamage:" + CalculateDamage + ","
         + "cooldown:" + Cooldown + ","

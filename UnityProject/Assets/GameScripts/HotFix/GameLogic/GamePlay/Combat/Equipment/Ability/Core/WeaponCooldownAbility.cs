@@ -1,12 +1,14 @@
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class WeaponCooldownAbility : EquipmentAbility, IAbilityUpdate
     {
         private WeaponEquipment _owner;
         public float Cooldown {get; private set;}
-        public WeaponCooldownAbility(float cooldown)
+        public WeaponCooldownAbility(WeaponCooldownAbilityConfig config)
         {
-            Cooldown = cooldown;
+            Cooldown = config.Cooldown;
         }
         public override void OnAdd()
         {

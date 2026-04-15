@@ -1,3 +1,5 @@
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class EquipmentRuntimeData : RuntimeData
@@ -6,6 +8,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public bool IsEquipped { get; set; }
         public bool IsBroken { get; set; }
 
-        public EquipmentRuntimeData(string configId, int level) : base(configId, level, EquipmentFactory.GetNextInstId) { }
+        public EquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig) : base(config.ConfigId, levelConfig.Level, EquipmentFactory.GetNextInstId)
+        {
+        }
     }
 }

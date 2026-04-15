@@ -22,6 +22,7 @@ public sealed partial class ProjectileLevelConfig : Luban.BeanBase
         { if(!_buf["move_ability"].IsObject) { throw new SerializationException(); }  MoveAbility = global::GameConfig.Gameplay.Combat.ProjectileMoveConfig.DeserializeProjectileMoveConfig(_buf["move_ability"]);  }
         { if(!_buf["damage_ability"].IsObject) { throw new SerializationException(); }  DamageAbility = global::GameConfig.Gameplay.Combat.ProjectileDamageConfig.DeserializeProjectileDamageConfig(_buf["damage_ability"]);  }
         { if(!_buf["lifetime"].IsObject) { throw new SerializationException(); }  Lifetime = global::GameConfig.Gameplay.Combat.ProjectileLifetimeConfig.DeserializeProjectileLifetimeConfig(_buf["lifetime"]);  }
+        { if(!_buf["tracking"].IsObject) { throw new SerializationException(); }  Tracking = global::GameConfig.Gameplay.Combat.ProjectileTrackingConfig.DeserializeProjectileTrackingConfig(_buf["tracking"]);  }
         { var __json0 = _buf["lst_ability"]; if(!__json0.IsArray) { throw new SerializationException(); } LstAbility = new System.Collections.Generic.List<Gameplay.Combat.ProjectileAbilityConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Combat.ProjectileAbilityConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Combat.ProjectileAbilityConfig.DeserializeProjectileAbilityConfig(__e0);  }  LstAbility.Add(__v0); }   }
     }
 
@@ -35,6 +36,7 @@ public sealed partial class ProjectileLevelConfig : Luban.BeanBase
     public readonly Gameplay.Combat.ProjectileMoveConfig MoveAbility;
     public readonly Gameplay.Combat.ProjectileDamageConfig DamageAbility;
     public readonly Gameplay.Combat.ProjectileLifetimeConfig Lifetime;
+    public readonly Gameplay.Combat.ProjectileTrackingConfig Tracking;
     public readonly System.Collections.Generic.List<Gameplay.Combat.ProjectileAbilityConfig> LstAbility;
    
     public const int __ID__ = -1953570453;
@@ -45,6 +47,7 @@ public sealed partial class ProjectileLevelConfig : Luban.BeanBase
         MoveAbility?.ResolveRef(tables);
         DamageAbility?.ResolveRef(tables);
         Lifetime?.ResolveRef(tables);
+        Tracking?.ResolveRef(tables);
         foreach (var _e in LstAbility) { _e?.ResolveRef(tables); }
     }
 
@@ -56,6 +59,7 @@ public sealed partial class ProjectileLevelConfig : Luban.BeanBase
         + "moveAbility:" + MoveAbility + ","
         + "damageAbility:" + DamageAbility + ","
         + "lifetime:" + Lifetime + ","
+        + "tracking:" + Tracking + ","
         + "lstAbility:" + Luban.StringUtil.CollectionToString(LstAbility) + ","
         + "}";
     }

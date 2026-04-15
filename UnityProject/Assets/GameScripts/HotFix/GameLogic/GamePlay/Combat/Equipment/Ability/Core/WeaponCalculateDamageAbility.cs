@@ -1,4 +1,5 @@
 using UnityEngine;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
@@ -6,9 +7,9 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         private WeaponEquipment _owner;
         public int? Attack {get; private set;}
-        public WeaponCalculateDamageAbility(int? attack)
+        public WeaponCalculateDamageAbility(WeaponCalculateDamageAbilityConfig config)
         {
-            Attack = attack;
+            Attack = config.Attack;
         }
         public override void OnAdd()
         {

@@ -1,11 +1,13 @@
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileLifetimeAbility : ProjectileAbility, IAbilityUpdate
     {
         public float MaxLifetime { get; private set; }
-        public ProjectileLifetimeAbility(float maxLifetime)
+        public ProjectileLifetimeAbility(ProjectileLifetimeConfig config)
         {
-            MaxLifetime = maxLifetime;
+            MaxLifetime = config?.MaxLifetime ?? 0f;
         }
 
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)

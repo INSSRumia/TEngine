@@ -1,3 +1,4 @@
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -9,6 +10,16 @@ namespace GameLogic.Gameplay.Combat.Marble
         public bool LockDirectionOnActivate { get; set; } = true;
 
         private Vector2 _lockedDirection;
+
+        public MarbleDashAbility(MarbleDashAbilityConfig config)
+        {
+            Priority = config.Priority;
+            CombineType = (EnumCombineType)config.CombineType;
+            TargetSpeed = config.TargetSpeed;
+            Acceleration = config.Acceleration;
+            LockDirectionOnActivate = config.LockDirectionOnActivate;
+            InitializeTiming(AbilityTimingFactory.CreateTiming(config.Timing));
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

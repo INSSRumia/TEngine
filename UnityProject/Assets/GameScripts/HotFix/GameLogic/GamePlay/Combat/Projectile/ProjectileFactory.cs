@@ -60,7 +60,7 @@ namespace GameLogic.Gameplay.Combat
             projectile.transform.position = spawnPosition;
             projectile.transform.rotation = rotation;
 
-            var runtimeData = CreateProjectileRuntimeData(configId, level, sourceMarble, targetMarble, targetPoint, spawnPosition, rotation, damage);
+            var runtimeData = CreateProjectileRuntimeData(projectileConfig, levelConfig, sourceMarble, targetMarble, targetPoint, spawnPosition, rotation, damage);
 
             projectile.Init(runtimeData);
 
@@ -69,9 +69,9 @@ namespace GameLogic.Gameplay.Combat
             return projectile;
         }
 
-        private static ProjectileRuntimeData CreateProjectileRuntimeData(string configId, int level, Marble.Marble sourceMarble, Marble.Marble targetMarble, Vector2 targetPoint, Vector2 spawnPosition, Quaternion rotation, int damage)
+        private static ProjectileRuntimeData CreateProjectileRuntimeData(ProjectileConfig config, ProjectileLevelConfig levelConfig, Marble.Marble sourceMarble, Marble.Marble targetMarble, Vector2 targetPoint, Vector2 spawnPosition, Quaternion rotation, int damage)
         {
-            return new ProjectileRuntimeData(configId, level)
+            return new ProjectileRuntimeData(config, levelConfig)
             {
                 SourceCamp = sourceMarble.RuntimeData.Camp,
                 SourceMarbleInstId = sourceMarble.RuntimeData.InstId,
@@ -106,14 +106,20 @@ namespace GameLogic.Gameplay.Combat
 
         private static void AttachDefaultAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
         {
-            var moveAbility = new ProjectileMoveAbility(levelConfig.MoveAbility.Speed);
+            var moveAbility = new ProjectileMoveAbility(levelConfig.MoveAbility);
             AttachCoreAbility(projectile, moveAbility);
 
-            var damageAbility = new ProjectileDamageAbility(levelConfig.DamageAbility?.PiercingCount ?? 0, projectile.RuntimeData.SourceMarbleInstId, levelConfig.DamageAbility.IsDamageByVelocity, levelConfig.DamageAbility.VelocityDamageFactor);
+            var damageAbility = new ProjectileDamageAbility(levelConfig.DamageAbility, projectile.RuntimeData.SourceMarbleInstId);
             AttachCoreAbility(projectile, damageAbility);
 
-            var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime?.MaxLifetime ?? 0f);
+            var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime);
             AttachCoreAbility(projectile, lifetimeAbility);
+
+            var trackingAbility = CreateAbilityFromConfig(levelConfig.Tracking);
+            if (trackingAbility != null)
+            {
+                AttachCoreAbility(projectile, trackingAbility);
+            }
 
             AttachConfigAbilities(projectile, levelConfig);
         }
@@ -175,9 +181,9 @@ namespace GameLogic.Gameplay.Combat
         {
             return config switch
             {
-                ProjectileNoTrackingConfig _ => new ProjectileNoTrackingAbility(),
-                ProjectileTrackTargetConfig trackTargetConfig => new ProjectileTrackTargetAbility(trackTargetConfig.AngularSpeed),
-                ProjectileTrackPointConfig trackPointConfig => new ProjectileTrackPointAbility(trackPointConfig.AngularSpeed),
+                ProjectileNoTrackingConfig projectileNoTrackingConfig => new ProjectileNoTrackingAbility(projectileNoTrackingConfig),
+                ProjectileTrackTargetConfig trackTargetConfig => new ProjectileTrackTargetAbility(trackTargetConfig),
+                ProjectileTrackPointConfig trackPointConfig => new ProjectileTrackPointAbility(trackPointConfig),
                 _ => null
             };
         }

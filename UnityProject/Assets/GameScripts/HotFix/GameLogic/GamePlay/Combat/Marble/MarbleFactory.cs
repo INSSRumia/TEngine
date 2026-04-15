@@ -21,31 +21,14 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public static Marble CreateMarble(string id, int camp, int level = 0)
         {
+            var config = ConfigSystem.Instance.Tables.TbMarble.Get(id);
             var levelData = GetMarbleLevelConfig(id, level);
-            if (levelData == null)
+            if (config == null || levelData == null)
             {
                 return null;
             }
 
-            var runtimeData = new MarbleRuntimeData(id, level)
-            {
-                Camp = camp,
-                IsAlive = true,
-                Level = level,
-                UpgradeExp = levelData.UpgradeExp,
-                MaxHp = levelData.Hp,
-                Hp = levelData.Hp,
-                MaxShield = levelData.Shield,
-                Shield = levelData.Shield,
-                Defense = levelData.Defense,
-                Attack = levelData.Attack,
-                DamageMultiplier = 1f,
-                HealMultiplier = 1f,
-                ShieldHealMultiplier = 1f,
-                AttackMultiplier = 1f,
-                Scale = levelData.Scale,
-                Mass = levelData.Mass,
-            };
+            var runtimeData = new MarbleRuntimeData(config, levelData) { Camp = camp };
 
             return CreateMarble(runtimeData);
         }
@@ -166,69 +149,12 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             return config switch
             {
-                MarbleCloseToTargetAbilityConfig closeConfig =>
-                    new MarbleCloseToTargetAbility
-                    {
-                        Priority = closeConfig.Priority,
-                        CombineType = (EnumCombineType)closeConfig.CombineType,
-                        CloseDistance = closeConfig.CloseDistance,
-                        TargetSpeed = closeConfig.TargetSpeed,
-                        Acceleration = closeConfig.Acceleration,
-                    },
-                MarbleDefaultRotateAbilityConfig defaultRotateConfig =>
-                    new MarbleDefaultRotateAbility
-                    {
-                        Priority = defaultRotateConfig.Priority,
-                        CombineType = (EnumCombineType)defaultRotateConfig.CombineType,
-                        TargetAngularSpeed = defaultRotateConfig.TargetAngularSpeed,
-                        AngularAcceleration = defaultRotateConfig.AngularAcceleration,
-                    },
-                MarbleDashAbilityConfig dashConfig =>
-                    CreateDashAbility(dashConfig),
-                MarbleFaceTargetDirectionAbilityConfig faceTargetDirectionConfig =>
-                    CreateFaceTargetDirectionAbility(faceTargetDirectionConfig),
+                MarbleCloseToTargetAbilityConfig closeConfig => new MarbleCloseToTargetAbility(closeConfig),
+                MarbleDefaultRotateAbilityConfig defaultRotateConfig => new MarbleDefaultRotateAbility(defaultRotateConfig),
+                MarbleDashAbilityConfig dashConfig => new MarbleDashAbility(dashConfig),
+                MarbleFaceTargetDirectionAbilityConfig faceTargetDirectionConfig => new MarbleFaceTargetDirectionAbility(faceTargetDirectionConfig),
                 _ => null
             };
-        }
-
-        private static MarbleDashAbility CreateDashAbility(MarbleDashAbilityConfig dashConfig)
-        {
-            var ability = new MarbleDashAbility
-            {
-                Priority = dashConfig.Priority,
-                CombineType = (EnumCombineType)dashConfig.CombineType,
-                TargetSpeed = dashConfig.TargetSpeed,
-                Acceleration = dashConfig.Acceleration,
-                LockDirectionOnActivate = dashConfig.LockDirectionOnActivate,
-            };
-
-            var timing = AbilityTimingFactory.CreateTiming(dashConfig.Timing);
-            if (timing != null)
-            {
-                ability.InitializeTiming(timing);
-            }
-
-            return ability;
-        }
-
-        private static MarbleFaceTargetDirectionAbility CreateFaceTargetDirectionAbility(MarbleFaceTargetDirectionAbilityConfig config)
-        {
-            var ability = new MarbleFaceTargetDirectionAbility
-            {
-                Priority = config.Priority,
-                CombineType = (EnumCombineType)config.CombineType,
-                TargetLocalDirection = config.TargetLocalDirection,
-                TargetAngularSpeed = config.TargetAngularSpeed,
-                AngularAcceleration = config.AngularAcceleration,
-            };
-
-            var timing = AbilityTimingFactory.CreateTiming(config.Timing);
-            if (timing != null)
-            {
-                ability.InitializeTiming(timing);
-            }
-
-            return ability;
         }
     }
 }

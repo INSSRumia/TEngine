@@ -1,10 +1,11 @@
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileNoTrackingAbility : ProjectileTrackingAbility
     {
-        public ProjectileNoTrackingAbility() : base(0f)
+        public ProjectileNoTrackingAbility(ProjectileNoTrackingConfig config) : base(0f)
         {
         }
 

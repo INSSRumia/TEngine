@@ -1,4 +1,5 @@
 using UnityEngine;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
@@ -7,10 +8,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         private BowEquipment _owner;
         public float RotateSpeed {get; private set;}
         public float AimAngle {get; private set;}
-        public BowAimAbility(float rotateSpeed, float aimAngle)
+        public BowAimAbility(BowAimAbilityConfig config)
         {
-            RotateSpeed = rotateSpeed;
-            AimAngle = aimAngle;
+            RotateSpeed = config.TargetAngularSpeed;
+            AimAngle = config.AimAngle;
         }
         public override void OnAdd()
         {

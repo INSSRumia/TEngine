@@ -1,3 +1,4 @@
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat
@@ -5,9 +6,9 @@ namespace GameLogic.Gameplay.Combat
     public class ProjectileMoveAbility : ProjectileAbility, IAbilityFixedUpdate
     {
         public float MoveSpeed { get; private set; }
-        public ProjectileMoveAbility(float moveSpeed)
+        public ProjectileMoveAbility(ProjectileMoveConfig config)
         {
-            MoveSpeed = moveSpeed;
+            MoveSpeed = config.Speed;
         }
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

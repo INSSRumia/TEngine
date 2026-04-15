@@ -1,12 +1,14 @@
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class ArmorReduceDamageAbility : EquipmentAbility, IReceiveDamage
     {
         private ArmorEquipment _owner;
         public int Defense {get; private set;}
-        public ArmorReduceDamageAbility(int defense)
+        public ArmorReduceDamageAbility(ArmorReduceDamageAbilityConfig config)
         {
-            Defense = defense;
+            Defense = config.Defense;
         }
         public override void OnAdd()
         {

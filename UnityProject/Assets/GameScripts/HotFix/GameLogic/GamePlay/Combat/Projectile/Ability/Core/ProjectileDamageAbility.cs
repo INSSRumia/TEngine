@@ -9,12 +9,12 @@ namespace GameLogic.Gameplay.Combat
         public int SourceMarble { get; private set; }
         public bool IsDamageByVelocity { get; private set; }
         public float VelocityDamageFactor { get; private set; }
-        public ProjectileDamageAbility(int maxPiercingCount, int sourceMarble, bool isDamageByVelocity, float velocityDamageFactor)
+        public ProjectileDamageAbility(ProjectileDamageConfig config, int sourceMarble)
         {
-            MaxPiercingCount = maxPiercingCount;
+            MaxPiercingCount = config?.PiercingCount ?? 0;
             SourceMarble = sourceMarble;
-            IsDamageByVelocity = isDamageByVelocity;
-            VelocityDamageFactor = velocityDamageFactor;
+            IsDamageByVelocity = config != null && config.IsDamageByVelocity;
+            VelocityDamageFactor = config?.VelocityDamageFactor ?? 0f;
         }
 
         public override void OnAdd()

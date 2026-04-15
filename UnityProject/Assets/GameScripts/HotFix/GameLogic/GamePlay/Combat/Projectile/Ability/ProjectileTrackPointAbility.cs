@@ -1,10 +1,11 @@
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileTrackPointAbility : ProjectileTrackingAbility
     {
-        public ProjectileTrackPointAbility(float rotateSpeed) : base(rotateSpeed)
+        public ProjectileTrackPointAbility(ProjectileTrackPointConfig config) : base(config.AngularSpeed)
         {
         }
 
