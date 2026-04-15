@@ -171,8 +171,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
             {
                 case ArmorEquipment armorEquipment:
                 {
-                    armorEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    armorEquipment.AddAbility(new EquipmentBrokenAbility());
+                    AttachCoreAbility(armorEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
+                    AttachCoreAbility(armorEquipment, new EquipmentBrokenAbility());
 
                     var armorConfig = levelConfig as ArmorLevelConfig;
                     if (armorConfig == null)
@@ -183,10 +183,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     switch(armorConfig.Armor)
                     {
                         case ArmorReduceDamageAbilityConfig c1 :
-                            armorEquipment.AddAbility(new ArmorReduceDamageAbility(c1.Defense));
+                            AttachCoreAbility(armorEquipment, new ArmorReduceDamageAbility(c1.Defense));
                             break;
                         case ArmorAbsorbDamageAbilityConfig c2 :
-                            armorEquipment.AddAbility(new ArmorAbsorbDamageAbility(c2.Defense, c2.Hp));
+                            AttachCoreAbility(armorEquipment, new ArmorAbsorbDamageAbility(c2.Defense, c2.Hp));
                             break;
                     }
 
@@ -194,33 +194,33 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 }
                 case BowEquipment bowEquipment:
                 {
-                    bowEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    bowEquipment.AddAbility(new EquipmentBrokenAbility());
+                    AttachCoreAbility(bowEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
+                    AttachCoreAbility(bowEquipment, new EquipmentBrokenAbility());
                     var bowConfig = levelConfig as BowLevelConfig;
                     if (bowConfig == null)
                     {
                         Log.Error($"BowLevelConfig 配置错误: {levelConfig.Level}");
                         break;
                     }
-                    bowEquipment.AddAbility(new WeaponCooldownAbility(bowConfig.Cooldown.Cooldown));
-                    bowEquipment.AddAbility(new WeaponCalculateDamageAbility(bowConfig.CalculateDamage.Attack));
-                    bowEquipment.AddAbility(new BowAimAbility(bowConfig.BowAim.RotateSpeed, bowConfig.BowAim.RotateSpeed));
-                    bowEquipment.AddAbility(new BowFireAbility(bowConfig.BowFire.ProjectileConfigId, bowConfig.BowFire.ProjectileLevel, bowConfig.BowFire.ArrowInterval, bowConfig.BowFire.ArrowCount, bowConfig.BowFire.ArrowAngleStep, bowConfig.BowFire.ShootType));
+                    AttachCoreAbility(bowEquipment, new WeaponCooldownAbility(bowConfig.Cooldown.Cooldown));
+                    AttachCoreAbility(bowEquipment, new WeaponCalculateDamageAbility(bowConfig.CalculateDamage.Attack));
+                    AttachCoreAbility(bowEquipment, new BowAimAbility(bowConfig.BowAim.RotateSpeed, bowConfig.BowAim.AimAngle));
+                    AttachCoreAbility(bowEquipment, new BowFireAbility(bowConfig.BowFire.ProjectileConfigId, bowConfig.BowFire.ProjectileLevel, bowConfig.BowFire.ArrowInterval, bowConfig.BowFire.ArrowCount, bowConfig.BowFire.ArrowAngleStep, bowConfig.BowFire.ShootType));
                     break;
                 }
                 case SwordEquipment swordEquipment:
                 {
-                    swordEquipment.AddAbility(new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    swordEquipment.AddAbility(new EquipmentBrokenAbility());
+                    AttachCoreAbility(swordEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
+                    AttachCoreAbility(swordEquipment, new EquipmentBrokenAbility());
                     var swordConfig = levelConfig as SwordLevelConfig;
                     if (swordConfig == null)
                     {
                         Log.Error($"SwordLevelConfig 配置错误: {levelConfig.Level}");
                         break;
                     }
-                    swordEquipment.AddAbility(new WeaponCooldownAbility(swordConfig.Cooldown.Cooldown));
-                    swordEquipment.AddAbility(new WeaponCalculateDamageAbility(swordConfig.CalculateDamage.Attack));
-                    swordEquipment.AddAbility(new SwordCollisionAttackAbility(swordConfig.SwordCollisionAttack.IsDamageByVelocity, swordConfig.SwordCollisionAttack.VelocityDamageFactor));
+                    AttachCoreAbility(swordEquipment, new WeaponCooldownAbility(swordConfig.Cooldown.Cooldown));
+                    AttachCoreAbility(swordEquipment, new WeaponCalculateDamageAbility(swordConfig.CalculateDamage.Attack));
+                    AttachCoreAbility(swordEquipment, new SwordCollisionAttackAbility(swordConfig.SwordCollisionAttack.IsDamageByVelocity, swordConfig.SwordCollisionAttack.VelocityDamageFactor));
                     break;
                 }
                 default:
@@ -229,6 +229,12 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     break;
                 }
             }
+        }
+
+        private static void AttachCoreAbility(Equipment equipment, EquipmentAbility ability)
+        {
+            ability.Category = AbilityCategory.Core;
+            equipment.AddAbility(ability);
         }
     }
 
