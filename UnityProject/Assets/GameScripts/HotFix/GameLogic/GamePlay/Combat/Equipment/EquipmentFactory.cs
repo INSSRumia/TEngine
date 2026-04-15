@@ -171,65 +171,88 @@ namespace GameLogic.Gameplay.Combat.Equipment
             switch (equipment)
             {
                 case ArmorEquipment armorEquipment:
-                {
-                    AttachCoreAbility(armorEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    AttachCoreAbility(armorEquipment, new EquipmentBrokenAbility());
-
-                    var armorConfig = levelConfig as ArmorLevelConfig;
-                    if (armorConfig == null)
-                    {
-                        Log.Error($"ArmorLevelConfig 配置错误: {levelConfig.Level}");
-                        break;
-                    }
-                    switch(armorConfig.Armor)
-                    {
-                        case ArmorReduceDamageAbilityConfig c1 :
-                            AttachCoreAbility(armorEquipment, new ArmorReduceDamageAbility(c1.Defense));
-                            break;
-                        case ArmorAbsorbDamageAbilityConfig c2 :
-                            AttachCoreAbility(armorEquipment, new ArmorAbsorbDamageAbility(c2.Defense, c2.Hp));
-                            break;
-                    }
-
+                    AttachArmorDefaultAbilities(armorEquipment, levelConfig as ArmorLevelConfig);
                     break;
-                }
                 case BowEquipment bowEquipment:
-                {
-                    AttachCoreAbility(bowEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    AttachCoreAbility(bowEquipment, new EquipmentBrokenAbility());
-                    var bowConfig = levelConfig as BowLevelConfig;
-                    if (bowConfig == null)
-                    {
-                        Log.Error($"BowLevelConfig 配置错误: {levelConfig.Level}");
-                        break;
-                    }
-                    AttachCoreAbility(bowEquipment, new WeaponCooldownAbility(bowConfig.Cooldown.Cooldown));
-                    AttachCoreAbility(bowEquipment, new WeaponCalculateDamageAbility(bowConfig.CalculateDamage.Attack));
-                    AttachCoreAbility(bowEquipment, new BowAimAbility(bowConfig.BowAim.RotateSpeed, bowConfig.BowAim.AimAngle));
-                    AttachCoreAbility(bowEquipment, new BowFireAbility(bowConfig.BowFire.ProjectileConfigId, bowConfig.BowFire.ProjectileLevel, bowConfig.BowFire.ArrowInterval, bowConfig.BowFire.ArrowCount, bowConfig.BowFire.ArrowAngleStep, bowConfig.BowFire.ShootType));
+                    AttachBowDefaultAbilities(bowEquipment, levelConfig as BowLevelConfig);
                     break;
-                }
                 case SwordEquipment swordEquipment:
-                {
-                    AttachCoreAbility(swordEquipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
-                    AttachCoreAbility(swordEquipment, new EquipmentBrokenAbility());
-                    var swordConfig = levelConfig as SwordLevelConfig;
-                    if (swordConfig == null)
-                    {
-                        Log.Error($"SwordLevelConfig 配置错误: {levelConfig.Level}");
-                        break;
-                    }
-                    AttachCoreAbility(swordEquipment, new WeaponCooldownAbility(swordConfig.Cooldown.Cooldown));
-                    AttachCoreAbility(swordEquipment, new WeaponCalculateDamageAbility(swordConfig.CalculateDamage.Attack));
-                    AttachCoreAbility(swordEquipment, new SwordCollisionAttackAbility(swordConfig.SwordCollisionAttack.IsDamageByVelocity, swordConfig.SwordCollisionAttack.VelocityDamageFactor));
+                    AttachSwordDefaultAbilities(swordEquipment, levelConfig as SwordLevelConfig);
                     break;
-                }
                 default:
                 {
                     Log.Error($"Equipment 类型错误: {equipment.GetType().Name}");
                     break;
                 }
             }
+        }
+
+        private static void AttachArmorDefaultAbilities(ArmorEquipment equipment, ArmorLevelConfig config)
+        {
+            if (config == null)
+            {
+                Log.Error("ArmorLevelConfig 配置错误");
+                return;
+            }
+
+            AttachEquipmentCoreAbilities(equipment);
+
+            switch (config.Armor)
+            {
+                case ArmorReduceDamageAbilityConfig reduceDamageConfig:
+                    AttachCoreAbility(equipment, new ArmorReduceDamageAbility(reduceDamageConfig.Defense));
+                    break;
+                case ArmorAbsorbDamageAbilityConfig absorbDamageConfig:
+                    AttachCoreAbility(equipment, new ArmorAbsorbDamageAbility(absorbDamageConfig.Defense, absorbDamageConfig.Hp));
+                    break;
+            }
+        }
+
+        private static void AttachBowDefaultAbilities(BowEquipment equipment, BowLevelConfig config)
+        {
+            if (config == null)
+            {
+                Log.Error("BowLevelConfig 配置错误");
+                return;
+            }
+
+            AttachEquipmentCoreAbilities(equipment);
+            AttachWeaponCoreAbilities(equipment, config);
+            AttachCoreAbility(equipment, new BowAimAbility(config.BowAim.RotateSpeed, config.BowAim.AimAngle));
+            AttachCoreAbility(equipment, new BowFireAbility(
+                config.BowFire.ProjectileConfigId,
+                config.BowFire.ProjectileLevel,
+                config.BowFire.ArrowInterval,
+                config.BowFire.ArrowCount,
+                config.BowFire.ArrowAngleStep,
+                config.BowFire.ShootType));
+        }
+
+        private static void AttachSwordDefaultAbilities(SwordEquipment equipment, SwordLevelConfig config)
+        {
+            if (config == null)
+            {
+                Log.Error("SwordLevelConfig 配置错误");
+                return;
+            }
+
+            AttachEquipmentCoreAbilities(equipment);
+            AttachWeaponCoreAbilities(equipment, config);
+            AttachCoreAbility(equipment, new SwordCollisionAttackAbility(
+                config.SwordCollisionAttack.IsDamageByVelocity,
+                config.SwordCollisionAttack.VelocityDamageFactor));
+        }
+
+        private static void AttachEquipmentCoreAbilities(Equipment equipment)
+        {
+            AttachCoreAbility(equipment, new EquipmentMountAbility(equipment.RuntimeData.Slot));
+            AttachCoreAbility(equipment, new EquipmentBrokenAbility());
+        }
+
+        private static void AttachWeaponCoreAbilities(WeaponEquipment equipment, WeaponLevelConfig config)
+        {
+            AttachCoreAbility(equipment, new WeaponCooldownAbility(config.Cooldown.Cooldown));
+            AttachCoreAbility(equipment, new WeaponCalculateDamageAbility(config.CalculateDamage.Attack));
         }
 
         private static void AttachCoreAbility(Equipment equipment, EquipmentAbility ability)
