@@ -109,12 +109,12 @@ namespace GameLogic.Gameplay.Combat
 
             var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime?.MaxLifetime ?? 0f);
             AttachCoreAbility(projectile, lifetimeAbility);
+        }
 
-            void AttachCoreAbility(Projectile projectile, ProjectileAbility ability)
-            {
-                ability.Category = AbilityCategory.Core;
-                projectile.AddAbility(ability);
-            }
+        private static void AttachCoreAbility(Projectile projectile, ProjectileAbility ability)
+        {
+            ability.Category = AbilityCategory.Core;
+            projectile.AddAbility(ability);
         }
 
         private static void AttachOptionalAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
@@ -133,8 +133,7 @@ namespace GameLogic.Gameplay.Combat
             }
         }
 
-
-        private readonly static System.Collections.Generic.List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new ()
+        private static readonly System.Collections.Generic.List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new()
         {
             new DefaultProjectileAbilityCreatorForConfig(),
         };

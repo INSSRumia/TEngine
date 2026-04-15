@@ -84,30 +84,37 @@ namespace GameLogic.Gameplay.Combat.Equipment
             foreach (var config in levelConfig.LstAbility)
             {
                 var ability = CreateAbilityFromConfig(equipment, config);
-                if (ability != null)
-                {
-                    ability.Priority = config.Priority;
-                    equipment.AddAbility(ability);
-                }
-            }
+                if (ability == null)
+                    continue;
 
+                ability.Priority = config.Priority;
+                equipment.AddAbility(ability);
+            }
         }
 
-        private static List<IEquipmentAbilityCreatorForConfig> _lstEquipmentAbilityCreatorsForConfig = new List<IEquipmentAbilityCreatorForConfig>
+        private static readonly List<IEquipmentAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IEquipmentAbilityCreatorForConfig>
         {
             new DefaultEquipmentAbilityCreatorForConfig(),
         };
+
+        public static void RegisterAbilityCreatorForConfig(IEquipmentAbilityCreatorForConfig creator)
+        {
+            _lstAbilityCreatorsForConfig.Add(creator);
+            _lstAbilityCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        }
+
         private static EquipmentAbility CreateAbilityFromConfig(Equipment equipment, EquipmentAbilityConfig config)
         {
-            foreach (var creator in _lstEquipmentAbilityCreatorsForConfig)
+            foreach (var creator in _lstAbilityCreatorsForConfig)
             {
                 var ability = creator.CreateAbility(equipment, config);
                 if (ability != null)
                 {
-                    ability.Priority = creator.Priority;
-                    equipment.AddAbility(ability);
+                    return ability;
                 }
             }
+
+            Log.Error($"Equipment ability creator for config not found: {config.GetType().Name}");
             return null;
         }
     }

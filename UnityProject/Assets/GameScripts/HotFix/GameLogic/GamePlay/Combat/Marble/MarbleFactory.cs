@@ -113,7 +113,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             }
         }
 
-        private readonly static List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
+        private static readonly List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
         {
             new DefaultMarbleAbilityCreatorForConfig(),
         };
