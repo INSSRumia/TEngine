@@ -5,6 +5,10 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleRotationAbility : MarbleAbility, IAbilityFixedUpdate
     {
+        public MarbleRotationAbility(GameConfig.Gameplay.Combat.MarbleRotationAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {

@@ -1,5 +1,6 @@
 using GameLogic.Gameplay.Combat.Equipment;
 using GameLogic.Gameplay.Combat;
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -8,6 +9,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleDeathAbility : MarbleAbility
     {
+        public MarbleDeathAbility(MarbleDeathAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public void Execute()
         {
             if (!Owner.RuntimeData.IsAlive || Owner.RuntimeData.Hp > 0)

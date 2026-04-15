@@ -8,6 +8,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public partial class MarbleShieldHealPipelineAbility : MarbleAbility, IReceiveShield
     {
+        public MarbleShieldHealPipelineAbility(GameConfig.Gameplay.Combat.MarbleShieldHealPipelineAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public enum ShieldStage
         {
             None = 0,

@@ -1,9 +1,15 @@
 using GameLogic.Gameplay.Combat;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleAddHealAbility : MarbleAbility, IReceiveHeal
     {
+        public MarbleAddHealAbility(MarbleAddHealAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public void ReceiveHeal(int value, ASC source = null)
         {
             if (Owner == null || Owner.RuntimeData == null || value <= 0)

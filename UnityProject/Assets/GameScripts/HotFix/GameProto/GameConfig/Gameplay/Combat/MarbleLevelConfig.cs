@@ -19,6 +19,19 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
     {
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
         { if(!_buf["upgrade_exp"].IsNumber) { throw new SerializationException(); }  UpgradeExp = _buf["upgrade_exp"]; }
+        { if(!_buf["sync_scale"].IsObject) { throw new SerializationException(); }  SyncScale = global::GameConfig.Gameplay.Combat.MarbleSyncScaleAbilityConfig.DeserializeMarbleSyncScaleAbilityConfig(_buf["sync_scale"]);  }
+        { if(!_buf["sync_mass"].IsObject) { throw new SerializationException(); }  SyncMass = global::GameConfig.Gameplay.Combat.MarbleSyncMassAbilityConfig.DeserializeMarbleSyncMassAbilityConfig(_buf["sync_mass"]);  }
+        { if(!_buf["damage_pipeline"].IsObject) { throw new SerializationException(); }  DamagePipeline = global::GameConfig.Gameplay.Combat.MarbleDamagePipelineAbilityConfig.DeserializeMarbleDamagePipelineAbilityConfig(_buf["damage_pipeline"]);  }
+        { if(!_buf["heal_pipeline"].IsObject) { throw new SerializationException(); }  HealPipeline = global::GameConfig.Gameplay.Combat.MarbleHealPipelineAbilityConfig.DeserializeMarbleHealPipelineAbilityConfig(_buf["heal_pipeline"]);  }
+        { if(!_buf["shield_heal_pipeline"].IsObject) { throw new SerializationException(); }  ShieldHealPipeline = global::GameConfig.Gameplay.Combat.MarbleShieldHealPipelineAbilityConfig.DeserializeMarbleShieldHealPipelineAbilityConfig(_buf["shield_heal_pipeline"]);  }
+        { if(!_buf["receive_damage"].IsObject) { throw new SerializationException(); }  ReceiveDamage = global::GameConfig.Gameplay.Combat.MarbleReceiveDamageAbilityConfig.DeserializeMarbleReceiveDamageAbilityConfig(_buf["receive_damage"]);  }
+        { if(!_buf["add_heal"].IsObject) { throw new SerializationException(); }  AddHeal = global::GameConfig.Gameplay.Combat.MarbleAddHealAbilityConfig.DeserializeMarbleAddHealAbilityConfig(_buf["add_heal"]);  }
+        { if(!_buf["add_exp"].IsObject) { throw new SerializationException(); }  AddExp = global::GameConfig.Gameplay.Combat.MarbleAddExpAbilityConfig.DeserializeMarbleAddExpAbilityConfig(_buf["add_exp"]);  }
+        { if(!_buf["death"].IsObject) { throw new SerializationException(); }  Death = global::GameConfig.Gameplay.Combat.MarbleDeathAbilityConfig.DeserializeMarbleDeathAbilityConfig(_buf["death"]);  }
+        { if(!_buf["level_up"].IsObject) { throw new SerializationException(); }  LevelUp = global::GameConfig.Gameplay.Combat.MarbleLevelUpAbilityConfig.DeserializeMarbleLevelUpAbilityConfig(_buf["level_up"]);  }
+        { if(!_buf["get_target"].IsObject) { throw new SerializationException(); }  GetTarget = global::GameConfig.Gameplay.Combat.MarbleGetTargetAbilityConfig.DeserializeMarbleGetTargetAbilityConfig(_buf["get_target"]);  }
+        { if(!_buf["movement"].IsObject) { throw new SerializationException(); }  Movement = global::GameConfig.Gameplay.Combat.MarbleMovementAbilityConfig.DeserializeMarbleMovementAbilityConfig(_buf["movement"]);  }
+        { if(!_buf["rotation"].IsObject) { throw new SerializationException(); }  Rotation = global::GameConfig.Gameplay.Combat.MarbleRotationAbilityConfig.DeserializeMarbleRotationAbilityConfig(_buf["rotation"]);  }
         { if(!_buf["attack"].IsNumber) { throw new SerializationException(); }  Attack = _buf["attack"]; }
         { if(!_buf["hp"].IsNumber) { throw new SerializationException(); }  Hp = _buf["hp"]; }
         { if(!_buf["shield"].IsNumber) { throw new SerializationException(); }  Shield = _buf["shield"]; }
@@ -37,6 +50,19 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
 
     public readonly int Level;
     public readonly int UpgradeExp;
+    public readonly Gameplay.Combat.MarbleSyncScaleAbilityConfig SyncScale;
+    public readonly Gameplay.Combat.MarbleSyncMassAbilityConfig SyncMass;
+    public readonly Gameplay.Combat.MarbleDamagePipelineAbilityConfig DamagePipeline;
+    public readonly Gameplay.Combat.MarbleHealPipelineAbilityConfig HealPipeline;
+    public readonly Gameplay.Combat.MarbleShieldHealPipelineAbilityConfig ShieldHealPipeline;
+    public readonly Gameplay.Combat.MarbleReceiveDamageAbilityConfig ReceiveDamage;
+    public readonly Gameplay.Combat.MarbleAddHealAbilityConfig AddHeal;
+    public readonly Gameplay.Combat.MarbleAddExpAbilityConfig AddExp;
+    public readonly Gameplay.Combat.MarbleDeathAbilityConfig Death;
+    public readonly Gameplay.Combat.MarbleLevelUpAbilityConfig LevelUp;
+    public readonly Gameplay.Combat.MarbleGetTargetAbilityConfig GetTarget;
+    public readonly Gameplay.Combat.MarbleMovementAbilityConfig Movement;
+    public readonly Gameplay.Combat.MarbleRotationAbilityConfig Rotation;
     public readonly int Attack;
     public readonly int Hp;
     public readonly int Shield;
@@ -52,6 +78,19 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
 
     public  void ResolveRef(Tables tables)
     {
+        SyncScale?.ResolveRef(tables);
+        SyncMass?.ResolveRef(tables);
+        DamagePipeline?.ResolveRef(tables);
+        HealPipeline?.ResolveRef(tables);
+        ShieldHealPipeline?.ResolveRef(tables);
+        ReceiveDamage?.ResolveRef(tables);
+        AddHeal?.ResolveRef(tables);
+        AddExp?.ResolveRef(tables);
+        Death?.ResolveRef(tables);
+        LevelUp?.ResolveRef(tables);
+        GetTarget?.ResolveRef(tables);
+        Movement?.ResolveRef(tables);
+        Rotation?.ResolveRef(tables);
         foreach (var _e in LstEquipment) { _e?.ResolveRef(tables); }
         foreach (var _e in LstAbility) { _e?.ResolveRef(tables); }
     }
@@ -61,6 +100,19 @@ public sealed partial class MarbleLevelConfig : Luban.BeanBase
         return "{ "
         + "level:" + Level + ","
         + "upgradeExp:" + UpgradeExp + ","
+        + "syncScale:" + SyncScale + ","
+        + "syncMass:" + SyncMass + ","
+        + "damagePipeline:" + DamagePipeline + ","
+        + "healPipeline:" + HealPipeline + ","
+        + "shieldHealPipeline:" + ShieldHealPipeline + ","
+        + "receiveDamage:" + ReceiveDamage + ","
+        + "addHeal:" + AddHeal + ","
+        + "addExp:" + AddExp + ","
+        + "death:" + Death + ","
+        + "levelUp:" + LevelUp + ","
+        + "getTarget:" + GetTarget + ","
+        + "movement:" + Movement + ","
+        + "rotation:" + Rotation + ","
         + "attack:" + Attack + ","
         + "hp:" + Hp + ","
         + "shield:" + Shield + ","

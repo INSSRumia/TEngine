@@ -17,6 +17,7 @@ public sealed partial class MarbleDashAbilityConfig : MarbleAbilityConfig
 {
     public MarbleDashAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["combine_type"].IsNumber) { throw new SerializationException(); }  CombineType = (Gameplay.Combat.EnumCombineType)_buf["combine_type"].AsInt; }
         { if(!_buf["target_speed"].IsNumber) { throw new SerializationException(); }  TargetSpeed = _buf["target_speed"]; }
         { if(!_buf["acceleration"].IsNumber) { throw new SerializationException(); }  Acceleration = _buf["acceleration"]; }
         { if(!_buf["lock_direction_on_activate"].IsBoolean) { throw new SerializationException(); }  LockDirectionOnActivate = _buf["lock_direction_on_activate"]; }
@@ -28,6 +29,7 @@ public sealed partial class MarbleDashAbilityConfig : MarbleAbilityConfig
         return new Gameplay.Combat.MarbleDashAbilityConfig(_buf);
     }
 
+    public readonly Gameplay.Combat.EnumCombineType CombineType;
     public readonly float TargetSpeed;
     public readonly float Acceleration;
     public readonly bool LockDirectionOnActivate;

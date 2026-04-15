@@ -17,6 +17,7 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
 {
     public MarbleCloseToTargetAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["combine_type"].IsNumber) { throw new SerializationException(); }  CombineType = (Gameplay.Combat.EnumCombineType)_buf["combine_type"].AsInt; }
         { if(!_buf["close_distance"].IsNumber) { throw new SerializationException(); }  CloseDistance = _buf["close_distance"]; }
         { if(!_buf["target_speed"].IsNumber) { throw new SerializationException(); }  TargetSpeed = _buf["target_speed"]; }
         { if(!_buf["acceleration"].IsNumber) { throw new SerializationException(); }  Acceleration = _buf["acceleration"]; }
@@ -27,6 +28,7 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
         return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
     }
 
+    public readonly Gameplay.Combat.EnumCombineType CombineType;
     public readonly float CloseDistance;
     public readonly float TargetSpeed;
     public readonly float Acceleration;

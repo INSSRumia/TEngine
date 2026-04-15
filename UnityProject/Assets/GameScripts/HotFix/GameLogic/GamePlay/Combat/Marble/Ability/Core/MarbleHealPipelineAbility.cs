@@ -8,6 +8,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public partial class MarbleHealPipelineAbility : MarbleAbility
     {
+        public MarbleHealPipelineAbility(GameConfig.Gameplay.Combat.MarbleHealPipelineAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public enum HealStage
         {
             None = 0,

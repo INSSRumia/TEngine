@@ -5,6 +5,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleMovementAbility : MarbleAbility, IAbilityFixedUpdate
     {
+        public MarbleMovementAbility(GameConfig.Gameplay.Combat.MarbleMovementAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)

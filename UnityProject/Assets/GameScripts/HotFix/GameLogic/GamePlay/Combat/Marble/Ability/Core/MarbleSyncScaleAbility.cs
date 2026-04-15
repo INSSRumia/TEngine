@@ -1,10 +1,16 @@
 using UnityEngine;
 using GameLogic.Gameplay.Combat;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleSyncScaleAbility : MarbleAbility
     {
+        public MarbleSyncScaleAbility(MarbleSyncScaleAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public override void OnAdd()
         {
             base.OnAdd();

@@ -11,7 +11,45 @@
     -->
     <bean name="MarbleAbilityConfig" valueType="false" sep=",">
         <var name="priority" type="int" />
-        <var name="combine_type" type="EnumCombineType" />
+    </bean>
+
+    <bean name="MarbleSyncScaleAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleSyncMassAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleDamagePipelineAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleHealPipelineAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleShieldHealPipelineAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleReceiveDamageAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleAddHealAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleAddExpAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleDeathAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleLevelUpAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleGetTargetAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleMovementAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
+    </bean>
+
+    <bean name="MarbleRotationAbilityConfig" parent="MarbleAbilityConfig" valueType="false" sep=",">
     </bean>
 
     <!--
@@ -21,6 +59,7 @@
     可选 Ability：当 Marble 与目标距离小于 CloseDistance 时停止移动。
     -->
     <bean name="MarbleCloseToTargetAbilityConfig" alias="close_to_target" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="combine_type" type="EnumCombineType" />
         <!-- # 触发停止移动的判定距离-->
         <var name="close_distance" type="float" />
         <var name="target_speed" type="float" />
@@ -34,6 +73,7 @@
     可选 Ability：默认旋转能力。
     -->
     <bean name="MarbleDefaultRotateAbilityConfig" alias="default_rotate" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="combine_type" type="EnumCombineType" />
         <var name="target_angular_speed" type="float" />
         <var name="angular_acceleration" type="float" />
     </bean>
@@ -45,6 +85,7 @@
     定时冲刺能力：激活期内持续提高目标速度和加速度。
     -->
     <bean name="MarbleDashAbilityConfig" alias="dash" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="combine_type" type="EnumCombineType" />
         <var name="target_speed" type="float" />
         <var name="acceleration" type="float" />
         <var name="lock_direction_on_activate" type="bool" />
@@ -58,6 +99,7 @@
     定时朝向目标能力：在激活期间持续让 Marble 的指定方向转向敌人。
     -->
     <bean name="MarbleFaceTargetDirectionAbilityConfig" alias="face_target_direction" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="combine_type" type="EnumCombineType" />
         <var name="target_local_direction" type="vector2" />
         <var name="target_angular_speed" type="float" />
         <var name="angular_acceleration" type="float" />

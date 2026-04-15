@@ -17,6 +17,7 @@ public sealed partial class MarbleDefaultRotateAbilityConfig : MarbleAbilityConf
 {
     public MarbleDefaultRotateAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
+        { if(!_buf["combine_type"].IsNumber) { throw new SerializationException(); }  CombineType = (Gameplay.Combat.EnumCombineType)_buf["combine_type"].AsInt; }
         { if(!_buf["target_angular_speed"].IsNumber) { throw new SerializationException(); }  TargetAngularSpeed = _buf["target_angular_speed"]; }
         { if(!_buf["angular_acceleration"].IsNumber) { throw new SerializationException(); }  AngularAcceleration = _buf["angular_acceleration"]; }
     }
@@ -26,6 +27,7 @@ public sealed partial class MarbleDefaultRotateAbilityConfig : MarbleAbilityConf
         return new Gameplay.Combat.MarbleDefaultRotateAbilityConfig(_buf);
     }
 
+    public readonly Gameplay.Combat.EnumCombineType CombineType;
     public readonly float TargetAngularSpeed;
     public readonly float AngularAcceleration;
    

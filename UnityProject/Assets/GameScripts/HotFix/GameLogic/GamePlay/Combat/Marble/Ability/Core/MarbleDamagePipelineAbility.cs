@@ -8,6 +8,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public partial class MarbleDamagePipelineAbility : MarbleAbility
     {
+        public MarbleDamagePipelineAbility(GameConfig.Gameplay.Combat.MarbleDamagePipelineAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public enum DamageStage
         {
             None = 0,

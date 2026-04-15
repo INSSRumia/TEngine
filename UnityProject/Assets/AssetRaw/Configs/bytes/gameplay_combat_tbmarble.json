@@ -6,6 +6,45 @@
       {
         "level": 0,
         "upgrade_exp": 100,
+        "sync_scale": {
+          "priority": 0
+        },
+        "sync_mass": {
+          "priority": 0
+        },
+        "damage_pipeline": {
+          "priority": 0
+        },
+        "heal_pipeline": {
+          "priority": 0
+        },
+        "shield_heal_pipeline": {
+          "priority": 0
+        },
+        "receive_damage": {
+          "priority": 0
+        },
+        "add_heal": {
+          "priority": 0
+        },
+        "add_exp": {
+          "priority": 0
+        },
+        "death": {
+          "priority": 0
+        },
+        "level_up": {
+          "priority": 0
+        },
+        "get_target": {
+          "priority": 0
+        },
+        "movement": {
+          "priority": 0
+        },
+        "rotation": {
+          "priority": 0
+        },
         "attack": 10,
         "hp": 100,
         "shield": 100,
@@ -62,6 +101,45 @@
       {
         "level": 1,
         "upgrade_exp": 150,
+        "sync_scale": {
+          "priority": 0
+        },
+        "sync_mass": {
+          "priority": 0
+        },
+        "damage_pipeline": {
+          "priority": 0
+        },
+        "heal_pipeline": {
+          "priority": 0
+        },
+        "shield_heal_pipeline": {
+          "priority": 0
+        },
+        "receive_damage": {
+          "priority": 0
+        },
+        "add_heal": {
+          "priority": 0
+        },
+        "add_exp": {
+          "priority": 0
+        },
+        "death": {
+          "priority": 0
+        },
+        "level_up": {
+          "priority": 0
+        },
+        "get_target": {
+          "priority": 0
+        },
+        "movement": {
+          "priority": 0
+        },
+        "rotation": {
+          "priority": 0
+        },
         "attack": 10,
         "hp": 150,
         "shield": 150,
@@ -124,6 +202,45 @@
       {
         "level": 0,
         "upgrade_exp": 100,
+        "sync_scale": {
+          "priority": 0
+        },
+        "sync_mass": {
+          "priority": 0
+        },
+        "damage_pipeline": {
+          "priority": 0
+        },
+        "heal_pipeline": {
+          "priority": 0
+        },
+        "shield_heal_pipeline": {
+          "priority": 0
+        },
+        "receive_damage": {
+          "priority": 0
+        },
+        "add_heal": {
+          "priority": 0
+        },
+        "add_exp": {
+          "priority": 0
+        },
+        "death": {
+          "priority": 0
+        },
+        "level_up": {
+          "priority": 0
+        },
+        "get_target": {
+          "priority": 0
+        },
+        "movement": {
+          "priority": 0
+        },
+        "rotation": {
+          "priority": 0
+        },
         "attack": 10,
         "hp": 100,
         "shield": 100,
@@ -169,6 +286,45 @@
       {
         "level": 1,
         "upgrade_exp": 150,
+        "sync_scale": {
+          "priority": 0
+        },
+        "sync_mass": {
+          "priority": 0
+        },
+        "damage_pipeline": {
+          "priority": 0
+        },
+        "heal_pipeline": {
+          "priority": 0
+        },
+        "shield_heal_pipeline": {
+          "priority": 0
+        },
+        "receive_damage": {
+          "priority": 0
+        },
+        "add_heal": {
+          "priority": 0
+        },
+        "add_exp": {
+          "priority": 0
+        },
+        "death": {
+          "priority": 0
+        },
+        "level_up": {
+          "priority": 0
+        },
+        "get_target": {
+          "priority": 0
+        },
+        "movement": {
+          "priority": 0
+        },
+        "rotation": {
+          "priority": 0
+        },
         "attack": 10,
         "hp": 150,
         "shield": 150,

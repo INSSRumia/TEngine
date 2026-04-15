@@ -6,6 +6,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleLevelUpAbility : MarbleAbility
     {
+        public MarbleLevelUpAbility(GameConfig.Gameplay.Combat.MarbleLevelUpAbilityConfig config)
+        {
+            Priority = config.Priority;
+        }
+
         public void Resolve()
         {
             if (Owner == null || Owner.RuntimeData == null)

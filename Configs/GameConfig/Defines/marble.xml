@@ -10,6 +10,20 @@
         <var name="level" type="int" />
         <var name="upgrade_exp" type="int" />
 
+        <var name="sync_scale" type="MarbleSyncScaleAbilityConfig" />
+        <var name="sync_mass" type="MarbleSyncMassAbilityConfig" />
+        <var name="damage_pipeline" type="MarbleDamagePipelineAbilityConfig" />
+        <var name="heal_pipeline" type="MarbleHealPipelineAbilityConfig" />
+        <var name="shield_heal_pipeline" type="MarbleShieldHealPipelineAbilityConfig" />
+        <var name="receive_damage" type="MarbleReceiveDamageAbilityConfig" />
+        <var name="add_heal" type="MarbleAddHealAbilityConfig" />
+        <var name="add_exp" type="MarbleAddExpAbilityConfig" />
+        <var name="death" type="MarbleDeathAbilityConfig" />
+        <var name="level_up" type="MarbleLevelUpAbilityConfig" />
+        <var name="get_target" type="MarbleGetTargetAbilityConfig" />
+        <var name="movement" type="MarbleMovementAbilityConfig" />
+        <var name="rotation" type="MarbleRotationAbilityConfig" />
+
         <var name="attack" type="int" />
         <var name="hp" type="int" />
         <var name="shield" type="int" />

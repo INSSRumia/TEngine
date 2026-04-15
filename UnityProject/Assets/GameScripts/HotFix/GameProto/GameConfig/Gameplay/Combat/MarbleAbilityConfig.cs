@@ -18,13 +18,25 @@ public abstract partial class MarbleAbilityConfig : Luban.BeanBase
     public MarbleAbilityConfig(JSONNode _buf) 
     {
         { if(!_buf["priority"].IsNumber) { throw new SerializationException(); }  Priority = _buf["priority"]; }
-        { if(!_buf["combine_type"].IsNumber) { throw new SerializationException(); }  CombineType = (Gameplay.Combat.EnumCombineType)_buf["combine_type"].AsInt; }
     }
 
     public static MarbleAbilityConfig DeserializeMarbleAbilityConfig(JSONNode _buf)
     {
         switch ((string)_buf["$type"])
         {
+            case "MarbleSyncScaleAbilityConfig": return new Gameplay.Combat.MarbleSyncScaleAbilityConfig(_buf);
+            case "MarbleSyncMassAbilityConfig": return new Gameplay.Combat.MarbleSyncMassAbilityConfig(_buf);
+            case "MarbleDamagePipelineAbilityConfig": return new Gameplay.Combat.MarbleDamagePipelineAbilityConfig(_buf);
+            case "MarbleHealPipelineAbilityConfig": return new Gameplay.Combat.MarbleHealPipelineAbilityConfig(_buf);
+            case "MarbleShieldHealPipelineAbilityConfig": return new Gameplay.Combat.MarbleShieldHealPipelineAbilityConfig(_buf);
+            case "MarbleReceiveDamageAbilityConfig": return new Gameplay.Combat.MarbleReceiveDamageAbilityConfig(_buf);
+            case "MarbleAddHealAbilityConfig": return new Gameplay.Combat.MarbleAddHealAbilityConfig(_buf);
+            case "MarbleAddExpAbilityConfig": return new Gameplay.Combat.MarbleAddExpAbilityConfig(_buf);
+            case "MarbleDeathAbilityConfig": return new Gameplay.Combat.MarbleDeathAbilityConfig(_buf);
+            case "MarbleLevelUpAbilityConfig": return new Gameplay.Combat.MarbleLevelUpAbilityConfig(_buf);
+            case "MarbleGetTargetAbilityConfig": return new Gameplay.Combat.MarbleGetTargetAbilityConfig(_buf);
+            case "MarbleMovementAbilityConfig": return new Gameplay.Combat.MarbleMovementAbilityConfig(_buf);
+            case "MarbleRotationAbilityConfig": return new Gameplay.Combat.MarbleRotationAbilityConfig(_buf);
             case "MarbleCloseToTargetAbilityConfig": return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
             case "MarbleDefaultRotateAbilityConfig": return new Gameplay.Combat.MarbleDefaultRotateAbilityConfig(_buf);
             case "MarbleDashAbilityConfig": return new Gameplay.Combat.MarbleDashAbilityConfig(_buf);
@@ -34,7 +46,6 @@ public abstract partial class MarbleAbilityConfig : Luban.BeanBase
     }
 
     public readonly int Priority;
-    public readonly Gameplay.Combat.EnumCombineType CombineType;
    
 
     public virtual void ResolveRef(Tables tables)
@@ -45,7 +56,6 @@ public abstract partial class MarbleAbilityConfig : Luban.BeanBase
     {
         return "{ "
         + "priority:" + Priority + ","
-        + "combineType:" + CombineType + ","
         + "}";
     }
 }

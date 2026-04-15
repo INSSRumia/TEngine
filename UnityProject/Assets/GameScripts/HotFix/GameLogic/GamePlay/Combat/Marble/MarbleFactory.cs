@@ -63,19 +63,19 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private static void AttachDefaultAbilities(Marble marbleComponent, MarbleLevelConfig levelData)
         {
-            AttachCoreAbility(marbleComponent, new MarbleSyncScaleAbility());
-            AttachCoreAbility(marbleComponent, new MarbleSyncMassAbility());
-            AttachCoreAbility(marbleComponent, new MarbleDamagePipelineAbility());
-            AttachCoreAbility(marbleComponent, new MarbleHealPipelineAbility());
-            AttachCoreAbility(marbleComponent, new MarbleShieldHealPipelineAbility());
-            AttachCoreAbility(marbleComponent, new MarbleReceiveDamageAbility());
-            AttachCoreAbility(marbleComponent, new MarbleAddHealAbility());
-            AttachCoreAbility(marbleComponent, new MarbleAddExpAbility());
-            AttachCoreAbility(marbleComponent, new MarbleDeathAbility());
-            AttachCoreAbility(marbleComponent, new MarbleLevelUpAbility());
-            AttachCoreAbility(marbleComponent, new MarbleGetTargetAbility());
-            AttachCoreAbility(marbleComponent, new MarbleMovementAbility());
-            AttachCoreAbility(marbleComponent, new MarbleRotationAbility());
+            AttachCoreAbility(marbleComponent, new MarbleSyncScaleAbility(levelData.SyncScale));
+            AttachCoreAbility(marbleComponent, new MarbleSyncMassAbility(levelData.SyncMass));
+            AttachCoreAbility(marbleComponent, new MarbleDamagePipelineAbility(levelData.DamagePipeline));
+            AttachCoreAbility(marbleComponent, new MarbleHealPipelineAbility(levelData.HealPipeline));
+            AttachCoreAbility(marbleComponent, new MarbleShieldHealPipelineAbility(levelData.ShieldHealPipeline));
+            AttachCoreAbility(marbleComponent, new MarbleReceiveDamageAbility(levelData.ReceiveDamage));
+            AttachCoreAbility(marbleComponent, new MarbleAddHealAbility(levelData.AddHeal));
+            AttachCoreAbility(marbleComponent, new MarbleAddExpAbility(levelData.AddExp));
+            AttachCoreAbility(marbleComponent, new MarbleDeathAbility(levelData.Death));
+            AttachCoreAbility(marbleComponent, new MarbleLevelUpAbility(levelData.LevelUp));
+            AttachCoreAbility(marbleComponent, new MarbleGetTargetAbility(levelData.GetTarget));
+            AttachCoreAbility(marbleComponent, new MarbleMovementAbility(levelData.Movement));
+            AttachCoreAbility(marbleComponent, new MarbleRotationAbility(levelData.Rotation));
 
             AttachConfigAbilities(marbleComponent, levelData);
         }
