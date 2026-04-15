@@ -59,11 +59,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 {
                     equipment.Init(ownerMarble, runtimeData);
                     creator.AttachDefaultAbilities(equipment, levelConfig);
+                    AttachConfigAbilities(equipment, levelConfig);
                     break;
                 }
             }
-
-            AttachOptionalAbilities(equipment, levelConfig);
 
             return equipment;
         }
@@ -81,7 +80,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             }
         }
 
-        private static void AttachOptionalAbilities(Equipment equipment, EquipmentLevelConfig levelConfig)
+        private static void AttachConfigAbilities(Equipment equipment, EquipmentLevelConfig levelConfig)
         {
             if (levelConfig?.LstAbility == null)
                 return;

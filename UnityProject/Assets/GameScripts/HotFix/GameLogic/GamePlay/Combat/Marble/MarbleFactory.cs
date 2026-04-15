@@ -55,8 +55,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var levelData = GetMarbleLevelConfig(runtimeData.ConfigId, runtimeData.Level);
             var marbleComponent = CreateMarbleInternal(runtimeData.ConfigId);
             marbleComponent.Init(runtimeData);
-            AttachDefaultAbilities(marbleComponent);
-            AttachOptionalAbilities(marbleComponent, levelData);
+            AttachDefaultAbilities(marbleComponent, levelData);
             AttachEquipment(marbleComponent, levelData);
             return marbleComponent;
         }
@@ -79,7 +78,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             return levelData;
         }
 
-        private static void AttachDefaultAbilities(Marble marbleComponent)
+        private static void AttachDefaultAbilities(Marble marbleComponent, MarbleLevelConfig levelData)
         {
             AttachCoreAbility(marbleComponent, new MarbleSyncScaleAbility());
             AttachCoreAbility(marbleComponent, new MarbleSyncMassAbility());
@@ -94,6 +93,8 @@ namespace GameLogic.Gameplay.Combat.Marble
             AttachCoreAbility(marbleComponent, new MarbleGetTargetAbility());
             AttachCoreAbility(marbleComponent, new MarbleMovementAbility());
             AttachCoreAbility(marbleComponent, new MarbleRotationAbility());
+
+            AttachConfigAbilities(marbleComponent, levelData);
         }
 
         private static void AttachCoreAbility(Marble marble, MarbleAbility ability)
@@ -102,7 +103,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             marble.AddAbility(ability);
         }
 
-        private static void AttachOptionalAbilities(Marble marbleComponent, MarbleLevelConfig levelData)
+        private static void AttachConfigAbilities(Marble marbleComponent, MarbleLevelConfig levelData)
         {
             if (levelData?.LstAbility == null)
                 return;

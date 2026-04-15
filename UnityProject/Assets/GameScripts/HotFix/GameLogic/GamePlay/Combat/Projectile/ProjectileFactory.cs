@@ -65,7 +65,6 @@ namespace GameLogic.Gameplay.Combat
             projectile.Init(runtimeData);
 
             AttachDefaultAbilities(projectile, levelConfig);
-            AttachOptionalAbilities(projectile, levelConfig);
 
             return projectile;
         }
@@ -115,6 +114,8 @@ namespace GameLogic.Gameplay.Combat
 
             var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime?.MaxLifetime ?? 0f);
             AttachCoreAbility(projectile, lifetimeAbility);
+
+            AttachConfigAbilities(projectile, levelConfig);
         }
 
         private static void AttachCoreAbility(Projectile projectile, ProjectileAbility ability)
@@ -123,7 +124,7 @@ namespace GameLogic.Gameplay.Combat
             projectile.AddAbility(ability);
         }
 
-        private static void AttachOptionalAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
+        private static void AttachConfigAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
         {
             if (levelConfig?.LstAbility == null)
                 return;
