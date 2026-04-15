@@ -6,6 +6,11 @@ namespace GameLogic.Gameplay.Combat
 {
     public static class ProjectileFactory
     {
+        private static readonly List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IProjectileAbilityCreatorForConfig>
+        {
+            new DefaultProjectileAbilityCreatorForConfig(),
+        };
+
         private static int _instIdCounter = 0;
         public static int GetNextInstId => _instIdCounter++;
 
@@ -13,11 +18,6 @@ namespace GameLogic.Gameplay.Combat
         public static int GetNextInstAbilityId => _instAbilityIdCounter++;
 
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Projectiles/");
-
-        private static readonly List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IProjectileAbilityCreatorForConfig>
-        {
-            new DefaultProjectileAbilityCreatorForConfig(),
-        };
 
         public static Projectile CreateProjectile(
             string configId,
@@ -164,11 +164,6 @@ namespace GameLogic.Gameplay.Combat
     {
         int Priority { get; set; }
         ProjectileAbility CreateAbility(ProjectileAbilityConfig config);
-    }
-
-    public interface IProjectileAbilityFactory
-    {
-        ProjectileAbility CreateAbilityFromConfig(ProjectileAbilityConfig config);
     }
 
     public class DefaultProjectileAbilityCreatorForConfig : IProjectileAbilityCreatorForConfig

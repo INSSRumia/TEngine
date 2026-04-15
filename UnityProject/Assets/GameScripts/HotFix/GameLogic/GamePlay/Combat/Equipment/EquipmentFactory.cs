@@ -7,7 +7,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public static partial class EquipmentFactory
     {
-        private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>
+        private static readonly List<IEquipmentCreatorForConfig> _lstCreatorsForConfig = new List<IEquipmentCreatorForConfig>
         {
             new DefaultEquipmentCreatorForConfig(),
         };
@@ -27,8 +27,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
         public static void RegisterEquipmentCreatorForConfig(IEquipmentCreatorForConfig creator)
         {
-            _lstEquipmentCreatorsForConfig.Add(creator);
-            _lstEquipmentCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+            _lstCreatorsForConfig.Add(creator);
+            _lstCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
         public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EnumEquipmentSlot slot)
@@ -52,7 +52,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return null;
             }
 
-            foreach (var creator in _lstEquipmentCreatorsForConfig)
+            foreach (var creator in _lstCreatorsForConfig)
             {
                 var runtimeData = creator.CreateEquipmentRuntimeData(config, levelConfig, slot);
                 if (runtimeData != null)
@@ -244,11 +244,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         int Priority { get; set; }
         EquipmentAbility CreateAbility(Equipment equipment, EquipmentAbilityConfig config);
-    }
-
-    public interface IEquipmentAbilityFactory
-    {
-        EquipmentAbility CreateAbilityFromConfig(Equipment equipment, EquipmentAbilityConfig config);
     }
 
     public class DefaultEquipmentAbilityCreatorForConfig : IEquipmentAbilityCreatorForConfig

@@ -7,6 +7,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public static partial class MarbleFactory
     {
+        private static readonly List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
+        {
+            new DefaultMarbleAbilityCreatorForConfig(),
+        };
+
         private static int _instIdCounter = 1;
         private static int _instAbilityIdCounter = 1;
         public static int GetNextInstId => _instIdCounter++;
@@ -113,11 +118,6 @@ namespace GameLogic.Gameplay.Combat.Marble
             }
         }
 
-        private static readonly List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
-        {
-            new DefaultMarbleAbilityCreatorForConfig(),
-        };
-
         public static void RegisterAbilityCreatorForConfig(IMarbleAbilityCreatorForConfig creator)
         {
             _lstAbilityCreatorsForConfig.Add(creator);
@@ -155,16 +155,6 @@ namespace GameLogic.Gameplay.Combat.Marble
     {
         int Priority { get; set; }
         MarbleAbility CreateAbility(MarbleAbilityConfig config);
-    }
-
-    public interface IMarbleTimingCreator
-    {
-        IAbilityTiming CreateTiming(AbilityTimingConfig config);
-    }
-
-    public interface IMarbleAbilityFactory
-    {
-        MarbleAbility CreateAbilityFromConfig(MarbleAbilityConfig config);
     }
 
     public class DefaultMarbleAbilityCreatorForConfig : IMarbleAbilityCreatorForConfig
