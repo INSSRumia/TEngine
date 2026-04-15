@@ -135,10 +135,7 @@
         ============================================================
         可选 Ability 配置列表
         ============================================================
-        Core 文件夹中的 Ability 由 EquipmentFactory.AttachDefaultAbilities() 硬编码添加，
-        无需在此配置。
-
-        此列表用于配置可选 Ability，或额外覆盖/替换 Core Ability。
+        此列表用于配置可选 Ability
         当前支持的类型：
           - ArmorAbsorbDamage : 护甲吸收
         -->
