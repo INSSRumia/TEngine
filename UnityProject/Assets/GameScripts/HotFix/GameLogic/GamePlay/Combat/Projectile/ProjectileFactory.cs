@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
-using GameConfig.Gameplay.Combat;
 namespace GameLogic.Gameplay.Combat
 {
     public static class ProjectileFactory
@@ -12,6 +13,11 @@ namespace GameLogic.Gameplay.Combat
         public static int GetNextInstAbilityId => _instAbilityIdCounter++;
 
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Projectiles/");
+
+        private static readonly List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IProjectileAbilityCreatorForConfig>
+        {
+            new DefaultProjectileAbilityCreatorForConfig(),
+        };
 
         public static Projectile CreateProjectile(
             string configId,
@@ -119,24 +125,19 @@ namespace GameLogic.Gameplay.Combat
 
         private static void AttachOptionalAbilities(Projectile projectile, ProjectileLevelConfig levelConfig)
         {
-            if(levelConfig?.LstAbility == null)
+            if (levelConfig?.LstAbility == null)
                 return;
 
             foreach (var config in levelConfig.LstAbility)
             {
                 var ability = CreateAbilityFromConfig(config);
-                if (ability != null)
-                {
-                    ability.Priority = config.Priority;
-                    projectile.AddAbility(ability);
-                }
+                if (ability == null)
+                    continue;
+
+                ability.Priority = config.Priority;
+                projectile.AddAbility(ability);
             }
         }
-
-        private static readonly System.Collections.Generic.List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new()
-        {
-            new DefaultProjectileAbilityCreatorForConfig(),
-        };
 
         public static void RegisterAbilityCreatorForConfig(IProjectileAbilityCreatorForConfig creator)
         {
@@ -165,14 +166,20 @@ namespace GameLogic.Gameplay.Combat
         ProjectileAbility CreateAbility(ProjectileAbilityConfig config);
     }
 
+    public interface IProjectileAbilityFactory
+    {
+        ProjectileAbility CreateAbilityFromConfig(ProjectileAbilityConfig config);
+    }
+
     public class DefaultProjectileAbilityCreatorForConfig : IProjectileAbilityCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
+
         public ProjectileAbility CreateAbility(ProjectileAbilityConfig config)
         {
             return config switch
             {
-                ProjectileNoTrackingConfig _=> new ProjectileNoTrackingAbility(),
+                ProjectileNoTrackingConfig _ => new ProjectileNoTrackingAbility(),
                 ProjectileTrackTargetConfig trackTargetConfig => new ProjectileTrackTargetAbility(trackTargetConfig.AngularSpeed),
                 ProjectileTrackPointConfig trackPointConfig => new ProjectileTrackPointAbility(trackPointConfig.AngularSpeed),
                 _ => null

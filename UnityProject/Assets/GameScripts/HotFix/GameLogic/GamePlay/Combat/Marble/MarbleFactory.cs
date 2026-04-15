@@ -1,7 +1,7 @@
-using TEngine;
-using GameLogic.Gameplay.Combat.Equipment;
-using GameConfig.Gameplay.Combat;
 using System.Collections.Generic;
+using GameConfig.Gameplay.Combat;
+using GameLogic.Gameplay.Combat.Equipment;
+using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -105,11 +105,11 @@ namespace GameLogic.Gameplay.Combat.Marble
             foreach (var config in levelData.LstAbility)
             {
                 var ability = CreateAbilityFromConfig(config);
-                if (ability != null)
-                {
-                    ability.Priority = config.Priority;
-                    marbleComponent.AddAbility(ability);
-                }
+                if (ability == null)
+                    continue;
+
+                ability.Priority = config.Priority;
+                marbleComponent.AddAbility(ability);
             }
         }
 
@@ -117,10 +117,10 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             new DefaultMarbleAbilityCreatorForConfig(),
         };
+
         public static void RegisterAbilityCreatorForConfig(IMarbleAbilityCreatorForConfig creator)
         {
             _lstAbilityCreatorsForConfig.Add(creator);
-            // 降序排序
             _lstAbilityCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
@@ -157,9 +157,20 @@ namespace GameLogic.Gameplay.Combat.Marble
         MarbleAbility CreateAbility(MarbleAbilityConfig config);
     }
 
+    public interface IMarbleTimingCreator
+    {
+        IAbilityTiming CreateTiming(AbilityTimingConfig config);
+    }
+
+    public interface IMarbleAbilityFactory
+    {
+        MarbleAbility CreateAbilityFromConfig(MarbleAbilityConfig config);
+    }
+
     public class DefaultMarbleAbilityCreatorForConfig : IMarbleAbilityCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
+
         public MarbleAbility CreateAbility(MarbleAbilityConfig config)
         {
             return config switch
@@ -200,7 +211,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 LockDirectionOnActivate = dashConfig.LockDirectionOnActivate,
             };
 
-            var timing = CreateTimingFromConfig(dashConfig.Timing);
+            var timing = AbilityTimingFactory.CreateTiming(dashConfig.Timing);
             if (timing != null)
             {
                 ability.InitializeTiming(timing);
@@ -220,31 +231,13 @@ namespace GameLogic.Gameplay.Combat.Marble
                 AngularAcceleration = config.AngularAcceleration,
             };
 
-            var timing = CreateTimingFromConfig(config.Timing);
+            var timing = AbilityTimingFactory.CreateTiming(config.Timing);
             if (timing != null)
             {
                 ability.InitializeTiming(timing);
             }
 
             return ability;
-        }
-
-        private static IAbilityTiming CreateTimingFromConfig(AbilityTimingConfig config)
-        {
-            return config switch
-            {
-                FixedAbilityTimingConfig fixedConfig =>
-                    new FixedDurationAbilityTiming(fixedConfig.Duration, fixedConfig.Cooldown, fixedConfig.AutoActivate),
-                RandomRangeAbilityTimingConfig randomConfig =>
-                    new RandomRangeAbilityTiming(
-                        randomConfig.MinDuration,
-                        randomConfig.MaxDuration,
-                        randomConfig.MinCooldown,
-                        randomConfig.MaxCooldown,
-                        randomConfig.AutoActivate),
-                null => null,
-                _ => null,
-            };
         }
     }
 }

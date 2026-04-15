@@ -7,6 +7,16 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public static partial class EquipmentFactory
     {
+        private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>
+        {
+            new DefaultEquipmentCreatorForConfig(),
+        };
+
+        private static readonly List<IEquipmentAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IEquipmentAbilityCreatorForConfig>
+        {
+            new DefaultEquipmentAbilityCreatorForConfig(),
+        };
+
         private static int _instIdCounter = 0;
         public static int GetNextInstId => _instIdCounter++;
 
@@ -15,14 +25,9 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Equipment/");
 
-        private static readonly List<IEquipmentCreatorForConfig> _lstEquipmentCreatorsForConfig = new List<IEquipmentCreatorForConfig>
-        {
-            new DefaultEquipmentCreatorForConfig(),
-        };
         public static void RegisterEquipmentCreatorForConfig(IEquipmentCreatorForConfig creator)
         {
             _lstEquipmentCreatorsForConfig.Add(creator);
-            // 降序排序
             _lstEquipmentCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
@@ -40,8 +45,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId);
 
-            Equipment equipment = gameObject.GetComponent<Equipment>();
-            if(equipment == null)
+            var equipment = gameObject.GetComponent<Equipment>();
+            if (equipment == null)
             {
                 Log.Error($"Equipment 组件缺失: {config.ConfigId}");
                 return null;
@@ -92,11 +97,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
             }
         }
 
-        private static readonly List<IEquipmentAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IEquipmentAbilityCreatorForConfig>
-        {
-            new DefaultEquipmentAbilityCreatorForConfig(),
-        };
-
         public static void RegisterAbilityCreatorForConfig(IEquipmentAbilityCreatorForConfig creator)
         {
             _lstAbilityCreatorsForConfig.Add(creator);
@@ -125,14 +125,16 @@ namespace GameLogic.Gameplay.Combat.Equipment
         EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EnumEquipmentSlot slot);
         void AttachDefaultAbilities(Equipment equipment, EquipmentLevelConfig levelConfig);
     }
+
     public class DefaultEquipmentCreatorForConfig : IEquipmentCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
+
         public EquipmentRuntimeData CreateEquipmentRuntimeData(EquipmentConfig config, EquipmentLevelConfig levelConfig, EnumEquipmentSlot slot)
         {
             switch (levelConfig)
             {
-                case ArmorLevelConfig armorConfig:
+                case ArmorLevelConfig:
                 {
                     return new ArmorRuntimeData(config.ConfigId, levelConfig.Level)
                     {
@@ -142,17 +144,17 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         // Hp = armorConfig.Armor.,
                     };
                 }
-                case BowLevelConfig bowConfig:
+                case BowLevelConfig:
                 {
                     return new BowRuntimeData(config.ConfigId, levelConfig.Level)
                     {
                         Slot = slot,
-                        IsEquipped =  true,
+                        IsEquipped = true,
                         IsBroken = false,
                         CanFire = false,
                     };
                 }
-                case SwordLevelConfig swordConfig:
+                case SwordLevelConfig:
                 {
                     return new SwordRuntimeData(config.ConfigId, levelConfig.Level)
                     {
@@ -243,9 +245,16 @@ namespace GameLogic.Gameplay.Combat.Equipment
         int Priority { get; set; }
         EquipmentAbility CreateAbility(Equipment equipment, EquipmentAbilityConfig config);
     }
+
+    public interface IEquipmentAbilityFactory
+    {
+        EquipmentAbility CreateAbilityFromConfig(Equipment equipment, EquipmentAbilityConfig config);
+    }
+
     public class DefaultEquipmentAbilityCreatorForConfig : IEquipmentAbilityCreatorForConfig
     {
         public int Priority { get; set; } = int.MinValue;
+
         public EquipmentAbility CreateAbility(Equipment equipment, EquipmentAbilityConfig config)
         {
             return config switch
