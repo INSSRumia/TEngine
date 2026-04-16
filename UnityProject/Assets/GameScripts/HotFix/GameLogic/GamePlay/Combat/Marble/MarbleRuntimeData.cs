@@ -23,8 +23,19 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public MarbleRuntimeData(MarbleConfig config, MarbleLevelConfig levelConfig) : base(config.ConfigId, levelConfig.Level, MarbleFactory.GetNextInstId)
         {
-            State.IsAlive = true;
             Level = levelConfig.Level;
+            ApplyLevelConfig(levelConfig);
+            State.IsAlive = true;
+            Config.DamageMultiplier = 1f;
+            Config.HealMultiplier = 1f;
+            Config.ShieldHealMultiplier = 1f;
+            Config.AttackMultiplier = 1f;
+            Config.MaxHpMultiplier = 1f;
+            Config.DefenseMultiplier = 1f;
+        }
+
+        public void ApplyLevelConfig(MarbleLevelConfig levelConfig)
+        {
             Config.UpgradeExp = levelConfig.UpgradeExp;
             State.MaxHp = levelConfig.Hp;
             State.Hp = levelConfig.Hp;
@@ -32,12 +43,6 @@ namespace GameLogic.Gameplay.Combat.Marble
             State.Shield = levelConfig.Shield;
             Config.Defense = levelConfig.Defense;
             Config.Attack = levelConfig.Attack;
-            Config.DamageMultiplier = 1f;
-            Config.HealMultiplier = 1f;
-            Config.ShieldHealMultiplier = 1f;
-            Config.AttackMultiplier = 1f;
-            Config.MaxHpMultiplier = 1f;
-            Config.DefenseMultiplier = 1f;
             Config.Scale = levelConfig.Scale;
             Config.Mass = levelConfig.Mass;
         }

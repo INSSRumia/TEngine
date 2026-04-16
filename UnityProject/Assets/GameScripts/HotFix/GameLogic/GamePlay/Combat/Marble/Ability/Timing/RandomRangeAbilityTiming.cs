@@ -1,4 +1,5 @@
 using System;
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -20,6 +21,11 @@ namespace GameLogic.Gameplay.Combat.Marble
         public event Action Activated;
         public event Action ActiveEnded;
         public event Action CooldownEnded;
+
+        public RandomRangeAbilityTiming(RandomRangeAbilityTimingConfig config)
+            : this(config.MinDuration, config.MaxDuration, config.MinCooldown, config.MaxCooldown, config.AutoActivate)
+        {
+        }
 
         public RandomRangeAbilityTiming(float minDuration, float maxDuration, float minCooldown, float maxCooldown, bool autoActivate = false)
         {

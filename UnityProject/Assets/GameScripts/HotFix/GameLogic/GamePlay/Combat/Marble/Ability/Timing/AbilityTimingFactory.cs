@@ -9,14 +9,9 @@ namespace GameLogic.Gameplay.Combat.Marble
             return config switch
             {
                 FixedAbilityTimingConfig fixedConfig =>
-                    new FixedDurationAbilityTiming(fixedConfig.Duration, fixedConfig.Cooldown, fixedConfig.AutoActivate),
+                    new FixedDurationAbilityTiming(fixedConfig),
                 RandomRangeAbilityTimingConfig randomConfig =>
-                    new RandomRangeAbilityTiming(
-                        randomConfig.MinDuration,
-                        randomConfig.MaxDuration,
-                        randomConfig.MinCooldown,
-                        randomConfig.MaxCooldown,
-                        randomConfig.AutoActivate),
+                    new RandomRangeAbilityTiming(randomConfig),
                 null => null,
                 _ => null,
             };

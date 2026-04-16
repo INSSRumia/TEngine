@@ -1,4 +1,5 @@
 using System;
+using GameConfig.Gameplay.Combat;
 using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
@@ -18,6 +19,11 @@ namespace GameLogic.Gameplay.Combat.Marble
         public event Action Activated;
         public event Action ActiveEnded;
         public event Action CooldownEnded;
+
+        public FixedDurationAbilityTiming(FixedAbilityTimingConfig config)
+            : this(config.Duration, config.Cooldown, config.AutoActivate)
+        {
+        }
 
         public FixedDurationAbilityTiming(float duration, float cooldown, bool autoActivate = false)
         {

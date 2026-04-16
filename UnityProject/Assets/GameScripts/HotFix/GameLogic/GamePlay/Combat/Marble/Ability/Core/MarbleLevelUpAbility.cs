@@ -6,9 +6,20 @@ namespace GameLogic.Gameplay.Combat.Marble
 {
     public class MarbleLevelUpAbility : MarbleAbility
     {
+        private GameConfig.Gameplay.Combat.MarbleLevelConfig _currentLevelConfig;
+
         public MarbleLevelUpAbility(GameConfig.Gameplay.Combat.MarbleLevelUpAbilityConfig config)
         {
             Priority = config.Priority;
+        }
+
+        public override void OnAdd()
+        {
+            base.OnAdd();
+            if (Owner?.RuntimeData != null)
+            {
+                _currentLevelConfig = MarbleFactory.GetMarbleLevelConfig(Owner.RuntimeData.ConfigId, Owner.RuntimeData.Level);
+            }
         }
 
         public void Resolve()
@@ -37,16 +48,8 @@ namespace GameLogic.Gameplay.Combat.Marble
 
             runtimeData.State.Exp = curExp - upgradeExp;
             runtimeData.Level = nextLevel;
-            runtimeData.Config.UpgradeExp = nextLevelData.UpgradeExp;
-
-            runtimeData.State.MaxHp = nextLevelData.Hp;
-            runtimeData.State.Hp = nextLevelData.Hp;
-            runtimeData.State.MaxShield = nextLevelData.Shield;
-            runtimeData.State.Shield = nextLevelData.Shield;
-            runtimeData.Config.Defense = nextLevelData.Defense;
-            runtimeData.Config.Attack = nextLevelData.Attack;
-            runtimeData.Config.Scale = nextLevelData.Scale;
-            runtimeData.Config.Mass = nextLevelData.Mass;
+            runtimeData.ApplyLevelConfig(nextLevelData);
+            _currentLevelConfig = nextLevelData;
 
             Owner.GetAbility<MarbleSyncScaleAbility>()?.Sync();
             Owner.GetAbility<MarbleSyncMassAbility>()?.Sync();
