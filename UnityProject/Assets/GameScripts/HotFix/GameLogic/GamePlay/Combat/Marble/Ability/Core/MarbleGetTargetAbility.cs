@@ -12,7 +12,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false)
+            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.State.IsAlive == false)
                 return;
 
             // TODO: 从战斗管理器中获取最近的敌人
@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if(target == null)
                 return;
 
-            Owner.RuntimeData.TargetMarbleInstId = target.RuntimeData.InstId;
+            Owner.RuntimeData.State.TargetMarbleInstId = target.RuntimeData.InstId;
         }
 
     }

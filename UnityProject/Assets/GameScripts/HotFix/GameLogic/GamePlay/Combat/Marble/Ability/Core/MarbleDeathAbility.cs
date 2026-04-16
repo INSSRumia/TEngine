@@ -16,7 +16,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public void Execute()
         {
-            if (!Owner.RuntimeData.IsAlive || Owner.RuntimeData.Hp > 0)
+            if (!Owner.RuntimeData.State.IsAlive || Owner.RuntimeData.State.Hp > 0)
                 return;
             Log.Info($"[MarbleDeathAbility]  marble {Owner.RuntimeData.ConfigId} 死亡");
 
@@ -26,12 +26,12 @@ namespace GameLogic.Gameplay.Combat.Marble
                 ability.BeforeDeath();
             ListPool<IBeforeDeath>.Release(lstBeforeDeathAbilities);
 
-            if(Owner.RuntimeData.Hp > 0)
+            if(Owner.RuntimeData.State.Hp > 0)
                 return;
 
             HandleDeath();
 
-            Owner.RuntimeData.IsAlive = false;
+            Owner.RuntimeData.State.IsAlive = false;
             GameEvent.Send(EventDef.Combat.MarbleDie, Owner);
         }
 

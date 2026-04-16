@@ -13,7 +13,7 @@ namespace GameLogic.Gameplay.Combat
         {
             var currentDirection = GetCurrentDirection();
             var target = Owner.CombatManager.GetTarget(Owner.RuntimeData.TargetMarbleInstId);
-            if (target == null || target.RuntimeData == null || !target.RuntimeData.IsAlive)
+            if (target == null || target.RuntimeData == null || !target.RuntimeData.State.IsAlive)
                 return currentDirection;
 
             var targetDirection = ((Vector2)(target.transform.position - Owner.transform.position)).normalized;

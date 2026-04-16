@@ -14,7 +14,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var context = (ability as MarbleDamagePipelineAbility)?.CurrentContext;
             if (Owner == null || Owner.RuntimeData == null || context == null)
                 return;
-            if (!Owner.RuntimeData.IsAlive)
+            if (!Owner.RuntimeData.State.IsAlive)
                 return;
 
             var runtimeData = Owner.RuntimeData;
@@ -22,13 +22,13 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (finalDamage <= 0)
                 return;
 
-            if (runtimeData.Shield > 0)
+            if (runtimeData.State.Shield > 0)
             {
-                runtimeData.Shield = Mathf.Clamp(runtimeData.Shield - finalDamage, 0, runtimeData.MaxShield);
+                runtimeData.State.Shield = Mathf.Clamp(runtimeData.State.Shield - finalDamage, 0, runtimeData.State.MaxShield);
                 return;
             }
 
-            runtimeData.Hp = Mathf.Clamp(runtimeData.Hp - finalDamage, 0, runtimeData.MaxHp);
+            runtimeData.State.Hp = Mathf.Clamp(runtimeData.State.Hp - finalDamage, 0, runtimeData.State.MaxHp);
         }
 
         public void AfterApplyHeal(IAbility ability)
@@ -36,11 +36,11 @@ namespace GameLogic.Gameplay.Combat.Marble
             var context = (ability as MarbleHealPipelineAbility)?.CurrentContext;
             if (Owner == null || Owner.RuntimeData == null || context == null)
                 return;
-            if (!Owner.RuntimeData.IsAlive)
+            if (!Owner.RuntimeData.State.IsAlive)
                 return;
 
             var runtimeData = Owner.RuntimeData;
-            runtimeData.Hp = Mathf.Clamp(runtimeData.Hp + Mathf.Max(context.FinalValue, 0), 0, runtimeData.MaxHp);
+            runtimeData.State.Hp = Mathf.Clamp(runtimeData.State.Hp + Mathf.Max(context.FinalValue, 0), 0, runtimeData.State.MaxHp);
         }
 
         public void AfterApplyShield(IAbility ability)
@@ -48,11 +48,11 @@ namespace GameLogic.Gameplay.Combat.Marble
             var context = (ability as MarbleShieldHealPipelineAbility)?.CurrentHealContext;
             if (Owner == null || Owner.RuntimeData == null || context == null)
                 return;
-            if (!Owner.RuntimeData.IsAlive)
+            if (!Owner.RuntimeData.State.IsAlive)
                 return;
 
             var runtimeData = Owner.RuntimeData;
-            runtimeData.Shield = Mathf.Clamp(runtimeData.Shield + Mathf.Max(context.FinalValue, 0), 0, runtimeData.MaxShield);
+            runtimeData.State.Shield = Mathf.Clamp(runtimeData.State.Shield + Mathf.Max(context.FinalValue, 0), 0, runtimeData.State.MaxShield);
         }
     }
 }

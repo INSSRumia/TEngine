@@ -55,7 +55,7 @@ namespace GameLogic.Gameplay.Combat
 
             foreach (var other in _activeMarbles)
             {
-                if (other == null || other.RuntimeData == null || !other.RuntimeData.IsAlive)
+                if (other == null || other.RuntimeData == null || !other.RuntimeData.State.IsAlive)
                     continue;
 
                 if (other.RuntimeData.Camp == selfCamp)

@@ -28,7 +28,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (!IsActive)
                 return;
 
-            var target = Owner.CombatManager?.GetTarget(Owner.RuntimeData.TargetMarbleInstId);
+            var target = Owner.CombatManager?.GetTarget(Owner.RuntimeData.State.TargetMarbleInstId);
             if (target == null)
                 return;
 
@@ -46,8 +46,8 @@ namespace GameLogic.Gameplay.Combat.Marble
             float angularSpeed = signedAngle * AngularAcceleration;
             float angularAcceleration = AngularAcceleration;
 
-            Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, angularSpeed, Priority, CombineType));
-            Owner.RuntimeData.AngularAccelerationManager.Add(new PriorityValue<float>(InstId, angularAcceleration, Priority, CombineType));
+            Owner.RuntimeData.Frame.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, angularSpeed, Priority, CombineType));
+            Owner.RuntimeData.Frame.AngularAccelerationManager.Add(new PriorityValue<float>(InstId, angularAcceleration, Priority, CombineType));
         }
 
         private Vector2 ResolveFacingDirection()

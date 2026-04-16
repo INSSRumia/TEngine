@@ -99,7 +99,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
                 context.Stage = HealStage.Calculate;
                 context.FinalValue = Mathf.Max(0,
-                    Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.HealAddition) * Owner.RuntimeData.HealMultiplier));
+                    Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.Config.HealAddition) * Owner.RuntimeData.Config.HealMultiplier));
                 var lstAfterCalculateHealAbilities = ListPool<IAfterCalculateHeal>.Get();
                 Owner.GetAbilities<IAfterCalculateHeal>(ref lstAfterCalculateHealAbilities);
                 foreach (var ability in lstAfterCalculateHealAbilities)

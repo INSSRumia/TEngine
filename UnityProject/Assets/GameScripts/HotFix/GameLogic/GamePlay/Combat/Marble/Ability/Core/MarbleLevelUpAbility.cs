@@ -15,15 +15,15 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             if (Owner == null || Owner.RuntimeData == null)
                 return;
-            if (!Owner.RuntimeData.IsAlive)
+            if (!Owner.RuntimeData.State.IsAlive)
                 return;
 
             var runtimeData = Owner.RuntimeData;
-            var upgradeExp = runtimeData.UpgradeExp;
+            var upgradeExp = runtimeData.Config.UpgradeExp;
             if (upgradeExp <= 0)
                 return;
 
-            var curExp = runtimeData.Exp;
+            var curExp = runtimeData.State.Exp;
             if (curExp < upgradeExp)
                 return;
 
@@ -31,22 +31,22 @@ namespace GameLogic.Gameplay.Combat.Marble
             var nextLevelData = MarbleFactory.GetMarbleLevelConfig(runtimeData.ConfigId, nextLevel);
             if (nextLevelData == null)
             {
-                runtimeData.UpgradeExp = 0;
+                runtimeData.Config.UpgradeExp = 0;
                 return;
             }
 
-            runtimeData.Exp = curExp - upgradeExp;
+            runtimeData.State.Exp = curExp - upgradeExp;
             runtimeData.Level = nextLevel;
-            runtimeData.UpgradeExp = nextLevelData.UpgradeExp;
+            runtimeData.Config.UpgradeExp = nextLevelData.UpgradeExp;
 
-            runtimeData.MaxHp = nextLevelData.Hp;
-            runtimeData.Hp = nextLevelData.Hp;
-            runtimeData.MaxShield = nextLevelData.Shield;
-            runtimeData.Shield = nextLevelData.Shield;
-            runtimeData.Defense = nextLevelData.Defense;
-            runtimeData.Attack = nextLevelData.Attack;
-            runtimeData.Scale = nextLevelData.Scale;
-            runtimeData.Mass = nextLevelData.Mass;
+            runtimeData.State.MaxHp = nextLevelData.Hp;
+            runtimeData.State.Hp = nextLevelData.Hp;
+            runtimeData.State.MaxShield = nextLevelData.Shield;
+            runtimeData.State.Shield = nextLevelData.Shield;
+            runtimeData.Config.Defense = nextLevelData.Defense;
+            runtimeData.Config.Attack = nextLevelData.Attack;
+            runtimeData.Config.Scale = nextLevelData.Scale;
+            runtimeData.Config.Mass = nextLevelData.Mass;
 
             Owner.GetAbility<MarbleSyncScaleAbility>()?.Sync();
             Owner.GetAbility<MarbleSyncMassAbility>()?.Sync();

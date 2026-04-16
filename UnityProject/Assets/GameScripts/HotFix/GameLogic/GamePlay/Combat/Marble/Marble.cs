@@ -20,7 +20,7 @@ namespace GameLogic.Gameplay.Combat.Marble
         public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
         {
             base.OnUpdate(elapseSeconds, realElapseSeconds);
-            if(RuntimeData.Hp <= 0)
+            if(RuntimeData.State.Hp <= 0)
             {
                 GetAbility<MarbleDeathAbility>()?.Execute();
             }
@@ -95,7 +95,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var pos = transform.position;
 
             // 绘制 TargetDirection（Editor 预览方向的半透明射线）
-            var targetDir = RuntimeData.TargetDirection;
+            var targetDir = RuntimeData.Frame.TargetDirection;
             if (targetDir.sqrMagnitude > 0.001f)
             {
                 Gizmos.color = new Color(0f, 1f, 0f, 0.4f);
@@ -113,7 +113,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var pos = transform.position;
 
             // 绘制 TargetDirection（选中时更清晰的实线）
-            var targetDir = RuntimeData.TargetDirection;
+            var targetDir = RuntimeData.Frame.TargetDirection;
             if (targetDir.sqrMagnitude > 0.001f)
             {
                 Gizmos.color = Color.green;
@@ -121,7 +121,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             }
 
             // 通过 TargetMarbleInstId 查询目标 Marble，并绘制连线
-            var targetInstId = RuntimeData.TargetMarbleInstId;
+            var targetInstId = RuntimeData.State.TargetMarbleInstId;
             if (targetInstId > 0 && CombatManager != null)
             {
                 var targetMarble = CombatManager.GetTarget(targetInstId);

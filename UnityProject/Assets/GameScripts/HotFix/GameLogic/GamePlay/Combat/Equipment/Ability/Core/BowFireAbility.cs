@@ -58,7 +58,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var spawnPosition = _bowOwner.transform.position;
             var forward = _bowOwner.transform.right;
 
-            var target = _sourceMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.TargetMarbleInstId);
+            var target = _sourceMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.State.TargetMarbleInstId);
 
             if (ShootType == EnumBowShootType.Spread)
             {

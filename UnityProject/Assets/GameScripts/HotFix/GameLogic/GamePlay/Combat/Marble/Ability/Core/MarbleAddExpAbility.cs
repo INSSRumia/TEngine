@@ -15,7 +15,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (Owner == null || Owner.RuntimeData == null || value <= 0)
                 return;
 
-            Owner.RuntimeData.Exp += value;
+            Owner.RuntimeData.State.Exp += value;
             Owner.GetAbility<MarbleLevelUpAbility>()?.Resolve();
         }
     }

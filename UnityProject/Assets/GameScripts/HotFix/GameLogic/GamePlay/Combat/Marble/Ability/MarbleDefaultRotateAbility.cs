@@ -20,7 +20,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false)
+            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.State.IsAlive == false)
                 return;
             // 方向对齐：当前旋转方向与目标方向相反时，取反目标速度
             var currentAngSpd = Owner.Rigidbody.angularVelocity;
@@ -28,8 +28,8 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (targetAngSpd * currentAngSpd < 0)
                 targetAngSpd = -targetAngSpd;
 
-            Owner.RuntimeData.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, targetAngSpd, Priority, CombineType));
-            Owner.RuntimeData.AngularAccelerationManager.Add(new PriorityValue<float>(InstId, AngularAcceleration, Priority, CombineType));
+            Owner.RuntimeData.Frame.TargetAngularVelocityManager.Add(new PriorityValue<float>(InstId, targetAngSpd, Priority, CombineType));
+            Owner.RuntimeData.Frame.AngularAccelerationManager.Add(new PriorityValue<float>(InstId, AngularAcceleration, Priority, CombineType));
         }
     }
 }

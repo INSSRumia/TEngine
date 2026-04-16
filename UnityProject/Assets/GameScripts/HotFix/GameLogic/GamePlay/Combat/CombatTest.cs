@@ -93,8 +93,8 @@ namespace GameLogic.Gameplay.Combat
             foreach (var marble in active)
             {
                 if (marble?.RuntimeData == null) continue;
-                var status = marble.RuntimeData.IsAlive ? "存活" : "死亡";
-                Log.Warning($"[CombatTest] [{marble.RuntimeData.InstId}] 阵营:{marble.RuntimeData.Camp} HP:{marble.RuntimeData.Hp}/{marble.RuntimeData.MaxHp} {status}");
+                var status = marble.RuntimeData.State.IsAlive ? "存活" : "死亡";
+                Log.Warning($"[CombatTest] [{marble.RuntimeData.InstId}] 阵营:{marble.RuntimeData.Camp} HP:{marble.RuntimeData.State.Hp}/{marble.RuntimeData.State.MaxHp} {status}");
 
                 if (marble.RuntimeData.Camp == _camp1Camp) camp1Alive++;
                 else if (marble.RuntimeData.Camp == _camp2Camp) camp2Alive++;

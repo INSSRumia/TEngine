@@ -15,7 +15,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;
             
-            var targetAngSpd = Owner.RuntimeData.TargetAngularVelocityManager.GetCombinedValue();
+            var targetAngSpd = Owner.RuntimeData.Frame.TargetAngularVelocityManager.GetCombinedValue();
             var curAngSpd = Owner.Rigidbody.angularVelocity;
 
             // 达到目标转速则停止施加扭矩
@@ -23,7 +23,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 return;
 
             var sign = Mathf.Sign(targetAngSpd);
-            var angAcc = Owner.RuntimeData.AngularAccelerationManager.GetCombinedValue();
+            var angAcc = Owner.RuntimeData.Frame.AngularAccelerationManager.GetCombinedValue();
             var torque = sign * angAcc * Owner.Rigidbody.inertia;
             Owner.Rigidbody.AddTorque(torque, ForceMode2D.Force);
         }

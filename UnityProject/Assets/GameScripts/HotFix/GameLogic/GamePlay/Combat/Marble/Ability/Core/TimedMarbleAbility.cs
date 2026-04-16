@@ -36,7 +36,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public void OnAbilityUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if (Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false || Timing == null)
+            if (Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.State.IsAlive == false || Timing == null)
                 return;
 
             Timing.Update(elapseSeconds);

@@ -30,10 +30,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return 0;
 
             bool isUseOwnerAttack = Attack == null;
-            int attack = isUseOwnerAttack ? _owner.OwnerMarble.RuntimeData.Attack : Attack.Value;
+            int attack = isUseOwnerAttack ? _owner.OwnerMarble.RuntimeData.Config.Attack : Attack.Value;
             // TODO: Marble应该提供一个计算伤害的核心Ability，计算伤害时应该使用这个Ability
-            int attackAddition = _owner.OwnerMarble.RuntimeData.AttackAddition;
-            float attackMultiplier = _owner.OwnerMarble.RuntimeData.AttackMultiplier;
+            int attackAddition = _owner.OwnerMarble.RuntimeData.Config.AttackAddition;
+            float attackMultiplier = _owner.OwnerMarble.RuntimeData.Config.AttackMultiplier;
             attack = Mathf.RoundToInt((attack + attackAddition) * attackMultiplier);
 
             return Mathf.Max(0, attack);

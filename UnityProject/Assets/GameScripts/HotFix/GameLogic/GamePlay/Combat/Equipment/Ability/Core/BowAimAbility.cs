@@ -30,7 +30,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (_owner == null || _owner.RuntimeData == null)
                 return;
 
-            var targetMarble = _owner.OwnerMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.TargetMarbleInstId);
+            var targetMarble = _owner.OwnerMarble.CombatManager?.GetTarget(Owner.OwnerMarble.RuntimeData.State.TargetMarbleInstId);
             if (targetMarble == null)
                 return;
 

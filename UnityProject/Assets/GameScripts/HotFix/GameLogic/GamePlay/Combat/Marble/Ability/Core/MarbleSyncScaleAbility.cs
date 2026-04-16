@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (Owner == null || Owner.RuntimeData == null)
                 return;
 
-            var scale = Owner.RuntimeData.Scale;
+            var scale = Owner.RuntimeData.Config.Scale;
             var curScale = Owner.transform.localScale.x;
             if (Mathf.Approximately(curScale, scale))
                 return;

@@ -21,10 +21,10 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.IsAlive == false)
+            if(Owner == null || Owner.RuntimeData == null || Owner.RuntimeData.State.IsAlive == false)
                 return;
 
-            Marble target = Owner.CombatManager?.GetTarget(Owner.RuntimeData.TargetMarbleInstId);
+            Marble target = Owner.CombatManager?.GetTarget(Owner.RuntimeData.State.TargetMarbleInstId);
             if(target == null)
                 return;
 
@@ -36,9 +36,9 @@ namespace GameLogic.Gameplay.Combat.Marble
             }
 
             Vector2 direction = (target.transform.position - Owner.transform.position).normalized;
-            Owner.RuntimeData.TargetDirectionManager.Add(new PriorityValue<Vector2>(InstId, direction, Priority, CombineType));
-            Owner.RuntimeData.TargetVelocityManager.Add(new PriorityValue<float>(InstId, TargetSpeed, Priority, CombineType));
-            Owner.RuntimeData.AccelerationManager.Add(new PriorityValue<float>(InstId, Acceleration, Priority, CombineType));
+            Owner.RuntimeData.Frame.TargetDirectionManager.Add(new PriorityValue<Vector2>(InstId, direction, Priority, CombineType));
+            Owner.RuntimeData.Frame.TargetVelocityManager.Add(new PriorityValue<float>(InstId, TargetSpeed, Priority, CombineType));
+            Owner.RuntimeData.Frame.AccelerationManager.Add(new PriorityValue<float>(InstId, Acceleration, Priority, CombineType));
         }
     }
 }

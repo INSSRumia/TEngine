@@ -104,7 +104,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
                 healContext.Stage = ShieldStage.Calculate;
                 healContext.FinalValue = Mathf.Max(0,
-                    Mathf.RoundToInt((healContext.InputValue + Owner.RuntimeData.ShieldHealAddition) * Owner.RuntimeData.ShieldHealMultiplier));
+                    Mathf.RoundToInt((healContext.InputValue + Owner.RuntimeData.Config.ShieldHealAddition) * Owner.RuntimeData.Config.ShieldHealMultiplier));
                 var lstAfterCalculateShieldAbilities = ListPool<IAfterCalculateShield>.Get();
                 Owner.GetAbilities<IAfterCalculateShield>(ref lstAfterCalculateShieldAbilities);
                 foreach (var ability in lstAfterCalculateShieldAbilities)

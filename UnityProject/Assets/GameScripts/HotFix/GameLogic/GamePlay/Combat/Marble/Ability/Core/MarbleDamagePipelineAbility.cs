@@ -98,7 +98,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 ListPool<IAfterReceiveDamage>.Release(lstAfterReceiveDamageAbilities);
 
                 context.Stage = DamageStage.Calculate;
-                context.FinalValue = Mathf.Max(0, Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.DamageAddition) * Owner.RuntimeData.DamageMultiplier) - Owner.RuntimeData.Defense);
+                context.FinalValue = Mathf.Max(0, Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.Config.DamageAddition) * Owner.RuntimeData.Config.DamageMultiplier) - Owner.RuntimeData.Config.Defense);
                 var lstAfterCalculateDamageAbilities = ListPool<IAfterCalculateDamage>.Get();
                 Owner.GetAbilities<IAfterCalculateDamage>(ref lstAfterCalculateDamageAbilities);
                 foreach (var ability in lstAfterCalculateDamageAbilities)
@@ -137,21 +137,21 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private void ApplyDamage(int damage)
         {
-            int shield = Owner.RuntimeData.Shield;
+            int shield = Owner.RuntimeData.State.Shield;
             if(shield > 0)
             {
                 shield = Mathf.Max(shield - damage, 0);
-                Owner.RuntimeData.Shield = shield;
+                Owner.RuntimeData.State.Shield = shield;
                 Log.Info($"[MarbleDamagePipelineAbility] 护盾吸收了 {damage} 点伤害，剩余护盾: {shield}");
                 return;
             }
 
-            int hp = Owner.RuntimeData.Hp;
+            int hp = Owner.RuntimeData.State.Hp;
             if(hp > 0)
             {
                 hp = Mathf.Max(hp - damage, 0);
                 Log.Info($"[MarbleDamagePipelineAbility] 剩余血量: {hp}");
-                Owner.RuntimeData.Hp = hp;
+                Owner.RuntimeData.State.Hp = hp;
                 return;
             }
         }

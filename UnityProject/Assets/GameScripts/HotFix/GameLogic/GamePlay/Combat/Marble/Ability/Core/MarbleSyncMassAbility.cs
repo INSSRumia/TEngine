@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (Owner == null || Owner.RuntimeData == null || Owner.Rigidbody == null)
                 return;
 
-            var mass = Owner.RuntimeData.Mass;
+            var mass = Owner.RuntimeData.Config.Mass;
             if (Mathf.Approximately(Owner.Rigidbody.mass, mass))
                 return;
 
