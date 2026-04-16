@@ -6,6 +6,11 @@ using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
+    /// <summary>
+    /// Marble 伤害结算主干能力。
+    /// 它负责维护一次受伤请求的阶段上下文，并串行处理嵌套伤害，
+    /// 避免多个 Ability 直接改写血量/护盾时丢失统一的阶段边界。
+    /// </summary>
     public partial class MarbleDamagePipelineAbility : MarbleAbility
     {
         public MarbleDamagePipelineAbility(GameConfig.Gameplay.Combat.MarbleDamagePipelineAbilityConfig config)
@@ -24,6 +29,11 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         public sealed class DamageContext : MemoryObject
         {
+            /// <summary>
+            /// 单次伤害请求的上下文。
+            /// 其它实现 IAfterReceiveDamage / IAfterCalculateDamage / IAfterApplyDamage 的能力
+            /// 都通过 CurrentContext 读取或修正本次结算数据。
+            /// </summary>
             public ASC Source { get; private set; }
             public ASC Target { get; private set; }
             public DamageStage Stage { get; set; }
@@ -73,6 +83,7 @@ namespace GameLogic.Gameplay.Combat.Marble
 
             if (_isProcessing)
             {
+                // 如果当前正在结算，则把新伤害排队，避免在同一条栈上递归破坏阶段顺序。
                 _pendingContexts.Enqueue(context);
                 return;
             }
@@ -98,6 +109,8 @@ namespace GameLogic.Gameplay.Combat.Marble
                 ListPool<IAfterReceiveDamage>.Release(lstAfterReceiveDamageAbilities);
 
                 context.Stage = DamageStage.Calculate;
+                // 这里使用 RuntimeData.Config 中的加成/倍率/防御做统一计算，
+                // 其它能力可在 Calculate 阶段后继续修正 FinalValue。
                 context.FinalValue = Mathf.Max(0, Mathf.RoundToInt((context.InputValue + Owner.RuntimeData.Config.DamageAddition) * Owner.RuntimeData.Config.DamageMultiplier) - Owner.RuntimeData.Config.Defense);
                 var lstAfterCalculateDamageAbilities = ListPool<IAfterCalculateDamage>.Get();
                 Owner.GetAbilities<IAfterCalculateDamage>(ref lstAfterCalculateDamageAbilities);
@@ -140,6 +153,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             int shield = Owner.RuntimeData.State.Shield;
             if(shield > 0)
             {
+                // 当前实现为“护盾先完整吸收当次伤害，不溢出到生命”。
                 shield = Mathf.Max(shield - damage, 0);
                 Owner.RuntimeData.State.Shield = shield;
                 Log.Info($"[MarbleDamagePipelineAbility] 护盾吸收了 {damage} 点伤害，剩余护盾: {shield}");

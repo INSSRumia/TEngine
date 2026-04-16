@@ -5,6 +5,11 @@ using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
+    /// <summary>
+    /// Equipment 装配入口。
+    /// 负责把装备配置分流为具体 RuntimeData，并在统一入口中完成：
+    /// 公共骨架能力挂载 → 类型专属核心能力挂载 → 扩展能力挂载。
+    /// </summary>
     public static partial class EquipmentFactory
     {
         private static readonly List<IEquipmentCreatorForConfig> _lstCreatorsForConfig = new List<IEquipmentCreatorForConfig>
@@ -58,6 +63,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 if (runtimeData != null)
                 {
                     equipment.Init(ownerMarble, runtimeData);
+                    // 先挂默认骨架能力，再追加 lst_ability 中的扩展能力，避免职责混叠。
                     creator.AttachDefaultAbilities(equipment, levelConfig);
                     AttachConfigAbilities(equipment, levelConfig);
                     break;
@@ -85,6 +91,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (levelConfig?.LstAbility == null)
                 return;
 
+            // 扩展列表只负责附加玩法能力；挂载、损坏、冷却、伤害计算等核心能力已有独立字段入口。
             foreach (var config in levelConfig.LstAbility)
             {
                 var ability = CreateAbilityFromConfig(equipment, config);
@@ -169,12 +176,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
             switch (equipment)
             {
                 case ArmorEquipment armorEquipment:
+                    // 护甲类型走承伤/减伤链路。
                     AttachArmorDefaultAbilities(armorEquipment, levelConfig as ArmorLevelConfig);
                     break;
                 case BowEquipment bowEquipment:
+                    // 弓类型走瞄准 + 发射物链路。
                     AttachBowDefaultAbilities(bowEquipment, levelConfig as BowLevelConfig);
                     break;
                 case SwordEquipment swordEquipment:
+                    // 剑类型走近战碰撞链路。
                     AttachSwordDefaultAbilities(swordEquipment, levelConfig as SwordLevelConfig);
                     break;
                 default:

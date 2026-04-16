@@ -5,6 +5,11 @@ using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
+    /// <summary>
+    /// 弓射击能力。
+    /// 负责把弓的发射参数转换为一个或多个 Projectile 创建请求，
+    /// 但不直接处理发射物生命周期与命中逻辑，后续链路统一交给 ProjectileFactory 和 Projectile Ability。
+    /// </summary>
     public class BowFireAbility : WeaponFireAbility
     {
         private const EnumBowShootType DefaultShootType = EnumBowShootType.Sequential;
@@ -62,6 +67,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 
             if (ShootType == EnumBowShootType.Spread)
             {
+                // 散射模式以当前朝向为中心，左右交替铺开角度。
                 var centerIndex = 0;
                 for (var i = 0; i < ArrowCount; i++)
                 {
@@ -82,6 +88,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 if (ShootType != DefaultShootType)
                     return;
 
+                // 顺序发射模式会在多支箭之间等待 ArrowInterval，期间弓位置和朝向允许继续变化。
                 for (var i = 0; i < ArrowCount; i++)
                 {
                     if(Owner.RuntimeData.IsBroken)

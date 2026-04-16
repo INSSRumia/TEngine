@@ -4,19 +4,31 @@
     ============================================================
     发射物等级配置
     ============================================================
+    该 bean 是 ProjectileFactory 的直接消费入口。
+    `move_ability`、`damage_ability`、`lifetime` 与 `tracking` 共同组成发射物默认运行骨架，
+    `lst_ability` 则用于额外挂载玩法扩展能力。
     -->
     <bean name="ProjectileLevelConfig" valueType="false" sep=",">
+        <!-- 等级索引。与 config_id 一起唯一定位某种发射物的等级配置。 -->
         <var name="level" type="int" />
         <var name="name" type="string" />
-        <!-- 移动能力配置 -->
+        <!-- 移动能力配置。ProjectileFactory 总会挂载 ProjectileMoveAbility。 -->
         <var name="move_ability" type="ProjectileMoveConfig" />
-        <!-- 伤害能力配置 -->
+        <!-- 伤害能力配置。ProjectileDamageAbility 会读取这里决定伤害、穿透与速度倍率逻辑。 -->
         <var name="damage_ability" type="ProjectileDamageConfig" />
-        <!-- 生命周期能力配置 -->
+        <!-- 生命周期能力配置。ProjectileLifetimeAbility 会根据这里决定存活时长。 -->
         <var name="lifetime" type="ProjectileLifetimeConfig" />
-        <!-- 追踪模式配置 -->
+        <!--
+        追踪模式配置。
+        这里虽然使用多态配置 bean，但仍属于发射物固定骨架入口，
+        ProjectileFactory 会把它转换为 no_track / track_target / track_point 对应的核心追踪能力。
+        -->
         <var name="tracking" type="ProjectileTrackingConfig" />
-        <!-- # 扩展玩法 Ability 配置列表；移动/伤害/生命周期等核心骨架参数保持独立字段 -->
+        <!--
+        # 扩展玩法 Ability 配置列表。
+        # 仅用于追加非默认骨架能力；移动/伤害/生命周期/追踪等核心骨架参数保持独立字段，
+        # 以便 AI 直接从 schema 识别 ProjectileFactory 的装配边界。
+        -->
         <var name="lst_ability" type="list, ProjectileAbilityConfig" />
     </bean>
 
@@ -24,6 +36,7 @@
     ============================================================
     发射物配置入口
     ============================================================
+    TbProjectile 表入口。武器能力通常通过 projectile_config_id + projectile_level 间接引用这里。
     -->
     <bean name="ProjectileConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />

@@ -4,6 +4,11 @@ using TEngine;
 using UnityEngine;
 namespace GameLogic.Gameplay.Combat
 {
+    /// <summary>
+    /// Projectile 装配入口。
+    /// 负责创建发射物实例、初始化运行时上下文，并按统一骨架挂载
+    /// 移动 / 伤害 / 生命周期 / 追踪 核心能力，再处理扩展能力。
+    /// </summary>
     public static class ProjectileFactory
     {
         private static readonly List<IProjectileAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IProjectileAbilityCreatorForConfig>
@@ -64,6 +69,7 @@ namespace GameLogic.Gameplay.Combat
 
             projectile.Init(runtimeData);
 
+            // 发射物骨架能力固定由 Factory 统一挂载，保证不同创建来源下的行为一致。
             AttachDefaultAbilities(projectile, levelConfig);
 
             return projectile;
@@ -115,12 +121,14 @@ namespace GameLogic.Gameplay.Combat
             var lifetimeAbility = new ProjectileLifetimeAbility(levelConfig.Lifetime);
             AttachCoreAbility(projectile, lifetimeAbility);
 
+            // tracking 使用多态配置，但语义上仍属于固定骨架能力入口，不属于通用扩展列表。
             var trackingAbility = CreateAbilityFromConfig(levelConfig.Tracking);
             if (trackingAbility != null)
             {
                 AttachCoreAbility(projectile, trackingAbility);
             }
 
+            // lst_ability 留给未来玩法扩展能力。
             AttachConfigAbilities(projectile, levelConfig);
         }
 

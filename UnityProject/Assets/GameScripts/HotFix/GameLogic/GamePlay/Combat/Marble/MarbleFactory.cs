@@ -5,6 +5,13 @@ using TEngine;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
+    /// <summary>
+    /// Marble 装配入口。
+    /// 负责把 Luban 等级配置转换为运行时实体，并明确区分：
+    /// 1. 固定骨架能力挂载
+    /// 2. 配置驱动扩展能力挂载
+    /// 3. 装备继续装配
+    /// </summary>
     public static partial class MarbleFactory
     {
         private static readonly List<IMarbleAbilityCreatorForConfig> _lstAbilityCreatorsForConfig = new List<IMarbleAbilityCreatorForConfig>
@@ -38,7 +45,9 @@ namespace GameLogic.Gameplay.Combat.Marble
             var levelData = GetMarbleLevelConfig(runtimeData.ConfigId, runtimeData.Level);
             var marbleComponent = CreateMarbleInternal(runtimeData.ConfigId);
             marbleComponent.Init(runtimeData);
+            // 固定骨架能力先挂载，保证 Marble 的受伤、治疗、移动、升级等基础链路先完整建立。
             AttachDefaultAbilities(marbleComponent, levelData);
+            // 装备装配放在 Marble 初始化之后进行，避免装备能力读取不到 OwnerMarble 的基础黑板。
             AttachEquipment(marbleComponent, levelData);
             return marbleComponent;
         }
@@ -77,6 +86,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             AttachCoreAbility(marbleComponent, new MarbleMovementAbility(levelData.Movement));
             AttachCoreAbility(marbleComponent, new MarbleRotationAbility(levelData.Rotation));
 
+            // 配置驱动扩展能力最后挂载，让玩法层能力建立在固定骨架之上。
             AttachConfigAbilities(marbleComponent, levelData);
         }
 
@@ -91,6 +101,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (levelData?.LstAbility == null)
                 return;
 
+            // lst_ability 只承载玩法扩展能力；固定骨架能力不应从这里重复声明。
             foreach (var config in levelData.LstAbility)
             {
                 var ability = CreateAbilityFromConfig(config);
