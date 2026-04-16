@@ -71,7 +71,13 @@
             "combine_type": 0,
             "close_distance": 5,
             "target_speed": 10,
-            "acceleration": 10
+            "acceleration": 10,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 5,
+              "cooldown": 5,
+              "auto_activate": true
+            }
           },
           {
             "$type": "MarbleDefaultRotateAbilityConfig",
@@ -166,7 +172,13 @@
             "combine_type": 0,
             "close_distance": 5,
             "target_speed": 10,
-            "acceleration": 10
+            "acceleration": 10,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 5,
+              "cooldown": 5,
+              "auto_activate": true
+            }
           },
           {
             "$type": "MarbleDefaultRotateAbilityConfig",
@@ -257,12 +269,18 @@
         ],
         "lst_ability": [
           {
-            "$type": "MarbleCloseToTargetAbilityConfig",
+            "$type": "MarbleKeepAwayFromTargetAbilityConfig",
             "priority": 1000,
             "combine_type": 0,
-            "close_distance": 8,
+            "keep_away_distance": 5,
             "target_speed": 10,
-            "acceleration": 10
+            "acceleration": 10,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 5,
+              "cooldown": 3,
+              "auto_activate": true
+            }
           },
           {
             "$type": "MarbleFaceTargetDirectionAbilityConfig",
@@ -341,12 +359,18 @@
         ],
         "lst_ability": [
           {
-            "$type": "MarbleCloseToTargetAbilityConfig",
+            "$type": "MarbleKeepAwayFromTargetAbilityConfig",
             "priority": 1000,
             "combine_type": 0,
-            "close_distance": 8,
+            "keep_away_distance": 5,
             "target_speed": 10,
-            "acceleration": 10
+            "acceleration": 10,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 5,
+              "cooldown": 3,
+              "auto_activate": true
+            }
           },
           {
             "$type": "MarbleFaceTargetDirectionAbilityConfig",

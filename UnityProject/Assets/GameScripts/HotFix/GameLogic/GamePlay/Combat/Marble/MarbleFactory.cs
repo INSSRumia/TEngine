@@ -161,6 +161,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             return config switch
             {
                 MarbleCloseToTargetAbilityConfig closeConfig => new MarbleCloseToTargetAbility(closeConfig),
+                MarbleKeepAwayFromTargetAbilityConfig keepAwayConfig => new MarbleKeepAwayFromTargetAbility(keepAwayConfig),
                 MarbleDefaultRotateAbilityConfig defaultRotateConfig => new MarbleDefaultRotateAbility(defaultRotateConfig),
                 MarbleDashAbilityConfig dashConfig => new MarbleDashAbility(dashConfig),
                 MarbleFaceTargetDirectionAbilityConfig faceTargetDirectionConfig => new MarbleFaceTargetDirectionAbility(faceTargetDirectionConfig),

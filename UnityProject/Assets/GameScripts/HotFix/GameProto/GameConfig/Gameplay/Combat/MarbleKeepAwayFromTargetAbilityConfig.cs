@@ -13,29 +13,29 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConfig
+public sealed partial class MarbleKeepAwayFromTargetAbilityConfig : MarbleAbilityConfig
 {
-    public MarbleCloseToTargetAbilityConfig(JSONNode _buf)  : base(_buf) 
+    public MarbleKeepAwayFromTargetAbilityConfig(JSONNode _buf)  : base(_buf) 
     {
         { if(!_buf["combine_type"].IsNumber) { throw new SerializationException(); }  CombineType = (Gameplay.Combat.EnumCombineType)_buf["combine_type"].AsInt; }
-        { if(!_buf["close_distance"].IsNumber) { throw new SerializationException(); }  CloseDistance = _buf["close_distance"]; }
+        { if(!_buf["keep_away_distance"].IsNumber) { throw new SerializationException(); }  KeepAwayDistance = _buf["keep_away_distance"]; }
         { if(!_buf["target_speed"].IsNumber) { throw new SerializationException(); }  TargetSpeed = _buf["target_speed"]; }
         { if(!_buf["acceleration"].IsNumber) { throw new SerializationException(); }  Acceleration = _buf["acceleration"]; }
         { if(!_buf["timing"].IsObject) { throw new SerializationException(); }  Timing = global::GameConfig.Gameplay.Combat.AbilityTimingConfig.DeserializeAbilityTimingConfig(_buf["timing"]);  }
     }
 
-    public static MarbleCloseToTargetAbilityConfig DeserializeMarbleCloseToTargetAbilityConfig(JSONNode _buf)
+    public static MarbleKeepAwayFromTargetAbilityConfig DeserializeMarbleKeepAwayFromTargetAbilityConfig(JSONNode _buf)
     {
-        return new Gameplay.Combat.MarbleCloseToTargetAbilityConfig(_buf);
+        return new Gameplay.Combat.MarbleKeepAwayFromTargetAbilityConfig(_buf);
     }
 
     public readonly Gameplay.Combat.EnumCombineType CombineType;
-    public readonly float CloseDistance;
+    public readonly float KeepAwayDistance;
     public readonly float TargetSpeed;
     public readonly float Acceleration;
     public readonly Gameplay.Combat.AbilityTimingConfig Timing;
    
-    public const int __ID__ = -2077236585;
+    public const int __ID__ = 449617295;
     public override int GetTypeId() => __ID__;
 
     public override void ResolveRef(Tables tables)
@@ -49,7 +49,7 @@ public sealed partial class MarbleCloseToTargetAbilityConfig : MarbleAbilityConf
         return "{ "
         + "priority:" + Priority + ","
         + "combineType:" + CombineType + ","
-        + "closeDistance:" + CloseDistance + ","
+        + "keepAwayDistance:" + KeepAwayDistance + ","
         + "targetSpeed:" + TargetSpeed + ","
         + "acceleration:" + Acceleration + ","
         + "timing:" + Timing + ","

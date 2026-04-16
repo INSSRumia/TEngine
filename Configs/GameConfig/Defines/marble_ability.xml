@@ -64,6 +64,22 @@
         <var name="close_distance" type="float" />
         <var name="target_speed" type="float" />
         <var name="acceleration" type="float" />
+        <var name="timing" type="AbilityTimingConfig" />
+    </bean>
+
+    <!--
+    ============================================================
+    MarbleKeepAwayFromTargetAbility 配置
+    ============================================================
+    可选 Ability：当 Marble 与目标距离小于 KeepAwayDistance 时，朝目标反方向移动。
+    -->
+    <bean name="MarbleKeepAwayFromTargetAbilityConfig" alias="keep_away_from_target" parent="MarbleAbilityConfig" valueType="false" sep=",">
+        <var name="combine_type" type="EnumCombineType" />
+        <!-- # 触发远离行为的判定距离 -->
+        <var name="keep_away_distance" type="float" />
+        <var name="target_speed" type="float" />
+        <var name="acceleration" type="float" />
+        <var name="timing" type="AbilityTimingConfig" />
     </bean>
 
     <!--
