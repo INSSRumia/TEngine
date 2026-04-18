@@ -45,7 +45,7 @@
         "rotation": {
           "priority": 0
         },
-        "attack": 10,
+        "attack": 50,
         "hp": 100,
         "shield": 100,
         "defense": 5,
@@ -146,7 +146,7 @@
         "rotation": {
           "priority": 0
         },
-        "attack": 10,
+        "attack": 50,
         "hp": 150,
         "shield": 150,
         "defense": 5,
@@ -253,7 +253,7 @@
         "rotation": {
           "priority": 0
         },
-        "attack": 10,
+        "attack": 50,
         "hp": 100,
         "shield": 100,
         "defense": 5,
@@ -343,7 +343,7 @@
         "rotation": {
           "priority": 0
         },
-        "attack": 10,
+        "attack": 50,
         "hp": 150,
         "shield": 150,
         "defense": 5,

@@ -70,7 +70,7 @@
           "$type": "ArmorAbsorbDamageAbilityConfig",
           "priority": 0,
           "hp": 100,
-          "defense": 0
+          "defense": 999999
         }
       },
       {

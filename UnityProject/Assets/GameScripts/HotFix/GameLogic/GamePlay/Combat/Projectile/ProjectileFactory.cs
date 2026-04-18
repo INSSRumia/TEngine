@@ -192,6 +192,7 @@ namespace GameLogic.Gameplay.Combat
                 ProjectileNoTrackingConfig projectileNoTrackingConfig => new ProjectileNoTrackingAbility(projectileNoTrackingConfig),
                 ProjectileTrackTargetConfig trackTargetConfig => new ProjectileTrackTargetAbility(trackTargetConfig),
                 ProjectileTrackPointConfig trackPointConfig => new ProjectileTrackPointAbility(trackPointConfig),
+                ProjectileKnockbackConfig knockbackConfig => new ProjectileKnockbackAbility(knockbackConfig),
                 _ => null
             };
         }

@@ -62,4 +62,13 @@
     <bean name="ProjectileTrackPointConfig" alias="track_point" parent="ProjectileTrackingConfig" valueType="false" sep=",">
         <var name="angular_speed" type="float" />
     </bean>
+
+    <!--
+    ============================================================
+    发射物击退能力配置
+    ============================================================
+    -->
+    <bean name="ProjectileKnockbackConfig" alias="knockback" parent="ProjectileAbilityConfig" valueType="false" sep=",">
+        <var name="force" type="float" />
+    </bean>
 </module>

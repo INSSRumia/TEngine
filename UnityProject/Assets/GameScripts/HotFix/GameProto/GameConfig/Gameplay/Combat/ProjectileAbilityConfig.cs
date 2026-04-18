@@ -30,6 +30,7 @@ public abstract partial class ProjectileAbilityConfig : Luban.BeanBase
             case "ProjectileNoTrackingConfig": return new Gameplay.Combat.ProjectileNoTrackingConfig(_buf);
             case "ProjectileTrackTargetConfig": return new Gameplay.Combat.ProjectileTrackTargetConfig(_buf);
             case "ProjectileTrackPointConfig": return new Gameplay.Combat.ProjectileTrackPointConfig(_buf);
+            case "ProjectileKnockbackConfig": return new Gameplay.Combat.ProjectileKnockbackConfig(_buf);
             default: throw new SerializationException();
         }
     }

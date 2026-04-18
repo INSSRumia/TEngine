@@ -1,5 +1,6 @@
 using TEngine;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Combat
 {
@@ -28,7 +29,80 @@ namespace GameLogic.Gameplay.Combat
             if (RuntimeData == null)
                 return;
 
-            GetAbility<ProjectileDamageAbility>()?.HandleCollider(other);
+            if (!TryCreateHitContext(other, out var hitContext))
+                return;
+
+            if (!RuntimeData.TryMarkHit(hitContext.TargetMarbleInstId))
+            {
+                MemoryPool.Dealloc(hitContext);
+                return;
+            }
+
+            try
+            {
+                DispatchHitHandlers(hitContext);
+            }
+            finally
+            {
+                MemoryPool.Dealloc(hitContext);
+            }
+        }
+
+        private bool TryCreateHitContext(Collider2D other, out ProjectileHitContext context)
+        {
+            context = null;
+            if (other == null)
+                return false;
+
+            var target = other.GetComponentInParent<ASC>();
+            if (target == null)
+                return false;
+
+            int targetCamp = RuntimeData.SourceCamp;
+            IReceiveDamage targetReceiveDamage = null;
+            int targetMarbleInstId = -1;
+            Rigidbody2D targetRigidbody = null;
+            switch (target)
+            {
+                case Marble.Marble marble:
+                    targetCamp = marble.RuntimeData.Camp;
+                    targetReceiveDamage = marble.GetAbility<IReceiveDamage>();
+                    targetMarbleInstId = marble.RuntimeData.InstId;
+                    targetRigidbody = marble.Rigidbody;
+                    break;
+                case Equipment.Equipment equipment:
+                    targetCamp = equipment.OwnerMarble.RuntimeData.Camp;
+                    targetReceiveDamage = equipment.GetAbility<IReceiveDamage>();
+                    targetMarbleInstId = equipment.OwnerMarble.RuntimeData.InstId;
+                    targetRigidbody = equipment.Rigidbody;
+                    break;
+                default:
+                    return false;
+            }
+
+            if (targetCamp == RuntimeData.SourceCamp || targetReceiveDamage == null)
+                return false;
+
+            context = MemoryPool.Alloc<ProjectileHitContext>();
+            context.Reset(other, target, targetRigidbody, targetReceiveDamage, targetMarbleInstId);
+            return true;
+        }
+
+        private void DispatchHitHandlers(ProjectileHitContext hitContext)
+        {
+            var hitHandlers = ListPool<IProjectileHitHandler>.Get();
+            try
+            {
+                GetAbilities(ref hitHandlers);
+                foreach (var hitHandler in hitHandlers)
+                {
+                    hitHandler.HandleHit(hitContext);
+                }
+            }
+            finally
+            {
+                ListPool<IProjectileHitHandler>.Release(hitHandlers);
+            }
         }
 
         private void OnDrawGizmos()

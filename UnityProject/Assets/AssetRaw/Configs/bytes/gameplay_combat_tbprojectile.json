@@ -13,7 +13,7 @@
           "priority": 0,
           "is_damage_by_velocity": true,
           "velocity_damage_factor": 0.05,
-          "piercing_count": 1
+          "piercing_count": 0
         },
         "lifetime": {
           "priority": 0,
@@ -23,7 +23,13 @@
           "$type": "ProjectileNoTrackingConfig",
           "priority": 1000
         },
-        "lst_ability": []
+        "lst_ability": [
+          {
+            "$type": "ProjectileKnockbackConfig",
+            "priority": 0,
+            "force": 10
+          }
+        ]
       },
       {
         "level": 1,
