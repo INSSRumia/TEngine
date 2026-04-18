@@ -121,7 +121,7 @@
         },
         "bow_fire": {
           "priority": 0,
-          "arrow_count": 3,
+          "arrow_count": 1,
           "arrow_interval": 0.1,
           "arrow_angle_step": 5,
           "shoot_type": 1,
@@ -154,7 +154,7 @@
         },
         "bow_fire": {
           "priority": 0,
-          "arrow_count": 3,
+          "arrow_count": 1,
           "arrow_interval": 0.1,
           "arrow_angle_step": 5,
           "shoot_type": 1,
