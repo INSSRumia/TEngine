@@ -6,82 +6,35 @@
         <var name="Bottom" alias="bottom" value="3" />
         <var name="Middle" alias="middle" value="4" />
     </enum>
-
-    <!--
-    装备挂载声明。由 MarbleLevelConfig.lst_equipment 消费，
-    用于指示 MarbleFactory 在创建 Marble 后挂载哪些装备、挂在哪个槽位、使用哪个等级。
-    -->
     <bean name="EquipAttachConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="level" type="int" />
-        <!-- # 装备位于marble的哪个位置
-        # 0: top, 1: left, 2: right, 3: bottom 4: middle -->
         <var name="slot" type="EnumEquipmentSlot" />
     </bean>
-
-    <!-- Equipment 表入口。EquipmentFactory 会先读取 config_id，再在 lst_level_config 中定位具体等级。 -->
     <bean name="EquipmentConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="lst_level_config" type="list, EquipmentLevelConfig" />
     </bean>
-
-    <!--
-    ============================================================
-    EquipmentLevelConfig 基类
-    ============================================================
-    所有装备等级配置的公共骨架。
-    `mount`、`broken` 属于每件装备默认挂载的核心能力字段；
-    `lst_ability` 则保留给未来扩展玩法能力，不应重复声明已经有独立字段的核心能力。
-    -->
     <bean name="EquipmentLevelConfig" alias="equip" valueType="false" sep=",">
         <var name="level" type="int" />
         <var name="name" type="string" />
-        <!-- 装备挂载能力。由 EquipmentFactory.AttachEquipmentCoreAbilities 统一挂载。 -->
         <var name="mount" type="EquipmentMountAbilityConfig" />
-        <!-- 装备损坏能力。控制装备是否还能工作，是所有装备的固定骨架能力。 -->
         <var name="broken" type="EquipmentBrokenAbilityConfig" />
-
-        <!--
-        # 扩展玩法 Ability 配置列表。
-        # 该列表用于补充非默认骨架的额外装备能力。
-        # 核心骨架能力字段保持独立显式配置，方便 Factory 明确区分挂载层次。
-        -->
         <var name="lst_ability" type="list, EquipmentAbilityConfig" />
     </bean>
-
-    <!-- 护甲等级配置。由 DefaultEquipmentCreatorForConfig 分流到 ArmorRuntimeData 与护甲核心能力装配。 -->
     <bean name="ArmorLevelConfig" alias="armor" parent="EquipmentLevelConfig" valueType="false" sep=",">
-        <!-- # 护甲主能力入口。该字段是护甲类型差异的核心配置，不属于 lst_ability 扩展列表。 -->
-
-        <!-- # 可选能力：
-          - ArmorReduceDamageAblityConfig : 护甲减伤
-          - ArmorAbsorbDamageAbilityConfig : 护甲吸收
-        -->
         <var name="armor" type="EquipmentAbilityConfig" />
     </bean>
-
-    <!-- 武器等级配置基类。Weapon 类型默认追加冷却与伤害计算核心能力。 -->
     <bean name="WeaponLevelConfig" alias="weapon" parent="EquipmentLevelConfig" valueType="false" sep=",">
-        <!-- # 武器伤害计算能力；BowFire / SwordCollisionAttack 等都会依赖该计算结果。 -->
         <var name="calculate_damage" type="WeaponCalculateDamageAbilityConfig" />
-        <!-- # 武器冷却能力；WeaponFireAbility 系列能力通过它消费冷却。 -->
         <var name="cooldown" type="WeaponCooldownAbilityConfig" />
     </bean>
-
-    <!-- 剑等级配置。以碰撞攻击为核心骨架，不通过投射物链路出伤。 -->
     <bean name="SwordLevelConfig" alias="sword" parent="WeaponLevelConfig" valueType="false" sep=",">
-        <!-- # 近战武器碰撞攻击能力 -->
         <var name="sword_collision_attack" type="SwordCollisionAttackAbilityConfig" />
     </bean>
-
-    <!-- 弓等级配置。先瞄准，再由 BowFireAbility 读取发射参数创建 Projectile。 -->
     <bean name="BowLevelConfig" alias="bow" parent="WeaponLevelConfig" valueType="false" sep=",">
-        <!-- # 弓瞄准能力 -->
         <var name="bow_aim" type="BowAimAbilityConfig" />
-        <!-- # 弓射击能力 -->
         <var name="bow_fire" type="BowFireAbilityConfig" />
     </bean>
-
-    <table name="TbEquipment" value="EquipmentConfig" input="equip.xlsx" index="config_id"/>
-
+    <table name="TbEquipment" value="EquipmentConfig" input="equip.xlsx" index="config_id" />
 </module>

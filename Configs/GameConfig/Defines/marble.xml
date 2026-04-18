@@ -1,22 +1,7 @@
 <module name="Gameplay.Combat">
-
-
-    <!--
-    ============================================================
-    Marble 等级配置
-    ============================================================
-    该 bean 是 MarbleFactory 的主要消费入口。
-    其中显式字段描述 Marble 固定运行骨架需要的配置，
-    例如受伤、治疗、移动、旋转、升级与基础属性投影；
-    `lst_ability` 则用于追加可选玩法能力，不应与固定骨架字段混用。
-    -->
     <bean name="MarbleLevelConfig" valueType="false" sep=",">
-        <!-- 等级索引。MarbleFactory 会用 config_id + level 定位唯一等级配置。 -->
         <var name="level" type="int" />
-        <!-- 升到下一等级所需经验，初始化时投影到 RuntimeData.Config.UpgradeExp。 -->
         <var name="upgrade_exp" type="int" />
-
-        <!-- 以下字段对应 MarbleFactory.AttachDefaultAbilities 挂载的固定核心能力。 -->
         <var name="sync_scale" type="MarbleSyncScaleAbilityConfig" />
         <var name="sync_mass" type="MarbleSyncMassAbilityConfig" />
         <var name="damage_pipeline" type="MarbleDamagePipelineAbilityConfig" />
@@ -30,40 +15,20 @@
         <var name="get_target" type="MarbleGetTargetAbilityConfig" />
         <var name="movement" type="MarbleMovementAbilityConfig" />
         <var name="rotation" type="MarbleRotationAbilityConfig" />
-
-        <!-- 基础战斗属性，初始化后主要投影到 MarbleRuntimeData.State / Config。 -->
         <var name="attack" type="int" />
         <var name="hp" type="int" />
         <var name="shield" type="int" />
         <var name="defense" type="int" />
-
-        <!-- 基础物理参数。speed 目前主要供玩法理解，mass/scale 会直接进入 RuntimeData.Config。 -->
         <var name="speed" type="float" />
         <var name="mass" type="float" />
         <var name="scale" type="float" />
-
-        <!-- 装备挂载列表。MarbleFactory 会在 Marble 初始化完成后继续调用 EquipmentFactory 进行装配。 -->
         <var name="lst_equipment" type="list, EquipAttachConfig" />
-
-        <!--
-        # 扩展玩法 Ability 配置列表。
-        # 该列表只用于附加非固定骨架能力，例如冲刺、贴近目标、朝向目标等行为逻辑。
-        # 固定运行骨架参数继续保留为显式字段，避免 AI 误把基础结算能力塞入扩展列表。
-        -->
         <var name="lst_ability" type="list, MarbleAbilityConfig" />
     </bean>
-
-    <!--
-    ============================================================
-    Marble 配置入口
-    ============================================================
-    TbMarble 的行级入口。AI 修改 Marble 玩法时通常先定位这里，再进入具体等级配置与 ability bean。
-    -->
     <bean name="MarbleConfig" valueType="false" sep=",">
         <var name="config_id" type="string" />
         <var name="name" type="string" />
         <var name="lst_level_config" type="list, MarbleLevelConfig" />
     </bean>
-
-    <table name="TbMarble" value="MarbleConfig" input="marble.xlsx" index="config_id"/>
+    <table name="TbMarble" value="MarbleConfig" input="marble.xlsx" index="config_id" />
 </module>
