@@ -1,0 +1,39 @@
+{
+  "name": "qiushi-skill",
+  "version": "1.3.0",
+  "description": "Qiushi Skill: methodology skills for AI agents guided by seeking truth from facts, packaged for Codex with skills, hooks, commands, and agent guidance.",
+  "author": {
+    "name": "HughYau",
+    "url": "https://github.com/HughYau"
+  },
+  "homepage": "https://github.com/HughYau",
+  "keywords": [
+    "methodology",
+    "agent",
+    "skills",
+    "evidence-first",
+    "productivity"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "interface": {
+    "displayName": "Qiushi Skill",
+    "shortDescription": "Methodology skills for evidence-first AI agent work",
+    "longDescription": "A Codex plugin that bundles methodology-oriented skills, commands, hooks, and agent prompts inspired by seeking truth from facts. It helps agents investigate first, identify the main contradiction, focus effort, validate through practice, and review results honestly.",
+    "developerName": "HughYau",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/HughYau",
+    "defaultPrompt": [
+      "Use qiushi-skill to investigate this problem before proposing a fix",
+      "Apply qiushi-skill to plan the next steps for this task",
+      "Use qiushi-skill to review this result and identify the main contradiction"
+    ],
+    "brandColor": "#B71C1C",
+    "screenshots": []
+  }
+}
