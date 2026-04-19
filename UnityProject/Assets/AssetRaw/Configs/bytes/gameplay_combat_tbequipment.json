@@ -163,5 +163,34 @@
         }
       }
     ]
+  },
+  {
+    "config_id": "spear",
+    "lst_level_config": [
+      {
+        "$type": "SwordLevelConfig",
+        "level": 0,
+        "name": "枪",
+        "mount": {
+          "priority": 0
+        },
+        "broken": {
+          "priority": 0
+        },
+        "lst_ability": [],
+        "calculate_damage": {
+          "priority": 0
+        },
+        "cooldown": {
+          "priority": 0,
+          "cooldown": 0.1
+        },
+        "sword_collision_attack": {
+          "priority": 0,
+          "is_damage_by_velocity": true,
+          "velocity_damage_factor": 0.2
+        }
+      }
+    ]
   }
 ]

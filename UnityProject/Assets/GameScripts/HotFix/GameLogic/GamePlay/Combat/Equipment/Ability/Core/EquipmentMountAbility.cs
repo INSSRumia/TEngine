@@ -8,15 +8,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
     // 装备挂载到角色身上
     public class EquipmentMountAbility : EquipmentAbility, IAbilityFixedUpdate
     {
-        private static readonly Dictionary<EnumEquipmentSlot, Vector2> _slotConnectedAnchorMap = new Dictionary<EnumEquipmentSlot, Vector2>
+        private static readonly Dictionary<EnumEquipmentSlot, Quaternion> _slotConnectedAnchorMap = new()
         {
-            { EnumEquipmentSlot.Top, new Vector2(0, 0.5f) },
-            { EnumEquipmentSlot.Left, new Vector2(-0.5f, 0) },
-            { EnumEquipmentSlot.Right, new Vector2(0.5f, 0) },
-            { EnumEquipmentSlot.Bottom, new Vector2(0, -0.5f) },
-            { EnumEquipmentSlot.Middle, new Vector2(0, 0) },
+            { EnumEquipmentSlot.Top, Quaternion.Euler(0, 0, -90) },
+            { EnumEquipmentSlot.Left, Quaternion.Euler(0, 0, 180) },
+            { EnumEquipmentSlot.Right, Quaternion.Euler(0, 0, 0) },
+            { EnumEquipmentSlot.Bottom, Quaternion.Euler(0, 0, 90) },
+            { EnumEquipmentSlot.Middle, Quaternion.identity },
         };
-        private List<HingeJoint2D> _joints = new List<HingeJoint2D>();
+        private List<AnchoredJoint2D> _joints = new List<AnchoredJoint2D>();
 
         public EnumEquipmentSlot Slot {get; private set;}
         public EquipmentMountAbility(EquipmentMountAbilityConfig config, EnumEquipmentSlot slot)
@@ -53,20 +53,23 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var joints = EquipmentOwner.GetComponents<Joint2D>();
             foreach (var joint in joints)
             {
-                if(joint is HingeJoint2D hingeJoint)
+                if(joint is AnchoredJoint2D anchorJoint)
                 {
-                    _joints.Add(hingeJoint);
+                    _joints.Add(anchorJoint);
+
+                    anchorJoint.connectedBody = EquipmentOwner.OwnerMarble.Rigidbody;
+                    anchorJoint.connectedAnchor = _slotConnectedAnchorMap[Slot] * anchorJoint.connectedAnchor;
                 }
             }
         }
 
         public void OnAbilityFixedUpdate(float elapseSeconds, float realElapseSeconds)
         {
-            foreach (var joint in _joints)
-            {
-                joint.connectedBody = EquipmentOwner.OwnerMarble.Rigidbody;
-                joint.connectedAnchor = _slotConnectedAnchorMap[Slot];
-            }
+            // foreach (var joint in _joints)
+            // {
+            //     joint.connectedBody = EquipmentOwner.OwnerMarble.Rigidbody;
+            //     joint.connectedAnchor = _slotConnectedAnchorMap[Slot];
+            // }
         }
 
     }

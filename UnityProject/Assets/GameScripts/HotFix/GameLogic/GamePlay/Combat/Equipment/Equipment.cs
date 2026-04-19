@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
@@ -11,6 +12,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
         {
             OwnerMarble = ownerMarble;
             base.Init(runtimeData);
+        }
+
+        public virtual void HandleCollisionEnter2D(Collision2D collision)
+        {
         }
 
         public override void OnUpdate(float elapseSeconds, float realElapseSeconds)

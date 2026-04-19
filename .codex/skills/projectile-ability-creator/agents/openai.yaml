@@ -1,0 +1,4 @@
+interface:
+  display_name: "Projectile Ability Creator"
+  short_description: "固化 Projectile Ability 创建流程"
+  default_prompt: "Use $projectile-ability-creator to add or modify a config-driven Projectile ability in this project."

@@ -392,5 +392,117 @@
         ]
       }
     ]
+  },
+  {
+    "config_id": "lancer",
+    "name": "枪兵",
+    "lst_level_config": [
+      {
+        "level": 0,
+        "upgrade_exp": 100,
+        "sync_scale": {
+          "priority": 0
+        },
+        "sync_mass": {
+          "priority": 0
+        },
+        "damage_pipeline": {
+          "priority": 0
+        },
+        "heal_pipeline": {
+          "priority": 0
+        },
+        "shield_heal_pipeline": {
+          "priority": 0
+        },
+        "receive_damage": {
+          "priority": 0
+        },
+        "add_heal": {
+          "priority": 0
+        },
+        "add_exp": {
+          "priority": 0
+        },
+        "death": {
+          "priority": 0
+        },
+        "level_up": {
+          "priority": 0
+        },
+        "get_target": {
+          "priority": 0
+        },
+        "movement": {
+          "priority": 0
+        },
+        "rotation": {
+          "priority": 0
+        },
+        "attack": 50,
+        "hp": 100,
+        "shield": 100,
+        "defense": 5,
+        "speed": 8,
+        "mass": 1,
+        "scale": 1,
+        "lst_equipment": [
+          {
+            "config_id": "spear",
+            "level": 0,
+            "slot": 3
+          }
+        ],
+        "lst_ability": [
+          {
+            "$type": "MarbleCloseToTargetAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "close_distance": 5,
+            "target_speed": 10,
+            "acceleration": 10,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 5,
+              "cooldown": 5,
+              "auto_activate": true
+            }
+          },
+          {
+            "$type": "MarbleFaceTargetDirectionAbilityConfig",
+            "priority": 1000,
+            "combine_type": 0,
+            "target_local_direction": {
+              "x": 1,
+              "y": 0
+            },
+            "target_angular_speed": 20,
+            "angular_acceleration": 20,
+            "timing": {
+              "$type": "FixedAbilityTimingConfig",
+              "duration": 10000,
+              "cooldown": 1,
+              "auto_activate": true
+            }
+          },
+          {
+            "$type": "MarbleDashAbilityConfig",
+            "priority": 2000,
+            "combine_type": 0,
+            "target_speed": 20,
+            "acceleration": 20,
+            "lock_direction_on_activate": false,
+            "timing": {
+              "$type": "RandomRangeAbilityTimingConfig",
+              "min_duration": 1,
+              "max_duration": 1,
+              "min_cooldown": 1,
+              "max_cooldown": 3,
+              "auto_activate": true
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

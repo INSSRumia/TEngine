@@ -31,6 +31,9 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (collision == null || _owner == null || _owner.OwnerMarble == null || _owner.RuntimeData == null)
                 return;
 
+            if (!_owner.CanDealDamageFromCollider(collision.otherCollider))
+                return;
+
             var target = collision.collider.GetComponentInParent<ASC>();
             if(target == null)
                 return;
