@@ -289,6 +289,7 @@ GameObject:
   - component: {fileID: 120862912213099571}
   - component: {fileID: 8243793357725559240}
   - component: {fileID: 6255426435548357771}
+  - component: {fileID: 7498845723178852209}
   m_Layer: 8
   m_Name: spear
   m_TagString: Untagged
@@ -378,3 +379,15 @@ HingeJoint2D:
   m_AngleLimits:
     m_LowerAngle: -15
     m_UpperAngle: 15
+--- !u!210 &7498845723178852209
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7419691998083981029}
+  m_Enabled: 1
+  m_SortingLayerID: 758890401
+  m_SortingLayer: 3
+  m_SortingOrder: 100
+  m_SortAtRoot: 0

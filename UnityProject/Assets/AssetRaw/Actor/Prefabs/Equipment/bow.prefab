@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4877978485178321414}
   - component: {fileID: 1639966886131386541}
   - component: {fileID: 8402385843417402456}
+  - component: {fileID: 5965543349597002679}
   m_Layer: 8
   m_Name: bow
   m_TagString: Untagged
@@ -46,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c527eb9aa0482fbf36973448a2540f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _damageColliders: []
 --- !u!50 &8402385843417402456
 Rigidbody2D:
   serializedVersion: 4
@@ -73,6 +75,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!210 &5965543349597002679
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2210815629543541388}
+  m_Enabled: 1
+  m_SortingLayerID: 758890401
+  m_SortingLayer: 3
+  m_SortingOrder: 100
+  m_SortAtRoot: 0
 --- !u!1 &4863740339774001999
 GameObject:
   m_ObjectHideFlags: 0

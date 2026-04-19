@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7607815070052567103}
   - component: {fileID: 1410102682055113337}
   - component: {fileID: 7077272604623256964}
+  - component: {fileID: 2613262847781471430}
   m_Layer: 9
   m_Name: arrow
   m_TagString: Untagged
@@ -119,6 +120,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.7701134, y: 0.13786927}
   m_EdgeRadius: 0
+--- !u!210 &2613262847781471430
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677809480833022616}
+  m_Enabled: 1
+  m_SortingLayerID: 758890401
+  m_SortingLayer: 3
+  m_SortingOrder: 100
+  m_SortAtRoot: 0
 --- !u!1 &5773496828481759733
 GameObject:
   m_ObjectHideFlags: 0
