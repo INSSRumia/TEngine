@@ -36,7 +36,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             _lstCreatorsForConfig.Sort((a, b) => b.Priority.CompareTo(a.Priority));
         }
 
-        public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EnumEquipmentSlot slot)
+        public static Equipment CreateEquipment(Marble.Marble ownerMarble, EquipmentConfig config, int level, EnumEquipmentSlot slot, Transform parent)
         {
             if (ownerMarble == null || config == null)
                 return null;
@@ -48,7 +48,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return null;
             }
 
-            var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId);
+            var gameObject = GameModule.Resource.LoadGameObject(_path + config.ConfigId, parent);
 
             var equipment = gameObject.GetComponent<Equipment>();
             if (equipment == null)

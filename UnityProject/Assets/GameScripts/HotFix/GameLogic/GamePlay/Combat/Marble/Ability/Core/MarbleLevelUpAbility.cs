@@ -112,7 +112,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(configId);
                 if (equipmentConfig != null)
                 {
-                    EquipmentFactory.CreateEquipment(Owner, equipmentConfig, level, slot);
+                    EquipmentFactory.CreateEquipment(Owner, equipmentConfig, level, slot, Owner.GetEquipmentSlotPoint(slot));
                 }
             }
         }

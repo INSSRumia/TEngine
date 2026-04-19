@@ -476,8 +476,8 @@
               "x": 1,
               "y": 0
             },
-            "target_angular_speed": 20,
-            "angular_acceleration": 20,
+            "target_angular_speed": 360,
+            "angular_acceleration": 180,
             "timing": {
               "$type": "FixedAbilityTimingConfig",
               "duration": 10000,

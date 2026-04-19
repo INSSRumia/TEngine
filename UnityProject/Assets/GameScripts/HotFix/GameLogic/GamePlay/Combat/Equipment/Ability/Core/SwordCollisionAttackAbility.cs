@@ -5,7 +5,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
 {
     public class SwordCollisionAttackAbility : EquipmentAbility
     {
-        private SwordEquipment _owner;
+        private WeaponEquipment _owner;
         public bool IsDamageByVelocity {get; private set;}
         public float VelocityDamageFactor {get; private set;}
         public SwordCollisionAttackAbility(SwordCollisionAttackAbilityConfig config)
@@ -16,8 +16,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public override void OnAdd()
         {
             base.OnAdd();
-            if(EquipmentOwner is SwordEquipment swordEquipment)
-                _owner = swordEquipment;
+            if(EquipmentOwner is WeaponEquipment weaponEquipment)
+                _owner = weaponEquipment;
         }
 
         public override void OnRemove()

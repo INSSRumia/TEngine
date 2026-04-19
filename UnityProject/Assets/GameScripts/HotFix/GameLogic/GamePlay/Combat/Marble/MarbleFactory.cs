@@ -141,7 +141,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             foreach (var config in levelData.LstEquipment)
             {
                 var equipmentConfig = ConfigSystem.Instance.Tables.TbEquipment.Get(config.ConfigId);
-                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (Equipment.EnumEquipmentSlot)config.Slot);
+                EquipmentFactory.CreateEquipment(marbleComponent, equipmentConfig, config.Level, (Equipment.EnumEquipmentSlot)config.Slot, marbleComponent.GetEquipmentSlotPoint((Equipment.EnumEquipmentSlot)config.Slot));
             }
         }
     }

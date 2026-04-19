@@ -22,11 +22,11 @@ namespace GameLogic.Gameplay.Combat.Equipment
         private void HandleBroken()
         {
             EquipmentOwner.RemoveAllAbilities();
-
-            if(EquipmentOwner.Rigidbody != null)
+            var rigidbodies = EquipmentOwner.GetComponentsInChildren<Rigidbody2D>();
+            foreach (var rigidbody in rigidbodies)
             {
-                EquipmentOwner.Rigidbody.drag = 5f;
-                EquipmentOwner.Rigidbody.angularDrag = 5f;
+                rigidbody.drag = 2f;
+                rigidbody.angularDrag = 2f;
             }
 
             foreach (var collider in EquipmentOwner.GetComponentsInChildren<Collider2D>())

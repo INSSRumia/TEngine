@@ -10,10 +10,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
     {
         private static readonly Dictionary<EnumEquipmentSlot, Quaternion> _slotConnectedAnchorMap = new()
         {
-            { EnumEquipmentSlot.Top, Quaternion.Euler(0, 0, -90) },
+            { EnumEquipmentSlot.Top, Quaternion.Euler(0, 0, 90) },
             { EnumEquipmentSlot.Left, Quaternion.Euler(0, 0, 180) },
             { EnumEquipmentSlot.Right, Quaternion.Euler(0, 0, 0) },
-            { EnumEquipmentSlot.Bottom, Quaternion.Euler(0, 0, 90) },
+            { EnumEquipmentSlot.Bottom, Quaternion.Euler(0, 0, -90) },
             { EnumEquipmentSlot.Middle, Quaternion.identity },
         };
         private List<AnchoredJoint2D> _joints = new List<AnchoredJoint2D>();
@@ -34,7 +34,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return;
 
             var slotPoint = EquipmentOwner.OwnerMarble.GetEquipmentSlotPoint(Slot);
-            EquipmentOwner.transform.SetParent(slotPoint, false);
+            EquipmentOwner.transform.SetParent(slotPoint, true);
             EquipmentOwner.transform.localPosition = Vector3.zero;
             EquipmentOwner.transform.localRotation = Quaternion.identity;
 
@@ -56,9 +56,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 if(joint is AnchoredJoint2D anchorJoint)
                 {
                     _joints.Add(anchorJoint);
-
                     anchorJoint.connectedBody = EquipmentOwner.OwnerMarble.Rigidbody;
-                    anchorJoint.connectedAnchor = _slotConnectedAnchorMap[Slot] * anchorJoint.connectedAnchor;
+                    // anchorJoint.connectedAnchor = _slotConnectedAnchorMap[Slot] * anchorJoint.connectedAnchor;
                 }
             }
         }
