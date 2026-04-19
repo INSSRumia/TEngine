@@ -158,6 +158,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
                         IsBroken = false,
                     };
                 }
+                case SpearLevelConfig:
+                {
+                    return new SpearRuntimeData(config, (SpearLevelConfig)levelConfig)
+                    {
+                        Slot = slot,
+                        IsEquipped = true,
+                        IsBroken = false,
+                    };
+                }
                 case SwordLevelConfig:
                 {
                     return new SwordRuntimeData(config, (SwordLevelConfig)levelConfig)
@@ -182,6 +191,10 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 case BowEquipment bowEquipment:
                     // 弓类型走瞄准 + 发射物链路。
                     AttachBowDefaultAbilities(bowEquipment, levelConfig as BowLevelConfig);
+                    break;
+                case SpearEquipment spearEquipment:
+                    // 长枪类型走近战碰撞链路，并额外持有伸缩关节引用。
+                    AttachSpearDefaultAbilities(spearEquipment, levelConfig as SpearLevelConfig);
                     break;
                 case SwordEquipment swordEquipment:
                     // 剑类型走近战碰撞链路。
@@ -235,6 +248,19 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (config == null)
             {
                 Log.Error("SwordLevelConfig 配置错误");
+                return;
+            }
+
+            AttachEquipmentCoreAbilities(equipment, config);
+            AttachWeaponCoreAbilities(equipment, config);
+            AttachCoreAbility(equipment, new SwordCollisionAttackAbility(config.SwordCollisionAttack));
+        }
+
+        private static void AttachSpearDefaultAbilities(SpearEquipment equipment, SpearLevelConfig config)
+        {
+            if (config == null)
+            {
+                Log.Error("SpearLevelConfig 配置错误");
                 return;
             }
 

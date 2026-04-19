@@ -26,6 +26,7 @@ public abstract partial class WeaponLevelConfig : EquipmentLevelConfig
         switch ((string)_buf["$type"])
         {
             case "SwordLevelConfig": return new Gameplay.Combat.SwordLevelConfig(_buf);
+            case "SpearLevelConfig": return new Gameplay.Combat.SpearLevelConfig(_buf);
             case "BowLevelConfig": return new Gameplay.Combat.BowLevelConfig(_buf);
             default: throw new SerializationException();
         }

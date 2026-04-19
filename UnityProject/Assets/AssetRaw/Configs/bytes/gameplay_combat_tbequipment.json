@@ -168,7 +168,7 @@
     "config_id": "spear",
     "lst_level_config": [
       {
-        "$type": "SwordLevelConfig",
+        "$type": "SpearLevelConfig",
         "level": 0,
         "name": "枪",
         "mount": {

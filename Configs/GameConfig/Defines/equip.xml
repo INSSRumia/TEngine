@@ -32,6 +32,9 @@
     <bean name="SwordLevelConfig" alias="sword" parent="WeaponLevelConfig" valueType="false" sep=",">
         <var name="sword_collision_attack" type="SwordCollisionAttackAbilityConfig" />
     </bean>
+    <bean name="SpearLevelConfig" alias="spear" parent="WeaponLevelConfig" valueType="false" sep=",">
+        <var name="sword_collision_attack" type="SwordCollisionAttackAbilityConfig" />
+    </bean>
     <bean name="BowLevelConfig" alias="bow" parent="WeaponLevelConfig" valueType="false" sep=",">
         <var name="bow_aim" type="BowAimAbilityConfig" />
         <var name="bow_fire" type="BowFireAbilityConfig" />
