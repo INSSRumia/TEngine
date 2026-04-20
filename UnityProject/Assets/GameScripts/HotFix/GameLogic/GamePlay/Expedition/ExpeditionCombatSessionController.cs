@@ -1,0 +1,224 @@
+using System;
+using System.Collections.Generic;
+using GameLogic.Gameplay.Combat;
+using GameLogic.Gameplay.Combat.Marble;
+using TEngine;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
+namespace GameLogic.Gameplay.Expedition
+{
+    public sealed class ExpeditionCombatSessionController : Singleton<ExpeditionCombatSessionController>, IUpdate
+    {
+        private readonly Dictionary<string, Marble> _playerMarbles = new Dictionary<string, Marble>();
+        private readonly List<Marble> _enemyMarbles = new List<Marble>();
+
+        private CombatSessionRequest _currentRequest;
+        private Action<CombatSessionResult> _onCompleted;
+        private CombatManager _combatManager;
+        private GameObject _sessionRoot;
+        private bool _isRunning;
+        private float _runningTime;
+
+        public bool IsRunning => _isRunning;
+
+        public bool StartSession(CombatSessionRequest request, Action<CombatSessionResult> onCompleted)
+        {
+            if (_isRunning || request == null)
+            {
+                return false;
+            }
+
+            ClearSession();
+
+            _currentRequest = request;
+            _onCompleted = onCompleted;
+            _combatManager = new CombatManager();
+            _isRunning = true;
+            _runningTime = 0f;
+
+            _sessionRoot = new GameObject("ExpeditionCombatSessionRoot");
+            SpawnAlliedMarbles(request.AlliedMarbles);
+            SpawnEnemyMarbles(request.EnemyMarbles);
+            Log.Info($"[ExpeditionCombatSessionController] StartSession {request.SessionId} Allies:{_playerMarbles.Count} Enemies:{_enemyMarbles.Count}");
+            return true;
+        }
+
+        public void OnUpdate()
+        {
+            if (!_isRunning || _combatManager == null)
+            {
+                return;
+            }
+
+            _runningTime += Time.deltaTime;
+            if (_runningTime < 0.25f)
+            {
+                return;
+            }
+
+            var activeMarbles = _combatManager.GetAllActiveMarbles();
+            if (activeMarbles == null || activeMarbles.Count == 0)
+            {
+                return;
+            }
+
+            int allyAlive = 0;
+            int enemyAlive = 0;
+            foreach (var marble in activeMarbles)
+            {
+                if (marble?.RuntimeData == null || !marble.RuntimeData.State.IsAlive)
+                {
+                    continue;
+                }
+
+                if (marble.RuntimeData.Camp == ExpeditionConstants.PlayerCamp)
+                {
+                    allyAlive++;
+                }
+                else if (marble.RuntimeData.Camp == ExpeditionConstants.EnemyCamp)
+                {
+                    enemyAlive++;
+                }
+            }
+
+            if (allyAlive <= 0 || enemyAlive <= 0)
+            {
+                CompleteSession(allyAlive > 0 && enemyAlive <= 0);
+            }
+        }
+
+        public void ClearSession()
+        {
+            foreach (var marble in _playerMarbles.Values)
+            {
+                if (marble != null)
+                {
+                    _combatManager?.Unregister(marble);
+                    Object.Destroy(marble.gameObject);
+                }
+            }
+
+            foreach (var marble in _enemyMarbles)
+            {
+                if (marble != null)
+                {
+                    _combatManager?.Unregister(marble);
+                    Object.Destroy(marble.gameObject);
+                }
+            }
+
+            _playerMarbles.Clear();
+            _enemyMarbles.Clear();
+            _currentRequest = null;
+            _onCompleted = null;
+            _combatManager = null;
+            _isRunning = false;
+            _runningTime = 0f;
+
+            if (_sessionRoot != null)
+            {
+                Object.Destroy(_sessionRoot);
+                _sessionRoot = null;
+            }
+        }
+
+        private void CompleteSession(bool isVictory)
+        {
+            var result = BuildSessionResult(isVictory);
+            var callback = _onCompleted;
+            ClearSession();
+            callback?.Invoke(result);
+        }
+
+        private CombatSessionResult BuildSessionResult(bool isVictory)
+        {
+            var result = new CombatSessionResult
+            {
+                IsVictory = isVictory,
+                CrystalReward = isVictory ? _currentRequest.VictoryCrystalReward : 0,
+                Summary = isVictory ? "Combat 胜利，队伍完成了本节点。": "Combat 失败，远征被迫结束。",
+            };
+
+            foreach (var snapshot in _currentRequest.AlliedMarbles)
+            {
+                _playerMarbles.TryGetValue(snapshot.PersistentId, out var marble);
+                var currentHp = marble?.RuntimeData?.State.Hp ?? 0;
+                var maxHp = marble?.RuntimeData?.State.MaxHp ?? snapshot.MaxHp;
+                var isDead = marble?.RuntimeData == null || !marble.RuntimeData.State.IsAlive || currentHp <= 0;
+                result.MarbleResults.Add(new CombatSessionMarbleResult
+                {
+                    PersistentId = snapshot.PersistentId,
+                    ConfigId = snapshot.ConfigId,
+                    RemainingHp = Mathf.Clamp(currentHp, 0, maxHp),
+                    MaxHp = maxHp,
+                    ExpDelta = isVictory && !isDead ? _currentRequest.VictoryExpReward : 0,
+                    IsDead = isDead,
+                });
+            }
+
+            return result;
+        }
+
+        private void SpawnAlliedMarbles(List<MarblePersistentDataSnapshot> snapshots)
+        {
+            if (snapshots == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < snapshots.Count; index++)
+            {
+                var snapshot = snapshots[index];
+                var marble = MarbleFactory.CreateMarble(snapshot.ConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
+                if (marble == null)
+                {
+                    continue;
+                }
+
+                marble.name = snapshot.PersistentId;
+                marble.transform.SetParent(_sessionRoot.transform, false);
+                marble.transform.position = new Vector3(-5f, 0f, GetLineOffset(index, snapshots.Count));
+                marble.RuntimeData.State.Hp = Mathf.Clamp(snapshot.CurrentHp, 1, marble.RuntimeData.State.MaxHp);
+                marble.RuntimeData.State.Exp = snapshot.Exp;
+                _combatManager.Register(marble);
+                _playerMarbles[snapshot.PersistentId] = marble;
+            }
+        }
+
+        private void SpawnEnemyMarbles(List<ExpeditionEnemyMarbleConfig> enemies)
+        {
+            if (enemies == null)
+            {
+                return;
+            }
+
+            for (int index = 0; index < enemies.Count; index++)
+            {
+                var enemy = enemies[index];
+                var marble = MarbleFactory.CreateMarble(enemy.ConfigId, ExpeditionConstants.EnemyCamp, enemy.Level);
+                if (marble == null)
+                {
+                    continue;
+                }
+
+                marble.name = enemy.EnemyId;
+                marble.transform.SetParent(_sessionRoot.transform, false);
+                marble.transform.position = new Vector3(5f, 0f, GetLineOffset(index, enemies.Count));
+                _combatManager.Register(marble);
+                _enemyMarbles.Add(marble);
+            }
+        }
+
+        private static float GetLineOffset(int index, int total)
+        {
+            if (total <= 1)
+            {
+                return 0f;
+            }
+
+            var start = -1.5f * (total - 1);
+            return start + index * 3f;
+        }
+    }
+}

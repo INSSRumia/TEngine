@@ -17,7 +17,7 @@ MonoBehaviour:
   impCodePath: Assets/GameScripts/HotFix/GameLogic/UI
   _namespace: GameLogic
   _widgetName: item
-  CodeStyle: 1
+  CodeStyle: 0
   uiGenTypes:
   - uiTypeName: UIWindow
     isGeneric: 0

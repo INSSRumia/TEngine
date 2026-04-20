@@ -35,9 +35,10 @@ public partial class GameApp
     
     private static void StartGameLogic()
     {
-        // GameEvent.Get<ILoginUI>().ShowLoginUI();
-        // GameModule.UI.ShowUIAsync<BattleMainUI>();
-        GameModule.Scene.LoadScene("Assets/AssetRaw/Scenes/Test");
+        GameModule.Scene.LoadScene("Assets/AssetRaw/Scenes/Test", callBack: scene =>
+        {
+            GameLogic.Gameplay.Expedition.ExpeditionFlowController.Instance.OpenEntryUi();
+        });
     }
     
     private static void Release()

@@ -10,13 +10,15 @@
    - 了解项目约束、热更边界、模块访问方式，以及 AI 工作流要求。
 3. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Combat模块说明.md`
    - 建立 Combat 模块整体结构、数据流、Factory 装配模型和 Runtime 黑板认知。
-4. `Configs/GameConfig/Defines/marble.xml`
+4. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/远征流程设计.md`
+   - 建立最小远征闭环、FSM、Marble 持久化快照、UI 约束和 Combat 边界认知。
+5. `Configs/GameConfig/Defines/marble.xml`
    - 了解 Marble 等级配置、固定骨架能力和扩展能力入口。
-5. `Configs/GameConfig/Defines/equip.xml`
+6. `Configs/GameConfig/Defines/equip.xml`
    - 了解装备层级结构、装备骨架能力和类型差异。
-6. `Configs/GameConfig/Defines/projectile.xml`
+7. `Configs/GameConfig/Defines/projectile.xml`
    - 了解发射物骨架能力、追踪模式和扩展能力入口。
-7. 关键代码入口
+8. 关键代码入口
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/MarbleFactory.cs`
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/EquipmentFactory.cs`
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Projectile/ProjectileFactory.cs`
@@ -28,6 +30,8 @@
   - 热更主业务代码。后续绝大多数玩法改动都在这里完成。
 - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/`
   - 当前战斗系统核心目录，包含 Marble、Equipment、Projectile、Ability、RuntimeData 与工厂装配逻辑。
+- `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/`
+  - 最小远征主流程目录，包含远征运行时数据、FSM、Combat 桥接和最小路线定义。
 - `Configs/GameConfig/Defines/`
   - Luban XML schema 定义。这里描述配置结构、字段语义和生成代码的源头。
 - `Configs/GameConfig/`
@@ -60,18 +64,30 @@
 - Luban XML 里的显式字段通常代表固定骨架能力参数；`lst_ability` 一类列表才是玩法扩展入口。
 - 不要仅凭类名猜系统边界，先看模块文档和 schema 注释，再读具体实现。
 
-## 5. AI 修改时的优先检查点
+## 5. 进入 Expedition 前需要记住的约定
+
+- Expedition 层统一使用 `Combat` 术语，不新建并行的 `Battle` 命名体系。
+- 局外数据使用 `MarblePersistentData`，远征内运行使用 `MarblePersistentDataSnapshot`。
+- 远征只通过 `CombatSessionRequest / CombatSessionResult` 与 Combat 域交互。
+- `ExpeditionNodeRecord` 记录节点实际运行结果，不再用 `Progress` 来描述节点执行记录。
+- UI 必须走 `UIWindow/UIModule` 流程；如果未来要改 Prefab 或 Canvas，优先通过 Unity MCP。
+
+## 6. AI 修改时的优先检查点
 
 - 先确认是改“固定骨架字段”还是“扩展能力列表”。
 - 先确认能力由哪个 Factory 挂载，而不是在能力类里反推来源。
 - 先确认数据应写入 `State`、`Config` 还是 `Frame`，避免把长期状态和逐帧临时值混在一起。
 - 先确认改动是否同时影响 Luban schema、运行时工厂和关键文档。
 
-## 6. 推荐继续深读的文件
+## 7. 推荐继续深读的文件
 
 - 战斗结算链路
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/Ability/Core/MarbleReceiveDamageAbility.cs`
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/Ability/Core/MarbleDamagePipelineAbility.cs`
+- 远征主流程
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionModels.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionFlowController.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionFlowStates.cs`
 - 远程武器链路
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/Ability/Core/WeaponCalculateDamageAbility.cs`
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/Ability/Core/BowFireAbility.cs`
