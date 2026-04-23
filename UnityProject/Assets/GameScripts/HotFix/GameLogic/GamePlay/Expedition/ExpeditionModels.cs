@@ -72,7 +72,7 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionPersistentDataStore
     {
-        public int Crystal;
+        public int Money;
         public List<MarblePersistentData?> Marbles = new List<MarblePersistentData?>();
         public ExpeditionResultSummary LastResult;
 
@@ -83,7 +83,7 @@ namespace GameLogic.Gameplay.Expedition
                 return;
             }
 
-            Crystal = 0;
+            Money = 0;
             Marbles.Add(MarblePersistentData.CreateDefault("marble_player_1", "lancer", "先锋一号", 0));
             Marbles.Add(MarblePersistentData.CreateDefault("marble_player_2", "archer", "先锋二号", 0));
             Marbles.Add(MarblePersistentData.CreateDefault("marble_player_3", "soldier", "先锋三号", 0));
@@ -119,7 +119,7 @@ namespace GameLogic.Gameplay.Expedition
         public EnumExpeditionFlowPhase Phase;
         public EnumExpeditionEndReason EndReason;
         public int CurrentNodeIndex;
-        public int TotalCrystalGained;
+        public int TotalMoneyGained;
         public List<MarblePersistentData?> MarbleSnapshots = new List<MarblePersistentData?>();
         public List<ExpeditionTable.ExpeditionRouteNodeConfig> Route = new List<ExpeditionTable.ExpeditionRouteNodeConfig>();
         public List<ExpeditionNodeRecord> NodeRecords = new List<ExpeditionNodeRecord>();
@@ -175,8 +175,9 @@ namespace GameLogic.Gameplay.Expedition
         public ExpeditionTable.EnumExpeditionNodeType NodeType;
         public EnumExpeditionNodeProcessStatus Status;
         public string ChosenOptionId;
-        public int GainedCrystal;
+        public int GainedMoney;
         public List<string> AppliedBuffIds = new List<string>();
+        public List<string> EffectSummaries = new List<string>();
         public string Summary;
         public CombatSessionResult CombatResult;
     }
@@ -187,7 +188,7 @@ namespace GameLogic.Gameplay.Expedition
         public string ExpeditionId;
         public bool IsVictory;
         public EnumExpeditionEndReason EndReason;
-        public int CrystalDelta;
+        public int MoneyDelta;
         public List<ExpeditionMarbleSummary> MarbleSummaries = new List<ExpeditionMarbleSummary>();
         public List<string> NodeSummaries = new List<string>();
 
@@ -198,7 +199,7 @@ namespace GameLogic.Gameplay.Expedition
                 ? "无参战 Marble 记录"
                 : string.Join("\n", MarbleSummaries.Select(summary => $"- {summary.DisplayName}: HP {summary.CurrentHp}/{summary.MaxHp} EXP {summary.Exp} {(summary.IsDead ? "[阵亡]" : "[存活]")}"));
             var nodeLines = NodeSummaries.Count == 0 ? "无节点记录" : string.Join("\n", NodeSummaries.Select(summary => $"- {summary}"));
-            return $"{status}\n资源变化: +{CrystalDelta} 晶体\n\n队伍状态:\n{marbleLines}\n\n节点记录:\n{nodeLines}";
+            return $"{status}\n资源变化: +{MoneyDelta} 晶体\n\n队伍状态:\n{marbleLines}\n\n节点记录:\n{nodeLines}";
         }
     }
 

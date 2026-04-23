@@ -34,7 +34,7 @@ namespace GameLogic
             var persistentData = controller.PersistentData;
 
             _tmpTittle.text = "远征入口 / 出征准备";
-            _tmpMarbleSummary.text = $"当前晶体: {persistentData.Crystal}\n\n可出征 Marble:\n{BuildMarbleSummary(persistentData)}";
+            _tmpMarbleSummary.text = $"当前晶体: {persistentData.Money}\n\n可出征 Marble:\n{BuildMarbleSummary(persistentData)}";
 
             var resultSummary = controller.GetDisplayableResult();
             _tmpLastResult.text = resultSummary == null

@@ -11,8 +11,6 @@ namespace GameLogic.Gameplay.Expedition
         public string NodeId;
         public string CombatId;
         public string Title;
-        public int VictoryCrystalReward;
-        public int VictoryExpReward;
         public List<string> ActiveBuffIds = new List<string>();
         public List<MarblePersistentData?> AlliedMarbles = new List<MarblePersistentData?>();
         public List<ExpeditionTable.ExpeditionEnemyMarbleConfig> EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>();
@@ -22,10 +20,7 @@ namespace GameLogic.Gameplay.Expedition
     public sealed class CombatSessionResult
     {
         public bool IsVictory;
-        public int CrystalReward;
         public string Summary;
         public List<MarblePersistentData?> MarbleResults = new List<MarblePersistentData?>();
     }
-
-
 }

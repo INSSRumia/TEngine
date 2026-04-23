@@ -19,18 +19,27 @@
         <var name="route" type="list, ExpeditionRouteNodeConfig" />
     </bean>
 
-    <bean name="ExpeditionEventEffectConfig" valueType="false" sep=",">
-        <var name="crystal_delta" type="int" />
-        <var name="exp_delta" type="int" />
-        <var name="hp_delta" type="int" />
+    <bean name="ExpeditionEffectConfig" valueType="false" sep=",">
         <var name="summary" type="string" />
+    </bean>
+
+    <bean name="AddMoneyEffectConfig" alias="add_money" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="money_delta" type="int" />
+    </bean>
+
+    <bean name="AddPlayerMarbleExpEffectConfig" alias="add_player_marble_exp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="exp_delta" type="int" />
+    </bean>
+
+    <bean name="AddPlayerMarbleHpEffectConfig" alias="add_player_marble_hp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="hp_delta" type="int" />
     </bean>
 
     <bean name="ExpeditionEventOptionConfig" valueType="false" sep=",">
         <var name="option_id" type="string" />
         <var name="title" type="string" />
         <var name="description" type="string" />
-        <var name="effect" type="ExpeditionEventEffectConfig" />
+        <var name="lst_effect" type="list, ExpeditionEffectConfig" />
     </bean>
 
     <bean name="ExpeditionEventConfig" valueType="false" sep=",">
@@ -51,8 +60,8 @@
         <var name="combat_encounter_id" type="string" />
         <var name="title" type="string" />
         <var name="description" type="string" />
-        <var name="victory_crystal_reward" type="int" />
-        <var name="victory_exp_reward" type="int" />
+        <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
+        <var name="lst_defeat_effect" type="list, ExpeditionEffectConfig" />
         <var name="enemy_marbles" type="list, ExpeditionEnemyMarbleConfig" />
     </bean>
 

@@ -137,8 +137,7 @@ namespace GameLogic.Gameplay.Expedition
             var result = new CombatSessionResult
             {
                 IsVictory = isVictory,
-                CrystalReward = isVictory ? _currentRequest.VictoryCrystalReward : 0,
-                Summary = isVictory ? "Combat 胜利，队伍完成了本节点。": "Combat 失败，远征被迫结束。",
+                Summary = isVictory ? "Combat 胜利，队伍完成了本节点。" : "Combat 失败，远征被迫结束。",
             };
 
             for (int i = 0; i < _currentRequest.AlliedMarbles.Count; i++)

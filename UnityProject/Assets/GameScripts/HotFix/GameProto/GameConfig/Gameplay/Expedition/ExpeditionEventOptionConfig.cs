@@ -20,7 +20,7 @@ public sealed partial class ExpeditionEventOptionConfig : Luban.BeanBase
         { if(!_buf["option_id"].IsString) { throw new SerializationException(); }  OptionId = _buf["option_id"]; }
         { if(!_buf["title"].IsString) { throw new SerializationException(); }  Title = _buf["title"]; }
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
-        { if(!_buf["effect"].IsObject) { throw new SerializationException(); }  Effect = global::GameConfig.Gameplay.Expedition.ExpeditionEventEffectConfig.DeserializeExpeditionEventEffectConfig(_buf["effect"]);  }
+        { var __json0 = _buf["lst_effect"]; if(!__json0.IsArray) { throw new SerializationException(); } LstEffect = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEffectConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEffectConfig.DeserializeExpeditionEffectConfig(__e0);  }  LstEffect.Add(__v0); }   }
     }
 
     public static ExpeditionEventOptionConfig DeserializeExpeditionEventOptionConfig(JSONNode _buf)
@@ -31,14 +31,14 @@ public sealed partial class ExpeditionEventOptionConfig : Luban.BeanBase
     public readonly string OptionId;
     public readonly string Title;
     public readonly string Description;
-    public readonly Gameplay.Expedition.ExpeditionEventEffectConfig Effect;
+    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig> LstEffect;
    
     public const int __ID__ = 888480267;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)
     {
-        Effect?.ResolveRef(tables);
+        foreach (var _e in LstEffect) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
@@ -47,7 +47,7 @@ public sealed partial class ExpeditionEventOptionConfig : Luban.BeanBase
         + "optionId:" + OptionId + ","
         + "title:" + Title + ","
         + "description:" + Description + ","
-        + "effect:" + Effect + ","
+        + "lstEffect:" + Luban.StringUtil.CollectionToString(LstEffect) + ","
         + "}";
     }
 }

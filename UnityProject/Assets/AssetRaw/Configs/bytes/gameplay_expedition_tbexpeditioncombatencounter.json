@@ -3,8 +3,20 @@
     "combat_encounter_id": "前哨遭遇战",
     "title": "前哨遭遇战",
     "description": "敌方巡逻 Marble 正在封锁出口，击败它们即可带走补给。",
-    "victory_crystal_reward": 120,
-    "victory_exp_reward": 15,
+    "lst_victory_effect": [
+      {
+        "$type": "AddMoneyEffectConfig",
+        "summary": "获得120晶体",
+        "money_delta": 120
+      }
+    ],
+    "lst_defeat_effect": [
+      {
+        "$type": "AddPlayerMarbleExpEffectConfig",
+        "summary": "全队获得 15 经验",
+        "exp_delta": 15
+      }
+    ],
     "enemy_marbles": [
       {
         "enemy_id": "1",

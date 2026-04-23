@@ -223,8 +223,6 @@ namespace GameLogic.Gameplay.Expedition
                 NodeId = "combat_debug_node",
                 CombatId = encounter.CombatEncounterId,
                 Title = encounter.Title,
-                VictoryCrystalReward = encounter.VictoryCrystalReward,
-                VictoryExpReward = encounter.VictoryExpReward,
                 AlliedMarbles = new List<MarblePersistentData?>(_persistentData.Marbles),
                 EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
             };
@@ -248,8 +246,6 @@ namespace GameLogic.Gameplay.Expedition
                 NodeId = node.NodeId,
                 CombatId = combatConfig.CombatEncounterId,
                 Title = combatConfig.Title,
-                VictoryCrystalReward = combatConfig.VictoryCrystalReward,
-                VictoryExpReward = combatConfig.VictoryExpReward,
                 AlliedMarbles = new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
                 EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),
             };
@@ -288,7 +284,7 @@ namespace GameLogic.Gameplay.Expedition
                 _persistentData.SetMarble(snapshot);
             }
 
-            _persistentData.Crystal += CurrentRun.TotalCrystalGained;
+            _persistentData.Money += CurrentRun.TotalMoneyGained;
             CurrentRun.ResultSummary = BuildResultSummary(CurrentRun);
             _persistentData.LastResult = CurrentRun.ResultSummary;
         }
@@ -302,10 +298,12 @@ namespace GameLogic.Gameplay.Expedition
                 return;
             }
 
-            ApplyEventEffect(CurrentRun, option.Effect);
+            var context = new ExpeditionEffectExecutionContext(CurrentRun, _persistentData, record);
+            ExpeditionEffectFactory.ExecuteEffects(option.LstEffect, context);
             record.ChosenOptionId = option.OptionId;
-            record.GainedCrystal = option.Effect?.CrystalDelta ?? 0;
-            record.Summary = option.Effect?.Summary;
+            record.GainedMoney = context.AppliedMoneyDelta;
+            record.EffectSummaries = context.SummaryLines.ToList();
+            record.Summary = JoinSummaryLines(record.EffectSummaries);
         }
 
         private void ApplyCombatNodeResult(ExpeditionNodeRecord record)
@@ -317,9 +315,6 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             record.CombatResult = result;
-            record.GainedCrystal = result.CrystalReward;
-            record.Summary = result.Summary;
-            CurrentRun.TotalCrystalGained += result.CrystalReward;
 
             for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
             {
@@ -338,33 +333,24 @@ namespace GameLogic.Gameplay.Expedition
                 CurrentRun.MarbleSnapshots[i] = marbleResult;
             }
 
+            var node = GetCurrentNode();
+            var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
+            var effectConfigs = result.IsVictory ? combatConfig?.LstVictoryEffect : combatConfig?.LstDefeatEffect;
+            var context = new ExpeditionEffectExecutionContext(CurrentRun, _persistentData, record);
+            ExpeditionEffectFactory.ExecuteEffects(effectConfigs, context);
+            record.GainedMoney = context.AppliedMoneyDelta;
+            record.EffectSummaries = context.SummaryLines.ToList();
+            record.Summary = JoinSummaryLines(new[] { result.Summary }.Concat(record.EffectSummaries));
+
             if (!result.IsVictory)
             {
                 CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
             }
         }
 
-        private static void ApplyEventEffect(ExpeditionRunState runState, ExpeditionTable.ExpeditionEventEffectConfig effect)
+        private static string JoinSummaryLines(IEnumerable<string> summaries)
         {
-            if (runState == null || effect == null)
-            {
-                return;
-            }
-
-            runState.TotalCrystalGained += effect.CrystalDelta;
-            for (int i = 0; i < runState.MarbleSnapshots.Count; i++)
-            {
-                if (!runState.MarbleSnapshots[i].HasValue)
-                {
-                    continue;
-                }
-
-                var snapshot = runState.MarbleSnapshots[i].Value;
-                snapshot.Exp += effect.ExpDelta;
-                snapshot.CurrentHp = UnityEngine.Mathf.Clamp(snapshot.CurrentHp + effect.HpDelta, 0, snapshot.MaxHp);
-                snapshot.IsDead = snapshot.CurrentHp <= 0;
-                runState.MarbleSnapshots[i] = snapshot;
-            }
+            return string.Join("\n", summaries.Where(summary => !string.IsNullOrWhiteSpace(summary)));
         }
 
         private ExpeditionResultSummary BuildResultSummary(ExpeditionRunState runState)
@@ -374,7 +360,7 @@ namespace GameLogic.Gameplay.Expedition
                 ExpeditionId = runState.ExpeditionId,
                 IsVictory = runState.EndReason == EnumExpeditionEndReason.Victory,
                 EndReason = runState.EndReason,
-                CrystalDelta = runState.TotalCrystalGained,
+                MoneyDelta = runState.TotalMoneyGained,
                 MarbleSummaries = runState.MarbleSnapshots.Where(snapshot => snapshot.HasValue).Select(snapshot => new ExpeditionMarbleSummary
                 {
                     PersistentId = snapshot.Value.PersistentId,

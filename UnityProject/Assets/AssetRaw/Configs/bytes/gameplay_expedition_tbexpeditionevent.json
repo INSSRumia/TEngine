@@ -8,23 +8,30 @@
         "option_id": "1",
         "title": "拆解补给箱",
         "description": "快速拆解出可回收晶体，但搬运时会造成碰撞损伤。",
-        "effect": {
-          "crystal_delta": 60,
-          "exp_delta": 0,
-          "hp_delta": -8,
-          "summary": "拆解补给箱，获得 60 晶体，全队失去 8 点生命。"
-        }
+        "lst_effect": [
+          {
+            "$type": "AddMoneyEffectConfig",
+            "summary": "获得 60 晶体。",
+            "money_delta": 60
+          },
+          {
+            "$type": "AddPlayerMarbleHpEffectConfig",
+            "summary": "全队失去 8 点生命",
+            "hp_delta": -8
+          }
+        ]
       },
       {
         "option_id": "2",
         "title": "整理战术笔记",
         "description": "没有额外晶体，但每名 Marble 都能获得战前经验。",
-        "effect": {
-          "crystal_delta": 0,
-          "exp_delta": 12,
-          "hp_delta": 0,
-          "summary": "整理战术笔记，全队获得 12 点经验。"
-        }
+        "lst_effect": [
+          {
+            "$type": "AddPlayerMarbleExpEffectConfig",
+            "summary": "全队获得 12 点经验。",
+            "exp_delta": 12
+          }
+        ]
       }
     ]
   }
