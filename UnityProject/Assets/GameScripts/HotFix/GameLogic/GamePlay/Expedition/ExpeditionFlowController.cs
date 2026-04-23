@@ -112,7 +112,7 @@ namespace GameLogic.Gameplay.Expedition
 
         #region FSM/节点推进
 
-        internal void SetPhase(EnumExpeditionFlowPhase phase)
+        public void SetPhase(EnumExpeditionFlowPhase phase)
         {
             if (CurrentRun != null)
             {
@@ -120,22 +120,22 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        internal bool HasPendingEventChoice()
+        public bool HasPendingEventChoice()
         {
             return CurrentRun != null && !string.IsNullOrEmpty(CurrentRun.PendingEventOptionId);
         }
 
-        internal bool HasPendingCombatResult()
+        public bool HasPendingCombatResult()
         {
             return CurrentRun?.PendingCombatResult != null;
         }
 
-        internal ExpeditionNodeConfig GetCurrentNode()
+        public ExpeditionNodeConfig GetCurrentNode()
         {
             return CurrentRun?.GetCurrentNode();
         }
 
-        internal ExpeditionNodeRecord EnterCurrentNode()
+        public ExpeditionNodeRecord EnterCurrentNode()
         {
             var record = CurrentRun?.GetCurrentRecord();
             if (record != null)
@@ -146,7 +146,7 @@ namespace GameLogic.Gameplay.Expedition
             return record;
         }
 
-        internal void ApplyCurrentNodeResult()
+        public void ApplyCurrentNodeResult()
         {
             var node = GetCurrentNode();
             var record = CurrentRun?.GetCurrentRecord();
@@ -184,7 +184,7 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        internal bool ShouldEnterSettlement()
+        public bool ShouldEnterSettlement()
         {
             return CurrentRun == null
                    || CurrentRun.EndReason != EnumExpeditionEndReason.None
@@ -210,7 +210,7 @@ namespace GameLogic.Gameplay.Expedition
                 Title = "Combat 调试后门",
                 VictoryCrystalReward = 0,
                 VictoryExpReward = 0,
-                AlliedMarbles = _persistentData.Marbles.Select(item => item.CreateSnapshot()).ToList(),
+                AlliedMarbles = new List<MarblePersistentData?>(_persistentData.Marbles),
                 EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>
                 {
                     new ExpeditionEnemyMarbleConfig
@@ -234,7 +234,7 @@ namespace GameLogic.Gameplay.Expedition
             return ExpeditionCombatSessionController.Instance.StartSession(request, OnDebugCombatCompleted);
         }
 
-        internal CombatSessionRequest BuildCombatSessionRequest()
+        public CombatSessionRequest BuildCombatSessionRequest()
         {
             var node = GetCurrentNode();
             var combatConfig = node?.CombatConfig;
@@ -251,17 +251,7 @@ namespace GameLogic.Gameplay.Expedition
                 Title = combatConfig.Title,
                 VictoryCrystalReward = combatConfig.VictoryCrystalReward,
                 VictoryExpReward = combatConfig.VictoryExpReward,
-                AlliedMarbles = CurrentRun.MarbleSnapshots.Select(snapshot => new MarblePersistentDataSnapshot
-                {
-                    PersistentId = snapshot.PersistentId,
-                    ConfigId = snapshot.ConfigId,
-                    DisplayName = snapshot.DisplayName,
-                    Level = snapshot.Level,
-                    CurrentHp = snapshot.CurrentHp,
-                    MaxHp = snapshot.MaxHp,
-                    Exp = snapshot.Exp,
-                    IsDead = snapshot.IsDead,
-                }).ToList(),
+                AlliedMarbles =  new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
                 EnemyMarbles = combatConfig.EnemyMarbles.Select(enemy => new ExpeditionEnemyMarbleConfig
                 {
                     EnemyId = enemy.EnemyId,
@@ -272,7 +262,7 @@ namespace GameLogic.Gameplay.Expedition
             };
         }
 
-        internal bool StartCurrentCombatSession()
+        public bool StartCurrentCombatSession()
         {
             var request = BuildCombatSessionRequest();
             if (request == null)
@@ -287,17 +277,22 @@ namespace GameLogic.Gameplay.Expedition
 
         #region 结果应用与结算
 
-        internal void SettleCurrentRun()
+        public void SettleCurrentRun()
         {
             if (CurrentRun == null)
             {
                 return;
             }
 
-            foreach (var snapshot in CurrentRun.MarbleSnapshots)
+            for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
             {
+                if(!CurrentRun.MarbleSnapshots[i].HasValue)
+                    continue;
+
+                var snapshot = CurrentRun.MarbleSnapshots[i].Value;
                 var persistentData = _persistentData.GetMarble(snapshot.PersistentId);
-                snapshot.ApplyPersistentWriteback(persistentData);
+
+                CurrentRun.MarbleSnapshots[i] = persistentData;
             }
 
             _persistentData.Crystal += CurrentRun.TotalCrystalGained;
@@ -332,19 +327,17 @@ namespace GameLogic.Gameplay.Expedition
             record.Summary = result.Summary;
             CurrentRun.TotalCrystalGained += result.CrystalReward;
 
-            foreach (var marbleResult in result.MarbleResults)
+            for(int i = 0; i < CurrentRun.MarbleSnapshots.Count; i ++)
             {
-                var snapshot = CurrentRun.MarbleSnapshots.Find(item => item.PersistentId == marbleResult.PersistentId);
-                if (snapshot == null)
+                var snapshot = CurrentRun.MarbleSnapshots[i];
+                var marbleResult = result.MarbleResults.Find(item => item.HasValue && item.Value.PersistentId == snapshot.Value.PersistentId);
+                if (!marbleResult.HasValue)
                 {
                     continue;
                 }
-
-                snapshot.CurrentHp = marbleResult.RemainingHp;
-                snapshot.MaxHp = marbleResult.MaxHp;
-                snapshot.Exp += marbleResult.ExpDelta;
-                snapshot.IsDead = marbleResult.IsDead;
+                CurrentRun.MarbleSnapshots[i] = marbleResult;
             }
+
 
             if (!result.IsVictory)
             {
@@ -360,14 +353,14 @@ namespace GameLogic.Gameplay.Expedition
                 IsVictory = runState.EndReason == EnumExpeditionEndReason.Victory,
                 EndReason = runState.EndReason,
                 CrystalDelta = runState.TotalCrystalGained,
-                MarbleSummaries = runState.MarbleSnapshots.Select(snapshot => new ExpeditionMarbleSummary
+                MarbleSummaries = runState.MarbleSnapshots.Where(snapshot => snapshot.HasValue).Select(snapshot => new ExpeditionMarbleSummary
                 {
-                    PersistentId = snapshot.PersistentId,
-                    DisplayName = snapshot.DisplayName,
-                    CurrentHp = snapshot.CurrentHp,
-                    MaxHp = snapshot.MaxHp,
-                    Exp = snapshot.Exp,
-                    IsDead = snapshot.IsDead,
+                    PersistentId = snapshot.Value.PersistentId,
+                    DisplayName = snapshot.Value.DisplayName,
+                    CurrentHp = snapshot.Value.CurrentHp,
+                    MaxHp = snapshot.Value.MaxHp,
+                    Exp = snapshot.Value.Exp,
+                    IsDead = snapshot.Value.IsDead,
                 }).ToList(),
                 NodeSummaries = runState.NodeRecords
                     .Where(record => !string.IsNullOrEmpty(record.Summary))

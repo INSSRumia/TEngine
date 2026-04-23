@@ -48,7 +48,7 @@ namespace GameLogic.Gameplay.Expedition
     }
 
     [Serializable]
-    public sealed class MarblePersistentData
+    public partial struct MarblePersistentData
     {
         public string PersistentId;
         public string ConfigId;
@@ -58,21 +58,6 @@ namespace GameLogic.Gameplay.Expedition
         public int MaxHp;
         public int Exp;
         public bool IsDead;
-
-        public MarblePersistentDataSnapshot CreateSnapshot()
-        {
-            return new MarblePersistentDataSnapshot
-            {
-                PersistentId = PersistentId,
-                ConfigId = ConfigId,
-                DisplayName = DisplayName,
-                Level = Level,
-                CurrentHp = CurrentHp,
-                MaxHp = MaxHp,
-                Exp = Exp,
-                IsDead = IsDead,
-            };
-        }
 
         public static MarblePersistentData CreateDefault(string persistentId, string configId, string displayName, int level)
         {
@@ -92,37 +77,10 @@ namespace GameLogic.Gameplay.Expedition
     }
 
     [Serializable]
-    public sealed class MarblePersistentDataSnapshot
-    {
-        public string PersistentId;
-        public string ConfigId;
-        public string DisplayName;
-        public int Level;
-        public int CurrentHp;
-        public int MaxHp;
-        public int Exp;
-        public bool IsDead;
-
-        public void ApplyPersistentWriteback(MarblePersistentData persistentData)
-        {
-            if (persistentData == null)
-            {
-                return;
-            }
-
-            persistentData.Level = Level;
-            persistentData.CurrentHp = Mathf.Clamp(CurrentHp, 0, MaxHp);
-            persistentData.MaxHp = MaxHp;
-            persistentData.Exp = Exp;
-            persistentData.IsDead = IsDead || persistentData.CurrentHp <= 0;
-        }
-    }
-
-    [Serializable]
     public sealed class ExpeditionPersistentDataStore
     {
         public int Crystal;
-        public List<MarblePersistentData> Marbles = new List<MarblePersistentData>();
+        public List<MarblePersistentData?> Marbles = new List<MarblePersistentData?>();
         public ExpeditionResultSummary LastResult;
 
         public void EnsureInitialized()
@@ -138,9 +96,9 @@ namespace GameLogic.Gameplay.Expedition
             Marbles.Add(MarblePersistentData.CreateDefault("marble_player_3", "soldier", "先锋三号", 0));
         }
 
-        public MarblePersistentData GetMarble(string persistentId)
+        public MarblePersistentData? GetMarble(string persistentId)
         {
-            return Marbles.Find(marble => marble.PersistentId == persistentId);
+            return Marbles.Find(marble => marble.HasValue && marble.Value.PersistentId == persistentId);
         }
     }
 
@@ -153,7 +111,7 @@ namespace GameLogic.Gameplay.Expedition
         public EnumExpeditionEndReason EndReason;
         public int CurrentNodeIndex;
         public int TotalCrystalGained;
-        public List<MarblePersistentDataSnapshot> MarbleSnapshots = new List<MarblePersistentDataSnapshot>();
+        public List<MarblePersistentData?> MarbleSnapshots = new List<MarblePersistentData?>();
         public List<ExpeditionNodeConfig> Route = new List<ExpeditionNodeConfig>();
         public List<ExpeditionNodeRecord> NodeRecords = new List<ExpeditionNodeRecord>();
         public string PendingEventOptionId;
@@ -197,7 +155,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public bool AreAllPlayerMarblesDead()
         {
-            return MarbleSnapshots.All(snapshot => snapshot.IsDead || snapshot.CurrentHp <= 0);
+            return MarbleSnapshots.All(snapshot => snapshot.HasValue && (snapshot.Value.IsDead || snapshot.Value.CurrentHp <= 0));
         }
     }
 
@@ -262,11 +220,17 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             runState.TotalCrystalGained += CrystalDelta;
-            foreach (var snapshot in runState.MarbleSnapshots)
+            for (int i = 0; i < runState.MarbleSnapshots.Count; i++)
             {
+                if(!runState.MarbleSnapshots[i].HasValue)
+                    continue;
+
+                var snapshot = runState.MarbleSnapshots[i].Value;
                 snapshot.Exp += ExpDelta;
                 snapshot.CurrentHp = Mathf.Clamp(snapshot.CurrentHp + HpDelta, 0, snapshot.MaxHp);
                 snapshot.IsDead = snapshot.CurrentHp <= 0;
+
+                runState.MarbleSnapshots[i] = snapshot;
             }
         }
     }
@@ -325,7 +289,7 @@ namespace GameLogic.Gameplay.Expedition
 
     public static class ExpeditionStaticRouteFactory
     {
-        public static ExpeditionRunState CreateMinimalRun(IEnumerable<MarblePersistentData> marbles)
+        public static ExpeditionRunState CreateMinimalRun(IEnumerable<MarblePersistentData?> marbles)
         {
             return new ExpeditionRunState
             {
@@ -335,8 +299,7 @@ namespace GameLogic.Gameplay.Expedition
                 EndReason = EnumExpeditionEndReason.None,
                 CurrentNodeIndex = 0,
                 MarbleSnapshots = marbles
-                    .Where(marble => marble != null && !marble.IsDead)
-                    .Select(marble => marble.CreateSnapshot())
+                    .Where(marble => marble.HasValue && !marble.Value.IsDead)
                     .ToList(),
                 Route = CreateMinimalRoute(),
             };

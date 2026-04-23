@@ -140,27 +140,33 @@ namespace GameLogic.Gameplay.Expedition
                 Summary = isVictory ? "Combat 胜利，队伍完成了本节点。": "Combat 失败，远征被迫结束。",
             };
 
-            foreach (var snapshot in _currentRequest.AlliedMarbles)
+            for (int i = 0; i < _currentRequest.AlliedMarbles.Count; i++)
             {
+                if(!_currentRequest.AlliedMarbles[i].HasValue)
+                    continue;
+
+                var snapshot = _currentRequest.AlliedMarbles[i].Value;
                 _playerMarbles.TryGetValue(snapshot.PersistentId, out var marble);
-                var currentHp = marble?.RuntimeData?.State.Hp ?? 0;
-                var maxHp = marble?.RuntimeData?.State.MaxHp ?? snapshot.MaxHp;
-                var isDead = marble?.RuntimeData == null || !marble.RuntimeData.State.IsAlive || currentHp <= 0;
-                result.MarbleResults.Add(new CombatSessionMarbleResult
-                {
-                    PersistentId = snapshot.PersistentId,
-                    ConfigId = snapshot.ConfigId,
-                    RemainingHp = Mathf.Clamp(currentHp, 0, maxHp),
-                    MaxHp = maxHp,
-                    ExpDelta = isVictory && !isDead ? _currentRequest.VictoryExpReward : 0,
-                    IsDead = isDead,
-                });
+                if(marble == null || marble.RuntimeData == null)
+                    continue;
+
+                var currentHp = marble.RuntimeData.State.Hp;
+                var maxHp = marble.RuntimeData.State.MaxHp;
+                var isDead = !marble.RuntimeData.State.IsAlive || currentHp <= 0;
+
+                snapshot.CurrentHp = marble.RuntimeData.State.Hp;
+                snapshot.MaxHp = marble.RuntimeData.State.MaxHp;
+                snapshot.Exp = marble.RuntimeData.State.Exp;
+                snapshot.Level = marble.RuntimeData.Level;
+                snapshot.IsDead = marble.RuntimeData.State.IsAlive;
+
+                result.MarbleResults.Add(snapshot);
             }
 
             return result;
         }
 
-        private void SpawnAlliedMarbles(List<MarblePersistentDataSnapshot> snapshots)
+        private void SpawnAlliedMarbles(List<MarblePersistentData?> snapshots)
         {
             if (snapshots == null)
             {
@@ -169,7 +175,10 @@ namespace GameLogic.Gameplay.Expedition
 
             for (int index = 0; index < snapshots.Count; index++)
             {
-                var snapshot = snapshots[index];
+                if(!snapshots[index].HasValue)
+                    continue;
+
+                var snapshot = snapshots[index].Value;
                 var marble = MarbleFactory.CreateMarble(snapshot.ConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
                 if (marble == null)
                 {
