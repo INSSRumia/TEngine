@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TEngine;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -42,10 +43,16 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             _persistentData.EnsureInitialized();
-            GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
             DestroyFsmIfNeeded();
 
-            CurrentRun = ExpeditionStaticRouteFactory.CreateMinimalRun(_persistentData.Marbles);
+            CurrentRun = ExpeditionConfigBridge.CreateConfiguredRun(_persistentData.Marbles, ExpeditionConstants.MinimalExpeditionId);
+            if (CurrentRun == null)
+            {
+                Log.Warning("[ExpeditionFlowController] StartMinimalExpedition aborted because expedition config could not be resolved.");
+                return false;
+            }
+
+            GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
             Fsm = GameModule.Fsm.CreateFsm(FsmName, this,
                 new ExpeditionFlowStatePrepare(),
                 new ExpeditionFlowStateEnterNode(),
@@ -62,9 +69,10 @@ namespace GameLogic.Gameplay.Expedition
 
         #region UI 交互输入
 
-        public ExpeditionEventNodeConfig GetCurrentEventNode()
+        public ExpeditionTable.ExpeditionEventConfig GetCurrentEventNode()
         {
-            return CurrentRun?.GetCurrentNode()?.EventConfig;
+            var node = CurrentRun?.GetCurrentNode();
+            return node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
         }
 
         public ExpeditionResultSummary GetDisplayableResult()
@@ -80,7 +88,7 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             var eventNode = GetCurrentEventNode();
-            if (eventNode?.GetOption(optionId) == null)
+            if (!eventNode?.Options?.Any(option => option != null && option.OptionId == optionId) ?? true)
             {
                 return;
             }
@@ -130,7 +138,7 @@ namespace GameLogic.Gameplay.Expedition
             return CurrentRun?.PendingCombatResult != null;
         }
 
-        public ExpeditionNodeConfig GetCurrentNode()
+        public ExpeditionTable.ExpeditionRouteNodeConfig GetCurrentNode()
         {
             return CurrentRun?.GetCurrentNode();
         }
@@ -157,10 +165,10 @@ namespace GameLogic.Gameplay.Expedition
 
             switch (node.NodeType)
             {
-                case EnumExpeditionNodeType.Event:
+                case ExpeditionTable.EnumExpeditionNodeType.Event:
                     ApplyEventNodeResult(node, record);
                     break;
-                case EnumExpeditionNodeType.Combat:
+                case ExpeditionTable.EnumExpeditionNodeType.Combat:
                     ApplyCombatNodeResult(record);
                     break;
             }
@@ -202,32 +210,23 @@ namespace GameLogic.Gameplay.Expedition
                 return false;
             }
 
+            var encounter = ExpeditionConfigBridge.ResolveDebugCombatEncounter(ExpeditionConstants.MinimalExpeditionId);
+            if (encounter == null)
+            {
+                Log.Warning("[ExpeditionFlowController] StartCombatDebug aborted because no combat encounter config was found.");
+                return false;
+            }
+
             var request = new CombatSessionRequest
             {
                 SessionId = "combat_debug_session",
                 NodeId = "combat_debug_node",
-                CombatId = "combat_debug",
-                Title = "Combat 调试后门",
-                VictoryCrystalReward = 0,
-                VictoryExpReward = 0,
+                CombatId = encounter.CombatEncounterId,
+                Title = encounter.Title,
+                VictoryCrystalReward = encounter.VictoryCrystalReward,
+                VictoryExpReward = encounter.VictoryExpReward,
                 AlliedMarbles = new List<MarblePersistentData?>(_persistentData.Marbles),
-                EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>
-                {
-                    new ExpeditionEnemyMarbleConfig
-                    {
-                        EnemyId = "debug_enemy_1",
-                        ConfigId = "Marble_001",
-                        DisplayName = "调试敌方一号",
-                        Level = 0,
-                    },
-                    new ExpeditionEnemyMarbleConfig
-                    {
-                        EnemyId = "debug_enemy_2",
-                        ConfigId = "Marble_001",
-                        DisplayName = "调试敌方二号",
-                        Level = 0,
-                    }
-                }
+                EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
             };
 
             GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
@@ -237,7 +236,7 @@ namespace GameLogic.Gameplay.Expedition
         public CombatSessionRequest BuildCombatSessionRequest()
         {
             var node = GetCurrentNode();
-            var combatConfig = node?.CombatConfig;
+            var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
             if (combatConfig == null || CurrentRun == null)
             {
                 return null;
@@ -245,20 +244,14 @@ namespace GameLogic.Gameplay.Expedition
 
             return new CombatSessionRequest
             {
-                SessionId = $"{CurrentRun.RunId}_{combatConfig.CombatId}",
+                SessionId = $"{CurrentRun.RunId}_{combatConfig.CombatEncounterId}",
                 NodeId = node.NodeId,
-                CombatId = combatConfig.CombatId,
+                CombatId = combatConfig.CombatEncounterId,
                 Title = combatConfig.Title,
                 VictoryCrystalReward = combatConfig.VictoryCrystalReward,
                 VictoryExpReward = combatConfig.VictoryExpReward,
-                AlliedMarbles =  new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
-                EnemyMarbles = combatConfig.EnemyMarbles.Select(enemy => new ExpeditionEnemyMarbleConfig
-                {
-                    EnemyId = enemy.EnemyId,
-                    ConfigId = enemy.ConfigId,
-                    DisplayName = enemy.DisplayName,
-                    Level = enemy.Level,
-                }).ToList(),
+                AlliedMarbles = new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
+                EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),
             };
         }
 
@@ -286,8 +279,10 @@ namespace GameLogic.Gameplay.Expedition
 
             for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
             {
-                if(!CurrentRun.MarbleSnapshots[i].HasValue)
+                if (!CurrentRun.MarbleSnapshots[i].HasValue)
+                {
                     continue;
+                }
 
                 var snapshot = CurrentRun.MarbleSnapshots[i].Value;
                 _persistentData.SetMarble(snapshot);
@@ -298,18 +293,19 @@ namespace GameLogic.Gameplay.Expedition
             _persistentData.LastResult = CurrentRun.ResultSummary;
         }
 
-        private void ApplyEventNodeResult(ExpeditionNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyEventNodeResult(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
-            var option = node.EventConfig?.GetOption(CurrentRun.PendingEventOptionId);
+            var eventConfig = node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
+            var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
             if (option == null)
             {
                 return;
             }
 
-            option.Effect.Apply(CurrentRun);
+            ApplyEventEffect(CurrentRun, option.Effect);
             record.ChosenOptionId = option.OptionId;
-            record.GainedCrystal = option.Effect.CrystalDelta;
-            record.Summary = option.Effect.Summary;
+            record.GainedCrystal = option.Effect?.CrystalDelta ?? 0;
+            record.Summary = option.Effect?.Summary;
         }
 
         private void ApplyCombatNodeResult(ExpeditionNodeRecord record)
@@ -325,21 +321,49 @@ namespace GameLogic.Gameplay.Expedition
             record.Summary = result.Summary;
             CurrentRun.TotalCrystalGained += result.CrystalReward;
 
-            for(int i = 0; i < CurrentRun.MarbleSnapshots.Count; i ++)
+            for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
             {
                 var snapshot = CurrentRun.MarbleSnapshots[i];
+                if (!snapshot.HasValue)
+                {
+                    continue;
+                }
+
                 var marbleResult = result.MarbleResults.Find(item => item.HasValue && item.Value.PersistentId == snapshot.Value.PersistentId);
                 if (!marbleResult.HasValue)
                 {
                     continue;
                 }
+
                 CurrentRun.MarbleSnapshots[i] = marbleResult;
             }
-
 
             if (!result.IsVictory)
             {
                 CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
+            }
+        }
+
+        private static void ApplyEventEffect(ExpeditionRunState runState, ExpeditionTable.ExpeditionEventEffectConfig effect)
+        {
+            if (runState == null || effect == null)
+            {
+                return;
+            }
+
+            runState.TotalCrystalGained += effect.CrystalDelta;
+            for (int i = 0; i < runState.MarbleSnapshots.Count; i++)
+            {
+                if (!runState.MarbleSnapshots[i].HasValue)
+                {
+                    continue;
+                }
+
+                var snapshot = runState.MarbleSnapshots[i].Value;
+                snapshot.Exp += effect.ExpDelta;
+                snapshot.CurrentHp = UnityEngine.Mathf.Clamp(snapshot.CurrentHp + effect.HpDelta, 0, snapshot.MaxHp);
+                snapshot.IsDead = snapshot.CurrentHp <= 0;
+                runState.MarbleSnapshots[i] = snapshot;
             }
         }
 

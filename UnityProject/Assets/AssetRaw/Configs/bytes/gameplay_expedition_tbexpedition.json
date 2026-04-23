@@ -1,0 +1,21 @@
+[
+  {
+    "expedition_id": "近郊森林",
+    "name": "近郊森林",
+    "description": "附加的森林，不算太危险",
+    "route": [
+      {
+        "node_id": "1",
+        "node_type": 1,
+        "event_id": "废墟补给点",
+        "combat_encounter_id": ""
+      },
+      {
+        "node_id": "2",
+        "node_type": 2,
+        "event_id": "",
+        "combat_encounter_id": "前哨遭遇战"
+      }
+    ]
+  }
+]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
-using UnityEngine;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -12,13 +12,6 @@ namespace GameLogic.Gameplay.Expedition
         public const string MinimalExpeditionId = "MinimalExpedition";
         public const int PlayerCamp = 1;
         public const int EnemyCamp = 2;
-    }
-
-    public enum EnumExpeditionNodeType
-    {
-        None = 0,
-        Event = 1,
-        Combat = 2,
     }
 
     public enum EnumExpeditionFlowPhase
@@ -61,7 +54,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public static MarblePersistentData CreateDefault(string persistentId, string configId, string displayName, int level)
         {
-            var maxHp = ExpeditionStaticRouteFactory.ResolveMarbleMaxHp(configId, level);
+            var maxHp = ExpeditionConfigBridge.ResolveMarbleMaxHp(configId, level);
             return new MarblePersistentData
             {
                 PersistentId = persistentId,
@@ -128,14 +121,14 @@ namespace GameLogic.Gameplay.Expedition
         public int CurrentNodeIndex;
         public int TotalCrystalGained;
         public List<MarblePersistentData?> MarbleSnapshots = new List<MarblePersistentData?>();
-        public List<ExpeditionNodeConfig> Route = new List<ExpeditionNodeConfig>();
+        public List<ExpeditionTable.ExpeditionRouteNodeConfig> Route = new List<ExpeditionTable.ExpeditionRouteNodeConfig>();
         public List<ExpeditionNodeRecord> NodeRecords = new List<ExpeditionNodeRecord>();
         public string PendingEventOptionId;
         public CombatSessionResult PendingCombatResult;
         public bool IsSettlementAcknowledged;
         public ExpeditionResultSummary ResultSummary;
 
-        public ExpeditionNodeConfig GetCurrentNode()
+        public ExpeditionTable.ExpeditionRouteNodeConfig GetCurrentNode()
         {
             if (CurrentNodeIndex < 0 || CurrentNodeIndex >= Route.Count)
             {
@@ -176,99 +169,16 @@ namespace GameLogic.Gameplay.Expedition
     }
 
     [Serializable]
-    public sealed class ExpeditionNodeConfig
-    {
-        public string NodeId;
-        public EnumExpeditionNodeType NodeType;
-        public ExpeditionEventNodeConfig EventConfig;
-        public ExpeditionCombatNodeConfig CombatConfig;
-    }
-
-    [Serializable]
     public sealed class ExpeditionNodeRecord
     {
         public string NodeId;
-        public EnumExpeditionNodeType NodeType;
+        public ExpeditionTable.EnumExpeditionNodeType NodeType;
         public EnumExpeditionNodeProcessStatus Status;
         public string ChosenOptionId;
         public int GainedCrystal;
         public List<string> AppliedBuffIds = new List<string>();
         public string Summary;
         public CombatSessionResult CombatResult;
-    }
-
-    [Serializable]
-    public sealed class ExpeditionEventNodeConfig
-    {
-        public string EventId;
-        public string Title;
-        public string Description;
-        public List<ExpeditionEventOptionConfig> Options = new List<ExpeditionEventOptionConfig>();
-
-        public ExpeditionEventOptionConfig GetOption(string optionId)
-        {
-            return Options.Find(option => option.OptionId == optionId);
-        }
-    }
-
-    [Serializable]
-    public sealed class ExpeditionEventOptionConfig
-    {
-        public string OptionId;
-        public string Title;
-        public string Description;
-        public ExpeditionEventEffect Effect = new ExpeditionEventEffect();
-    }
-
-    [Serializable]
-    public sealed class ExpeditionEventEffect
-    {
-        public int CrystalDelta;
-        public int ExpDelta;
-        public int HpDelta;
-        public string Summary;
-
-        public void Apply(ExpeditionRunState runState)
-        {
-            if (runState == null)
-            {
-                return;
-            }
-
-            runState.TotalCrystalGained += CrystalDelta;
-            for (int i = 0; i < runState.MarbleSnapshots.Count; i++)
-            {
-                if(!runState.MarbleSnapshots[i].HasValue)
-                    continue;
-
-                var snapshot = runState.MarbleSnapshots[i].Value;
-                snapshot.Exp += ExpDelta;
-                snapshot.CurrentHp = Mathf.Clamp(snapshot.CurrentHp + HpDelta, 0, snapshot.MaxHp);
-                snapshot.IsDead = snapshot.CurrentHp <= 0;
-
-                runState.MarbleSnapshots[i] = snapshot;
-            }
-        }
-    }
-
-    [Serializable]
-    public sealed class ExpeditionCombatNodeConfig
-    {
-        public string CombatId;
-        public string Title;
-        public string Description;
-        public int VictoryCrystalReward;
-        public int VictoryExpReward;
-        public List<ExpeditionEnemyMarbleConfig> EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>();
-    }
-
-    [Serializable]
-    public sealed class ExpeditionEnemyMarbleConfig
-    {
-        public string EnemyId;
-        public string ConfigId;
-        public string DisplayName;
-        public int Level;
     }
 
     [Serializable]
@@ -303,96 +213,99 @@ namespace GameLogic.Gameplay.Expedition
         public bool IsDead;
     }
 
-    public static class ExpeditionStaticRouteFactory
+    public static class ExpeditionConfigBridge
     {
-        public static ExpeditionRunState CreateMinimalRun(IEnumerable<MarblePersistentData?> marbles)
+        public static ExpeditionRunState CreateConfiguredRun(IEnumerable<MarblePersistentData?> marbles, string preferredExpeditionId)
         {
+            var expedition = ResolveStartupExpedition(preferredExpeditionId);
+            if (expedition == null)
+            {
+                Log.Warning($"[Expedition] Unable to resolve startup expedition. PreferredId:{preferredExpeditionId}");
+                return null;
+            }
+
+            if (!ValidateExpedition(expedition))
+            {
+                Log.Warning($"[Expedition] Expedition config validation failed. ExpeditionId:{expedition.ExpeditionId}");
+                return null;
+            }
+
             return new ExpeditionRunState
             {
                 RunId = Guid.NewGuid().ToString("N"),
-                ExpeditionId = ExpeditionConstants.MinimalExpeditionId,
+                ExpeditionId = expedition.ExpeditionId,
                 Phase = EnumExpeditionFlowPhase.None,
                 EndReason = EnumExpeditionEndReason.None,
                 CurrentNodeIndex = 0,
-                MarbleSnapshots = marbles
+                MarbleSnapshots = marbles?
                     .Where(marble => marble.HasValue && !marble.Value.IsDead)
-                    .ToList(),
-                Route = CreateMinimalRoute(),
+                    .ToList() ?? new List<MarblePersistentData?>(),
+                Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionTable.ExpeditionRouteNodeConfig>(),
             };
         }
 
-        public static List<ExpeditionNodeConfig> CreateMinimalRoute()
+        public static ExpeditionTable.ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionId)
         {
-            return new List<ExpeditionNodeConfig>
+            var expeditionTable = ConfigSystem.Instance.Tables?.TbExpedition;
+            if (expeditionTable == null)
             {
-                new ExpeditionNodeConfig
+                return null;
+            }
+
+            if (!string.IsNullOrEmpty(preferredExpeditionId))
+            {
+                var expedition = expeditionTable.GetOrDefault(preferredExpeditionId);
+                if (expedition != null)
                 {
-                    NodeId = "event_supply_cache",
-                    NodeType = EnumExpeditionNodeType.Event,
-                    EventConfig = new ExpeditionEventNodeConfig
+                    return expedition;
+                }
+            }
+
+            return expeditionTable.DataList.Count > 0 ? expeditionTable.DataList[0] : null;
+        }
+
+        public static ExpeditionTable.ExpeditionEventConfig ResolveEvent(string eventId)
+        {
+            if (string.IsNullOrEmpty(eventId))
+            {
+                return null;
+            }
+
+            return ConfigSystem.Instance.Tables?.TbExpeditionEvent?.GetOrDefault(eventId);
+        }
+
+        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveCombatEncounter(string encounterId)
+        {
+            if (string.IsNullOrEmpty(encounterId))
+            {
+                return null;
+            }
+
+            return ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter?.GetOrDefault(encounterId);
+        }
+
+        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionId)
+        {
+            var expedition = ResolveStartupExpedition(preferredExpeditionId);
+            if (expedition?.Route != null)
+            {
+                foreach (var node in expedition.Route)
+                {
+                    if (node == null || node.NodeType != ExpeditionTable.EnumExpeditionNodeType.Combat)
                     {
-                        EventId = "event_supply_cache",
-                        Title = "废墟补给点",
-                        Description = "队伍在废墟中发现两份应急补给，你要立刻决定如何处理。",
-                        Options = new List<ExpeditionEventOptionConfig>
-                        {
-                            new ExpeditionEventOptionConfig
-                            {
-                                OptionId = "option_salvage",
-                                Title = "拆解补给箱",
-                                Description = "快速拆解出可回收晶体，但搬运时会造成碰撞损伤。",
-                                Effect = new ExpeditionEventEffect
-                                {
-                                    CrystalDelta = 60,
-                                    HpDelta = -8,
-                                    Summary = "拆解补给箱，获得 60 晶体，全队失去 8 点生命。"
-                                }
-                            },
-                            new ExpeditionEventOptionConfig
-                            {
-                                OptionId = "option_briefing",
-                                Title = "整理战术笔记",
-                                Description = "没有额外晶体，但每名 Marble 都能获得战前经验。",
-                                Effect = new ExpeditionEventEffect
-                                {
-                                    ExpDelta = 12,
-                                    Summary = "整理战术笔记，全队获得 12 点经验。"
-                                }
-                            }
-                        }
+                        continue;
                     }
-                },
-                new ExpeditionNodeConfig
-                {
-                    NodeId = "combat_outpost",
-                    NodeType = EnumExpeditionNodeType.Combat,
-                    CombatConfig = new ExpeditionCombatNodeConfig
+
+                    var encounter = ResolveCombatEncounter(node.CombatEncounterId);
+                    if (encounter != null)
                     {
-                        CombatId = "combat_outpost",
-                        Title = "前哨遭遇战",
-                        Description = "敌方巡逻 Marble 正在封锁出口，击败它们即可带走补给。",
-                        VictoryCrystalReward = 120,
-                        VictoryExpReward = 15,
-                        EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>
-                        {
-                            new ExpeditionEnemyMarbleConfig
-                            {
-                                EnemyId = "enemy_1",
-                                ConfigId = "archer",
-                                DisplayName = "巡逻 Marble A",
-                                Level = 0,
-                            },
-                            new ExpeditionEnemyMarbleConfig
-                            {
-                                EnemyId = "enemy_2",
-                                ConfigId = "soldier",
-                                DisplayName = "巡逻 Marble B",
-                                Level = 0,
-                            }
-                        }
+                        return encounter;
                     }
                 }
-            };
+            }
+
+            var encounterTable = ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter;
+            return encounterTable != null && encounterTable.DataList.Count > 0 ? encounterTable.DataList[0] : null;
         }
 
         public static int ResolveMarbleMaxHp(string configId, int level)
@@ -411,6 +324,47 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             return 100;
+        }
+
+        private static bool ValidateExpedition(ExpeditionTable.ExpeditionConfig expedition)
+        {
+            if (expedition == null || expedition.Route == null || expedition.Route.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var node in expedition.Route)
+            {
+                if (node == null)
+                {
+                    return false;
+                }
+
+                switch (node.NodeType)
+                {
+                    case ExpeditionTable.EnumExpeditionNodeType.Event:
+                        if (ResolveEvent(node.EventId) == null)
+                        {
+                            Log.Warning($"[Expedition] Missing event config for node:{node.NodeId} eventId:{node.EventId}");
+                            return false;
+                        }
+
+                        break;
+                    case ExpeditionTable.EnumExpeditionNodeType.Combat:
+                        if (ResolveCombatEncounter(node.CombatEncounterId) == null)
+                        {
+                            Log.Warning($"[Expedition] Missing combat encounter config for node:{node.NodeId} encounterId:{node.CombatEncounterId}");
+                            return false;
+                        }
+
+                        break;
+                    default:
+                        Log.Warning($"[Expedition] Unsupported node type:{node.NodeType} nodeId:{node.NodeId}");
+                        return false;
+                }
+            }
+
+            return true;
         }
     }
 }

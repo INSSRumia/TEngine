@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -14,7 +15,7 @@ namespace GameLogic.Gameplay.Expedition
         public int VictoryExpReward;
         public List<string> ActiveBuffIds = new List<string>();
         public List<MarblePersistentData?> AlliedMarbles = new List<MarblePersistentData?>();
-        public List<ExpeditionEnemyMarbleConfig> EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>();
+        public List<ExpeditionTable.ExpeditionEnemyMarbleConfig> EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>();
     }
 
     [Serializable]

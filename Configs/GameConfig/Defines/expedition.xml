@@ -1,0 +1,62 @@
+<module name="Gameplay.Expedition">
+    <enum name="EnumExpeditionNodeType">
+        <var name="None" alias="none" value="0" />
+        <var name="Event" alias="event" value="1" />
+        <var name="Combat" alias="combat" value="2" />
+    </enum>
+
+    <bean name="ExpeditionRouteNodeConfig" valueType="false" sep=",">
+        <var name="node_id" type="string" />
+        <var name="node_type" type="EnumExpeditionNodeType" />
+        <var name="event_id" type="string" />
+        <var name="combat_encounter_id" type="string" />
+    </bean>
+
+    <bean name="ExpeditionConfig" valueType="false" sep=",">
+        <var name="expedition_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="route" type="list, ExpeditionRouteNodeConfig" />
+    </bean>
+
+    <bean name="ExpeditionEventEffectConfig" valueType="false" sep=",">
+        <var name="crystal_delta" type="int" />
+        <var name="exp_delta" type="int" />
+        <var name="hp_delta" type="int" />
+        <var name="summary" type="string" />
+    </bean>
+
+    <bean name="ExpeditionEventOptionConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <var name="effect" type="ExpeditionEventEffectConfig" />
+    </bean>
+
+    <bean name="ExpeditionEventConfig" valueType="false" sep=",">
+        <var name="event_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <var name="options" type="list, ExpeditionEventOptionConfig" />
+    </bean>
+
+    <bean name="ExpeditionEnemyMarbleConfig" valueType="false" sep=",">
+        <var name="enemy_id" type="string" />
+        <var name="config_id" type="string" />
+        <var name="display_name" type="string" />
+        <var name="level" type="int" />
+    </bean>
+
+    <bean name="ExpeditionCombatEncounterConfig" valueType="false" sep=",">
+        <var name="combat_encounter_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <var name="victory_crystal_reward" type="int" />
+        <var name="victory_exp_reward" type="int" />
+        <var name="enemy_marbles" type="list, ExpeditionEnemyMarbleConfig" />
+    </bean>
+
+    <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_id" />
+    <table name="TbExpeditionEvent" value="ExpeditionEventConfig" input="expedition_event.xlsx" index="event_id" />
+    <table name="TbExpeditionCombatEncounter" value="ExpeditionCombatEncounterConfig" input="expedition_combat_encounter.xlsx" index="combat_encounter_id" />
+</module>

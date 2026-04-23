@@ -1,4 +1,5 @@
 using TEngine;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -44,10 +45,10 @@ namespace GameLogic.Gameplay.Expedition
 
             switch (node.NodeType)
             {
-                case EnumExpeditionNodeType.Event:
+                case ExpeditionTable.EnumExpeditionNodeType.Event:
                     ChangeState<ExpeditionFlowStateEvent>(fsm);
                     break;
-                case EnumExpeditionNodeType.Combat:
+                case ExpeditionTable.EnumExpeditionNodeType.Combat:
                     ChangeState<ExpeditionFlowStateCombat>(fsm);
                     break;
                 default:

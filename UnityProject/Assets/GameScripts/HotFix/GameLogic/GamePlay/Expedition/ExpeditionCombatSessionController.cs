@@ -5,6 +5,7 @@ using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -195,7 +196,7 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        private void SpawnEnemyMarbles(List<ExpeditionEnemyMarbleConfig> enemies)
+        private void SpawnEnemyMarbles(List<ExpeditionTable.ExpeditionEnemyMarbleConfig> enemies)
         {
             if (enemies == null)
             {
