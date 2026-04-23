@@ -6,6 +6,8 @@ namespace GameLogic.Gameplay.Expedition
 {
     public sealed class ExpeditionFlowController : Singleton<ExpeditionFlowController>
     {
+        #region 常量/字段/属性
+
         private const string FsmName = "MinimalExpeditionFlow";
 
         private readonly ExpeditionPersistentDataStore _persistentData = new ExpeditionPersistentDataStore();
@@ -15,6 +17,10 @@ namespace GameLogic.Gameplay.Expedition
         public IFsm<ExpeditionFlowController> Fsm { get; private set; }
 
         public bool IsFlowRunning => CurrentRun != null && Fsm != null;
+
+        #endregion
+
+        #region 生命周期与入口
 
         protected override void OnInit()
         {
@@ -52,45 +58,9 @@ namespace GameLogic.Gameplay.Expedition
             return true;
         }
 
-        public bool StartCombatDebug()
-        {
-            if (IsFlowRunning || ExpeditionCombatSessionController.Instance.IsRunning)
-            {
-                return false;
-            }
+        #endregion
 
-            var request = new CombatSessionRequest
-            {
-                SessionId = "combat_debug_session",
-                NodeId = "combat_debug_node",
-                CombatId = "combat_debug",
-                Title = "Combat 调试后门",
-                VictoryCrystalReward = 0,
-                VictoryExpReward = 0,
-                AlliedMarbles = _persistentData.Marbles.Select(item => item.CreateSnapshot()).ToList(),
-                EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>
-                {
-                    new ExpeditionEnemyMarbleConfig
-                    {
-                        EnemyId = "debug_enemy_1",
-                        ConfigId = "Marble_001",
-                        DisplayName = "调试敌方一号",
-                        Level = 0,
-                    },
-                    new ExpeditionEnemyMarbleConfig
-                    {
-                        EnemyId = "debug_enemy_2",
-                        ConfigId = "Marble_001",
-                        DisplayName = "调试敌方二号",
-                        Level = 0,
-                    }
-                }
-            };
-
-            GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
-            GameModule.UI.ShowUIAsync<BattleMainUI>();
-            return ExpeditionCombatSessionController.Instance.StartSession(request, OnDebugCombatCompleted);
-        }
+        #region UI 交互输入
 
         public ExpeditionEventNodeConfig GetCurrentEventNode()
         {
@@ -138,6 +108,10 @@ namespace GameLogic.Gameplay.Expedition
             CurrentRun.IsSettlementAcknowledged = true;
         }
 
+        #endregion
+
+        #region FSM/节点推进
+
         internal void SetPhase(EnumExpeditionFlowPhase phase)
         {
             if (CurrentRun != null)
@@ -170,6 +144,94 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             return record;
+        }
+
+        internal void ApplyCurrentNodeResult()
+        {
+            var node = GetCurrentNode();
+            var record = CurrentRun?.GetCurrentRecord();
+            if (node == null || record == null)
+            {
+                return;
+            }
+
+            switch (node.NodeType)
+            {
+                case EnumExpeditionNodeType.Event:
+                    ApplyEventNodeResult(node, record);
+                    break;
+                case EnumExpeditionNodeType.Combat:
+                    ApplyCombatNodeResult(record);
+                    break;
+            }
+
+            record.Status = EnumExpeditionNodeProcessStatus.Resolved;
+            CurrentRun.PendingEventOptionId = null;
+            CurrentRun.PendingCombatResult = null;
+
+            if (CurrentRun.AreAllPlayerMarblesDead())
+            {
+                CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
+            }
+
+            if (CurrentRun.EndReason == EnumExpeditionEndReason.None)
+            {
+                CurrentRun.CurrentNodeIndex++;
+                if (CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count)
+                {
+                    CurrentRun.EndReason = EnumExpeditionEndReason.Victory;
+                }
+            }
+        }
+
+        internal bool ShouldEnterSettlement()
+        {
+            return CurrentRun == null
+                   || CurrentRun.EndReason != EnumExpeditionEndReason.None
+                   || CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count;
+        }
+
+        #endregion
+
+        #region Combat 桥接
+
+        public bool StartCombatDebug()
+        {
+            if (IsFlowRunning || ExpeditionCombatSessionController.Instance.IsRunning)
+            {
+                return false;
+            }
+
+            var request = new CombatSessionRequest
+            {
+                SessionId = "combat_debug_session",
+                NodeId = "combat_debug_node",
+                CombatId = "combat_debug",
+                Title = "Combat 调试后门",
+                VictoryCrystalReward = 0,
+                VictoryExpReward = 0,
+                AlliedMarbles = _persistentData.Marbles.Select(item => item.CreateSnapshot()).ToList(),
+                EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>
+                {
+                    new ExpeditionEnemyMarbleConfig
+                    {
+                        EnemyId = "debug_enemy_1",
+                        ConfigId = "Marble_001",
+                        DisplayName = "调试敌方一号",
+                        Level = 0,
+                    },
+                    new ExpeditionEnemyMarbleConfig
+                    {
+                        EnemyId = "debug_enemy_2",
+                        ConfigId = "Marble_001",
+                        DisplayName = "调试敌方二号",
+                        Level = 0,
+                    }
+                }
+            };
+
+            GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
+            return ExpeditionCombatSessionController.Instance.StartSession(request, OnDebugCombatCompleted);
         }
 
         internal CombatSessionRequest BuildCombatSessionRequest()
@@ -218,54 +280,12 @@ namespace GameLogic.Gameplay.Expedition
                 return false;
             }
 
-            GameModule.UI.ShowUIAsync<BattleMainUI>();
             return ExpeditionCombatSessionController.Instance.StartSession(request, SubmitCombatResult);
         }
 
-        internal void ApplyCurrentNodeResult()
-        {
-            var node = GetCurrentNode();
-            var record = CurrentRun?.GetCurrentRecord();
-            if (node == null || record == null)
-            {
-                return;
-            }
+        #endregion
 
-            switch (node.NodeType)
-            {
-                case EnumExpeditionNodeType.Event:
-                    ApplyEventNodeResult(node, record);
-                    break;
-                case EnumExpeditionNodeType.Combat:
-                    ApplyCombatNodeResult(record);
-                    break;
-            }
-
-            record.Status = EnumExpeditionNodeProcessStatus.Resolved;
-            CurrentRun.PendingEventOptionId = null;
-            CurrentRun.PendingCombatResult = null;
-
-            if (CurrentRun.AreAllPlayerMarblesDead())
-            {
-                CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
-            }
-
-            if (CurrentRun.EndReason == EnumExpeditionEndReason.None)
-            {
-                CurrentRun.CurrentNodeIndex++;
-                if (CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count)
-                {
-                    CurrentRun.EndReason = EnumExpeditionEndReason.Victory;
-                }
-            }
-        }
-
-        internal bool ShouldEnterSettlement()
-        {
-            return CurrentRun == null
-                   || CurrentRun.EndReason != EnumExpeditionEndReason.None
-                   || CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count;
-        }
+        #region 结果应用与结算
 
         internal void SettleCurrentRun()
         {
@@ -283,15 +303,6 @@ namespace GameLogic.Gameplay.Expedition
             _persistentData.Crystal += CurrentRun.TotalCrystalGained;
             CurrentRun.ResultSummary = BuildResultSummary(CurrentRun);
             _persistentData.LastResult = CurrentRun.ResultSummary;
-        }
-
-        internal void ReturnToEntry()
-        {
-            GameModule.UI.CloseUI<global::GameLogic.EventCardUI>();
-            GameModule.UI.CloseUI<global::GameLogic.ExpeditionResultUI>();
-            GameModule.UI.CloseUI<BattleMainUI>();
-            CurrentRun = null;
-            OpenEntryUi();
         }
 
         private void ApplyEventNodeResult(ExpeditionNodeConfig node, ExpeditionNodeRecord record)
@@ -365,10 +376,21 @@ namespace GameLogic.Gameplay.Expedition
             };
         }
 
+        #endregion
+
+        #region 调试与清理
+
         private void OnDebugCombatCompleted(CombatSessionResult result)
         {
             Log.Info($"[ExpeditionFlowController] Combat debug complete. Victory:{result?.IsVictory}");
-            GameModule.UI.CloseUI<BattleMainUI>();
+            OpenEntryUi();
+        }
+
+        internal void ReturnToEntry()
+        {
+            GameModule.UI.CloseUI<global::GameLogic.EventCardUI>();
+            GameModule.UI.CloseUI<global::GameLogic.ExpeditionResultUI>();
+            CurrentRun = null;
             OpenEntryUi();
         }
 
@@ -381,5 +403,7 @@ namespace GameLogic.Gameplay.Expedition
 
             Fsm = null;
         }
+
+        #endregion
     }
 }

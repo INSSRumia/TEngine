@@ -12,7 +12,6 @@ namespace GameLogic.Gameplay.Expedition
         public const string MinimalExpeditionId = "MinimalExpedition";
         public const int PlayerCamp = 1;
         public const int EnemyCamp = 2;
-        public const string SharedUiPrefabLocation = "BattleMainUI";
     }
 
     public enum EnumExpeditionNodeType
@@ -134,9 +133,9 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             Crystal = 0;
-            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_1", "Marble_001", "先锋一号", 0));
-            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_2", "Marble_001", "先锋二号", 0));
-            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_3", "Marble_001", "先锋三号", 0));
+            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_1", "lancer", "先锋一号", 0));
+            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_2", "archer", "先锋二号", 0));
+            Marbles.Add(MarblePersistentData.CreateDefault("marble_player_3", "soldier", "先锋三号", 0));
         }
 
         public MarblePersistentData GetMarble(string persistentId)
@@ -400,14 +399,14 @@ namespace GameLogic.Gameplay.Expedition
                             new ExpeditionEnemyMarbleConfig
                             {
                                 EnemyId = "enemy_1",
-                                ConfigId = "Marble_001",
+                                ConfigId = "archer",
                                 DisplayName = "巡逻 Marble A",
                                 Level = 0,
                             },
                             new ExpeditionEnemyMarbleConfig
                             {
                                 EnemyId = "enemy_2",
-                                ConfigId = "Marble_001",
+                                ConfigId = "soldier",
                                 DisplayName = "巡逻 Marble B",
                                 Level = 0,
                             }

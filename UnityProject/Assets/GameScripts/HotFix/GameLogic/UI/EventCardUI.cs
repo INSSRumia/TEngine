@@ -40,8 +40,8 @@ namespace GameLogic
             {
                 _tmpTitle.text = "事件缺失";
                 _tmpDesc.text = "当前没有可执行的事件节点。";
-				SetOption(_btnOptionA, "返回", "");
-				SetOption(_btnOptionB, "返回", "");
+				SetOptionA(true, "返回", "");
+				SetOptionB(true, "返回", "");
                 return;
             }
 
@@ -50,17 +50,21 @@ namespace GameLogic
 
             var optionA = eventNode.Options.Count > 0 ? eventNode.Options[0] : null;
             var optionB = eventNode.Options.Count > 1 ? eventNode.Options[1] : null;
-			SetOption(_btnOptionA, optionA == null ? "无可选项" : optionA.Title, optionA == null ? "" : optionA.Description);
-			SetOption(_btnOptionB, optionB == null ? "无可选项" : optionB.Title, optionB == null ? "" : optionB.Description);
-            _btnOptionA.interactable = optionA != null;
-            _btnOptionB.interactable = optionB != null;
+			SetOptionA(optionA != null, optionA == null ? "无可选项" : optionA.Title, optionA == null ? "" : optionA.Description);
+			SetOptionB(optionB != null, optionB == null ? "无可选项" : optionB.Title, optionB == null ? "" : optionB.Description);
         }
 
-		private void SetOption(Button button, string title, string desc)
+		private void SetOptionA(bool interactable, string title, string desc)
 		{
-			button.interactable = true;
+			_btnOptionA.interactable = interactable;
 			_tmpOptionATitle.text = title;
 			_tmpOptionADesc.text = desc;
 		}
+        private void SetOptionB(bool interactable, string title, string desc)
+        {
+            _btnOptionB.interactable = interactable;
+            _tmpOptionBTitle.text = title;
+            _tmpOptionBDesc.text = desc;
+        }
 	}
 }

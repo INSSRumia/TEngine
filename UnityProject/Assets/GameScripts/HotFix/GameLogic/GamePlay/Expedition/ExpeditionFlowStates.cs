@@ -106,7 +106,6 @@ namespace GameLogic.Gameplay.Expedition
         protected override void OnLeave(IFsm<ExpeditionFlowController> fsm, bool isShutdown)
         {
             ExpeditionCombatSessionController.Instance.ClearSession();
-            GameModule.UI.CloseUI<BattleMainUI>();
         }
     }
 
