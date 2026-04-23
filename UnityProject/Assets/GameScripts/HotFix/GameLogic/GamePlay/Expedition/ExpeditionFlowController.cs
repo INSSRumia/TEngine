@@ -290,9 +290,7 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
 
                 var snapshot = CurrentRun.MarbleSnapshots[i].Value;
-                var persistentData = _persistentData.GetMarble(snapshot.PersistentId);
-
-                CurrentRun.MarbleSnapshots[i] = persistentData;
+                _persistentData.SetMarble(snapshot);
             }
 
             _persistentData.Crystal += CurrentRun.TotalCrystalGained;

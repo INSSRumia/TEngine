@@ -100,6 +100,22 @@ namespace GameLogic.Gameplay.Expedition
         {
             return Marbles.Find(marble => marble.HasValue && marble.Value.PersistentId == persistentId);
         }
+
+        public void SetMarble(MarblePersistentData marble)
+        {
+            for (int i = 0; i < Marbles.Count; i++)
+            {
+                if (!Marbles[i].HasValue || Marbles[i].Value.PersistentId != marble.PersistentId)
+                {
+                    continue;
+                }
+
+                Marbles[i] = marble;
+                return;
+            }
+
+            Marbles.Add(marble);
+        }
     }
 
     [Serializable]

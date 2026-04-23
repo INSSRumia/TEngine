@@ -154,11 +154,11 @@ namespace GameLogic.Gameplay.Expedition
                 var maxHp = marble.RuntimeData.State.MaxHp;
                 var isDead = !marble.RuntimeData.State.IsAlive || currentHp <= 0;
 
-                snapshot.CurrentHp = marble.RuntimeData.State.Hp;
-                snapshot.MaxHp = marble.RuntimeData.State.MaxHp;
+                snapshot.CurrentHp = currentHp;
+                snapshot.MaxHp = maxHp;
                 snapshot.Exp = marble.RuntimeData.State.Exp;
                 snapshot.Level = marble.RuntimeData.Level;
-                snapshot.IsDead = marble.RuntimeData.State.IsAlive;
+                snapshot.IsDead = isDead;
 
                 result.MarbleResults.Add(snapshot);
             }
