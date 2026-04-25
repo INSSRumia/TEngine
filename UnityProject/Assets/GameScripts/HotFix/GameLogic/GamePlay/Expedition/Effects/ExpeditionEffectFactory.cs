@@ -26,6 +26,7 @@ namespace GameLogic.Gameplay.Expedition
                 ExpeditionTable.AddMoneyEffectConfig moneyConfig => new AddMoneyEffect(moneyConfig),
                 ExpeditionTable.AddPlayerMarbleExpEffectConfig expConfig => new AddPlayerMarbleExpEffect(expConfig),
                 ExpeditionTable.AddPlayerMarbleHpEffectConfig hpConfig => new AddPlayerMarbleHpEffect(hpConfig),
+                ExpeditionTable.AddPlayerMarbleEffectConfig marbleConfig => new AddPlayerMarbleEffect(marbleConfig),
                 ExpeditionTable.ChangeEnvironmentEffectConfig environmentConfig => new ChangeEnvironmentEffect(environmentConfig),
                 _ => null,
             };

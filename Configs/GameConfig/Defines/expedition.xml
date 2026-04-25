@@ -152,6 +152,12 @@
         <var name="hp_delta" type="int" />
     </bean>
 
+    <!-- 往玩家当前远征队伍中添加指定数量的 Marble。新增 Marble 会参与后续 Combat，并在远征结算时回写到局外队伍。 -->
+    <bean name="AddPlayerMarbleEffectConfig" alias="add_player_marble" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="marble_spawn_config" type="Gameplay.Combat.MarbleSpawnConfig" />
+        <var name="count" type="int" />
+    </bean>
+
     <!-- 改变当前远征环境，并按环境切换规则更新环境来源随机事件池。 -->
     <bean name="ChangeEnvironmentEffectConfig" alias="change_environment" parent="ExpeditionEffectConfig" valueType="false" sep=",">
         <var name="target_environment_config_id" type="string" />

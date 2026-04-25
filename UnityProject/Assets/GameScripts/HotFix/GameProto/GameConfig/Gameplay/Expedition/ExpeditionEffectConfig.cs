@@ -27,6 +27,7 @@ public abstract partial class ExpeditionEffectConfig : Luban.BeanBase
             case "AddMoneyEffectConfig": return new Gameplay.Expedition.AddMoneyEffectConfig(_buf);
             case "AddPlayerMarbleExpEffectConfig": return new Gameplay.Expedition.AddPlayerMarbleExpEffectConfig(_buf);
             case "AddPlayerMarbleHpEffectConfig": return new Gameplay.Expedition.AddPlayerMarbleHpEffectConfig(_buf);
+            case "AddPlayerMarbleEffectConfig": return new Gameplay.Expedition.AddPlayerMarbleEffectConfig(_buf);
             case "ChangeEnvironmentEffectConfig": return new Gameplay.Expedition.ChangeEnvironmentEffectConfig(_buf);
             default: throw new SerializationException();
         }
