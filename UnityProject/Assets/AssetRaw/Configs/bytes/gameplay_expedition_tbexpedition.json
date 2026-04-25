@@ -3,6 +3,8 @@
     "expedition_config_id": "近郊森林",
     "name": "近郊森林",
     "description": "附加的森林，不算太危险",
+    "initial_environment_config_id": "普通森林",
+    "lst_random_event_pool_config_id": [],
     "route": [
       {
         "node_config_id": "1",
@@ -22,18 +24,27 @@
       },
       {
         "node_config_id": "2",
-        "node_type": 2,
+        "node_type": 3,
         "event_config_id": "",
-        "combat_encounter_config_id": "前哨遭遇战",
+        "combat_encounter_config_id": "",
         "route_policy": 0,
         "transitions": [
           {
             "transition_id": "1",
-            "target_node_config_id": "1",
+            "target_node_config_id": "3",
             "priority": 0,
             "conditions": []
           }
         ],
+        "option_routes": []
+      },
+      {
+        "node_config_id": "3",
+        "node_type": 2,
+        "event_config_id": "",
+        "combat_encounter_config_id": "前哨遭遇战",
+        "route_policy": 0,
+        "transitions": [],
         "option_routes": []
       }
     ]

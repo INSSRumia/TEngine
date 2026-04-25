@@ -87,6 +87,7 @@ namespace GameLogic.Gameplay.Expedition
                     .ToList() ?? new List<MarblePersistentData?>(),
                 Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
             };
+            runState.InitializeRandomEventPools(expedition);
 
             var firstNode = runState.Route.FirstOrDefault(node => node != null);
             if (firstNode != null)
@@ -147,6 +148,22 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             return ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter?.GetOrDefault(combatEncounterConfigId);
+        }
+
+        public static ExpeditionRandomEventPoolConfig ResolveRandomEventPool(string randomEventPoolConfigId)
+        {
+            if (string.IsNullOrEmpty(randomEventPoolConfigId))
+                return null;
+
+            return ConfigSystem.Instance.Tables?.TbExpeditionRandomEventPool?.GetOrDefault(randomEventPoolConfigId);
+        }
+
+        public static ExpeditionEnvironmentConfig ResolveEnvironment(string environmentConfigId)
+        {
+            if (string.IsNullOrEmpty(environmentConfigId))
+                return null;
+
+            return ConfigSystem.Instance.Tables?.TbExpeditionEnvironment?.GetOrDefault(environmentConfigId);
         }
 
         public static ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
@@ -228,8 +245,11 @@ namespace GameLogic.Gameplay.Expedition
                         }
 
                         break;
+                    case EnumExpeditionNodeType.RandomEvent:
+                        break;
                     case EnumExpeditionNodeType.Combat:
-                        if (ResolveCombatEncounter(node.CombatEncounterConfigId) == null)
+                        var encounter = ResolveCombatEncounter(node.CombatEncounterConfigId);
+                        if (encounter == null)
                         {
                             Log.Warning($"[远征] 节点:{node.NodeConfigId} 缺少战斗遭遇配置 combatEncounterConfigId:{node.CombatEncounterConfigId}");
                             return false;
@@ -314,6 +334,9 @@ namespace GameLogic.Gameplay.Expedition
 
             if (node.RoutePolicy == EnumExpeditionRoutePolicy.BySelectedOption)
             {
+                if (node.NodeType == EnumExpeditionNodeType.RandomEvent)
+                    return true;
+
                 var eventConfig = ResolveEvent(node.EventConfigId);
                 foreach (var optionRoute in node.OptionRoutes)
                 {

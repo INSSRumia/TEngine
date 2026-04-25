@@ -31,6 +31,41 @@ namespace GameLogic.Gameplay.Expedition
             return CurrentRun?.EnterNextPendingNode();
         }
 
+        public bool PrepareCurrentRandomEventNode()
+        {
+            var node = GetCurrentNode();
+            var record = CurrentRun?.GetCurrentRecord();
+            if (CurrentRun == null || node == null || record == null)
+                return false;
+
+            if (record.WasRandomEventSkipped || !string.IsNullOrWhiteSpace(record.ActualEventConfigId))
+                return !record.WasRandomEventSkipped;
+
+            var drawResult = CurrentRun.DrawRandomEvent();
+            record.AddRouteDecisionLog(drawResult?.Summary);
+            if (drawResult == null || !drawResult.IsSuccess)
+            {
+                record.WasRandomEventSkipped = true;
+                record.Summary = drawResult?.Summary ?? "随机事件抽取失败，节点跳过。";
+                CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 未抽到事件。");
+                return false;
+            }
+
+            record.ActualEventConfigId = drawResult.EventConfigId;
+            record.RandomEventPoolConfigId = drawResult.RandomEventPoolConfigId;
+            if (ExpeditionConfigBridge.ResolveEvent(record.ActualEventConfigId) == null)
+            {
+                record.WasRandomEventSkipped = true;
+                record.Summary = $"随机事件 {record.ActualEventConfigId} 不存在，节点跳过。";
+                record.AddRouteDecisionLog(record.Summary);
+                CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 抽到不存在的事件 {record.ActualEventConfigId}。");
+                return false;
+            }
+
+            CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 抽到事件 {record.ActualEventConfigId} pool={record.RandomEventPoolConfigId}");
+            return true;
+        }
+
         public void ApplyCurrentNodeResult()
         {
             var node = GetCurrentNode();
@@ -43,6 +78,9 @@ namespace GameLogic.Gameplay.Expedition
             {
                 case EnumExpeditionNodeType.Event:
                     ApplyEventNodeResult(node, record);
+                    break;
+                case EnumExpeditionNodeType.RandomEvent:
+                    ApplyRandomEventNodeResult(node, record);
                     break;
                 case EnumExpeditionNodeType.Combat:
                     ApplyCombatNodeResult(node, record);
@@ -76,7 +114,7 @@ namespace GameLogic.Gameplay.Expedition
 
         private void ApplyEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
-            var eventConfig = node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventConfigId);
+            var eventConfig = ResolveNodeEventConfig(node, record);
             var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
             if (option == null)
             {
@@ -91,6 +129,18 @@ namespace GameLogic.Gameplay.Expedition
 
             CurrentRun.Blackboard?.AddChosenOption(option.OptionId);
             CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventConfigId);
+        }
+
+        private void ApplyRandomEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        {
+            if (record.WasRandomEventSkipped)
+            {
+                record.RecordEffectSummary(0, new[] { "随机事件池为空，节点跳过。" });
+                record.AddRouteDecisionLog("RandomEvent 节点未抽到事件，按默认出口推进。");
+                return;
+            }
+
+            ApplyEventNodeResult(node, record);
         }
 
         private void ApplyCombatNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
@@ -166,6 +216,14 @@ namespace GameLogic.Gameplay.Expedition
                 "route_transition");
             record.ResolvedTransitionId = decision.TransitionId;
             record.NextNodeConfigId = enqueuedNode?.NodeConfigId;
+        }
+
+        private ExpeditionEventConfig ResolveNodeEventConfig(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        {
+            var eventConfigId = !string.IsNullOrWhiteSpace(record?.ActualEventConfigId)
+                ? record.ActualEventConfigId
+                : node?.EventConfigId;
+            return ExpeditionConfigBridge.ResolveEvent(eventConfigId);
         }
     }
 }

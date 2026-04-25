@@ -26,6 +26,9 @@ namespace GameLogic.Gameplay.Expedition
                 };
             }
 
+            if (record != null && record.WasRandomEventSkipped)
+                return ResolveFixedNext(node);
+
             switch (node.RoutePolicy)
             {
                 case EnumExpeditionRoutePolicy.FixedNext:

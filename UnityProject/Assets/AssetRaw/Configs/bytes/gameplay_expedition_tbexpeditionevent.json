@@ -34,5 +34,36 @@
         ]
       }
     ]
+  },
+  {
+    "event_config_id": "森林泉水",
+    "title": "森林泉水",
+    "description": "遇到一滩泉水，如何处理呢？",
+    "options": [
+      {
+        "option_id": "喝水",
+        "title": "喝水",
+        "description": "回复全体士兵50点血量",
+        "lst_effect": [
+          {
+            "$type": "AddPlayerMarbleHpEffectConfig",
+            "summary": "全队回复 50 点生命",
+            "hp_delta": 50
+          }
+        ]
+      },
+      {
+        "option_id": "把钱丢进去看看",
+        "title": "把钱丢进去看看",
+        "description": "不知道为什么，你有种想要将所有钱都丢进去的冲动，似乎受到寓言故事的影响。",
+        "lst_effect": [
+          {
+            "$type": "AddMoneyEffectConfig",
+            "summary": "获得 1000 晶体",
+            "money_delta": 1000
+          }
+        ]
+      }
+    ]
   }
 ]

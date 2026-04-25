@@ -1,0 +1,8 @@
+<module name="Gameplay.Combat">
+    <bean name="CombatBattlefieldConfig" valueType="false" sep=",">
+        <var name="battlefield_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+    </bean>
+    <table name="TbCombatBattlefield" value="CombatBattlefieldConfig" input="combat_battlefield.xlsx" index="battlefield_config_id" />
+</module>

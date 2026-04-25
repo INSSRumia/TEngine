@@ -18,6 +18,7 @@ namespace GameLogic.Gameplay.Expedition
         private Action<CombatSessionResult> _onCompleted;
         private CombatManager _combatManager;
         private GameObject _sessionRoot;
+        private Battlefield _battlefield;
         private bool _isRunning;
         private float _runningTime;
 
@@ -39,9 +40,16 @@ namespace GameLogic.Gameplay.Expedition
             _runningTime = 0f;
 
             _sessionRoot = new GameObject("ExpeditionCombatSessionRoot");
+            _battlefield = BattlefieldFactory.CreateBattlefield(request.BattlefieldConfigId, _sessionRoot.transform);
+            if (_battlefield == null)
+            {
+                ClearSession();
+                return false;
+            }
+
             SpawnAlliedMarbles(request.LstAlliedMarble);
             SpawnEnemyMarbles(request.LstEnemyMarble);
-            Log.Info($"[远征战斗会话控制器] 开始会话 {request.CombatSessionInstId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
+            Log.Info($"[远征战斗会话控制器] 开始会话 {request.CombatSessionInstId} 场地:{request.BattlefieldConfigId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
             return true;
         }
 
@@ -114,6 +122,7 @@ namespace GameLogic.Gameplay.Expedition
             _currentRequest = null;
             _onCompleted = null;
             _combatManager = null;
+            _battlefield = null;
             _isRunning = false;
             _runningTime = 0f;
 
@@ -190,7 +199,7 @@ namespace GameLogic.Gameplay.Expedition
 
                 marble.name = snapshot.MarbleInstId;
                 marble.transform.SetParent(_sessionRoot.transform, false);
-                marble.transform.position = new Vector3(-5f, 0f, GetLineOffset(index, snapshots.Count));
+                _battlefield.PlaceMarble(marble, ExpeditionConstants.PlayerCombatSide);
                 marble.RuntimeData.State.Hp = Mathf.Clamp(snapshot.CurrentHp, 1, marble.RuntimeData.State.MaxHp);
                 marble.RuntimeData.State.Exp = snapshot.Exp;
                 _combatManager.Register(marble);
@@ -215,21 +224,10 @@ namespace GameLogic.Gameplay.Expedition
                 }
 
                 marble.transform.SetParent(_sessionRoot.transform, false);
-                marble.transform.position = new Vector3(5f, 0f, GetLineOffset(index, enemies.Count));
+                _battlefield.PlaceMarble(marble, ExpeditionConstants.EnemyCombatSide);
                 _combatManager.Register(marble);
                 _enemyMarbles.Add(marble);
             }
-        }
-
-        private static float GetLineOffset(int index, int total)
-        {
-            if (total <= 1)
-            {
-                return 0f;
-            }
-
-            var start = -1.5f * (total - 1);
-            return start + index * 3f;
         }
     }
 }

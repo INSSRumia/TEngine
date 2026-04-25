@@ -3,6 +3,7 @@
         <var name="None" alias="none" value="0" />
         <var name="Event" alias="event" value="1" />
         <var name="Combat" alias="combat" value="2" />
+        <var name="RandomEvent" alias="random_event" value="3" />
     </enum>
 
     <enum name="EnumExpeditionRoutePolicy">
@@ -66,10 +67,39 @@
         <var name="option_routes" type="list, ExpeditionOptionRouteConfig" />
     </bean>
 
+    <bean name="ExpeditionRandomEventPoolEntryConfig" valueType="false" sep=",">
+        <var name="event_config_id" type="string" />
+        <var name="weight" type="int" />
+    </bean>
+
+    <bean name="ExpeditionRandomEventPoolConfig" valueType="false" sep=",">
+        <var name="random_event_pool_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_event" type="list, ExpeditionRandomEventPoolEntryConfig" />
+    </bean>
+
+
+
+    <bean name="ExpeditionEnvironmentBattlefieldConfig" valueType="false" sep=",">
+        <var name="battlefield_config_id" type="string" />
+        <var name="weight" type="int" />
+    </bean>
+
+    <bean name="ExpeditionEnvironmentConfig" valueType="false" sep=",">
+        <var name="environment_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_random_event_pool_config_id" type="list, string" />
+        <var name="lst_battlefield" type="list, ExpeditionEnvironmentBattlefieldConfig" />
+    </bean>
+
     <bean name="ExpeditionConfig" valueType="false" sep=",">
         <var name="expedition_config_id" type="string" />
         <var name="name" type="string" />
         <var name="description" type="string" />
+        <var name="initial_environment_config_id" type="string" />
+        <var name="lst_random_event_pool_config_id" type="list, string" />
         <var name="route" type="list, ExpeditionRouteNodeConfig" />
     </bean>
 
@@ -87,6 +117,10 @@
 
     <bean name="AddPlayerMarbleHpEffectConfig" alias="add_player_marble_hp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
         <var name="hp_delta" type="int" />
+    </bean>
+
+    <bean name="ChangeEnvironmentEffectConfig" alias="change_environment" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="target_environment_config_id" type="string" />
     </bean>
 
     <bean name="ExpeditionEventOptionConfig" valueType="false" sep=",">
@@ -110,9 +144,12 @@
         <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
         <var name="lst_defeat_effect" type="list, ExpeditionEffectConfig" />
         <var name="enemy_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
+        <var name="battlefield_config_id" type="string" />
     </bean>
 
     <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_config_id" />
     <table name="TbExpeditionEvent" value="ExpeditionEventConfig" input="expedition_event.xlsx" index="event_config_id" />
     <table name="TbExpeditionCombatEncounter" value="ExpeditionCombatEncounterConfig" input="expedition_combat_encounter.xlsx" index="combat_encounter_config_id" />
+    <table name="TbExpeditionRandomEventPool" value="ExpeditionRandomEventPoolConfig" input="expedition_random_event_pool.xlsx" index="random_event_pool_config_id" />
+    <table name="TbExpeditionEnvironment" value="ExpeditionEnvironmentConfig" input="expedition_environment.xlsx" index="environment_config_id" />
 </module>

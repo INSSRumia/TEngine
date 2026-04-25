@@ -27,6 +27,12 @@ namespace GameLogic.Gameplay.Expedition
                 case ExpeditionTable.EnumExpeditionNodeType.Event:
                     ChangeState<ExpeditionFlowStateEvent>(fsm);
                     break;
+                case ExpeditionTable.EnumExpeditionNodeType.RandomEvent:
+                    if (owner.PrepareCurrentRandomEventNode())
+                        ChangeState<ExpeditionFlowStateEvent>(fsm);
+                    else
+                        ChangeState<ExpeditionFlowStateApplyNodeResult>(fsm);
+                    break;
                 case ExpeditionTable.EnumExpeditionNodeType.Combat:
                     ChangeState<ExpeditionFlowStateCombat>(fsm);
                     break;

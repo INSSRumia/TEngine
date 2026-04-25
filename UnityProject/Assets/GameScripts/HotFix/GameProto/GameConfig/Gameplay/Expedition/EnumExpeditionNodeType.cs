@@ -25,6 +25,10 @@ namespace GameConfig.Gameplay.Expedition
         /// combat
         /// </summary>
         Combat = 2,
+        /// <summary>
+        /// random_event
+        /// </summary>
+        RandomEvent = 3,
     }
 
 } 

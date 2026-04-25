@@ -1,6 +1,8 @@
 using TEngine;
 using UnityEngine;
 using System.Collections.Generic;
+using GameConfig.Gameplay.Combat;
+
 namespace GameLogic.Gameplay.Combat
 {
     public interface ICombatManager

@@ -10,6 +10,7 @@ namespace GameLogic.Gameplay.Expedition
         public string CombatSessionInstId;
         public string NodeConfigId;
         public string CombatEncounterConfigId;
+        public string BattlefieldConfigId;
         public string Title;
         public List<MarblePersistentData?> LstAlliedMarble = new ();
         public List<MarbleSpawnConfig> LstEnemyMarble = new ();

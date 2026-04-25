@@ -19,6 +19,9 @@ namespace GameLogic.Gameplay.Expedition
         public bool WasDynamicallyInserted;
         public string RoutePolicy;
         public string ChosenOptionId;
+        public string ActualEventConfigId;
+        public string RandomEventPoolConfigId;
+        public bool WasRandomEventSkipped;
         public int GainedMoney;
         public string ResolvedTransitionId;
         public string NextNodeConfigId;
