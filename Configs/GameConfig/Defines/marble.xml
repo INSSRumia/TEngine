@@ -31,9 +31,13 @@
         <var name="lst_level_config" type="list, MarbleLevelConfig" />
     </bean>
 
+    <!-- Marble 生成配置。可用于玩家初始队伍，也可用于远征敌方编队。 -->
     <bean name="MarbleSpawnConfig" valueType="false" sep=",">
+        <!-- 引用 MarbleConfig.config_id。 -->
         <var name="marble_config_id" type="string" />
+        <!-- 生成时的初始等级。 -->
         <var name="level" type="int" />
+        <!-- 配置阵营 Id，用于外观、颜色等表现来源；战斗敌我归属由运行时 CombatSide 决定。 -->
         <var name="camp_config_id" type="string" />
     </bean>
 

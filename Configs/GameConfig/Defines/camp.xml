@@ -1,12 +1,15 @@
 <module name="Gameplay.Camp">
 
+    <!-- 开局阵营配置。这里的 camp_config_id 表示世界观/外观/颜色阵营，不等同于 CombatSide。 -->
     <bean name="CampConfig" valueType="false" sep=",">
         <var name="camp_config_id" type="string" />
         <var name="name" type="string" />
         <var name="description" type="string" />
         <!-- 阵营颜色 -->
         <var name="color" type="color32" />
+        <!-- 玩家以该阵营开始游戏时拥有的初始 money。 -->
         <var name="initial_money" type="int" />
+        <!-- 玩家以该阵营开始游戏时拥有的初始 Marble。MarbleSpawnConfig 中也保留 camp_config_id 用于外观来源。 -->
         <var name="lst_initial_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
         <!-- 初始可用的远征配置ID列表 -->
         <var name="lst_expedition" type="list, string" />

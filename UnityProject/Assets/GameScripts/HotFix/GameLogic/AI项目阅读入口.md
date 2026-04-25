@@ -11,17 +11,22 @@
 3. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Combat模块说明.md`
    - 建立 Combat 模块整体结构、数据流、Factory 装配模型和 Runtime 黑板认知。
 4. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/远征流程设计.md`
-   - 建立最小远征闭环、FSM、Marble 持久化快照、UI 约束和 Combat 边界认知。
-5. `Configs/GameConfig/Defines/marble.xml`
+   - 建立配置驱动远征、FSM、随机事件池、环境、Effect、UI 约束和 Combat 边界认知。
+5. `Configs/GameConfig/Defines/expedition.xml`
+   - 了解远征路线、事件、随机事件池、环境、Effect 和 Combat 遭遇配置。
+6. `Configs/GameConfig/Defines/battlefield.xml`
+   - 了解 Combat 场地配置，以及 battlefield_config_id 与同名 prefab 的关系。
+7. `Configs/GameConfig/Defines/marble.xml`
    - 了解 Marble 等级配置、固定骨架能力和扩展能力入口。
-6. `Configs/GameConfig/Defines/equip.xml`
+8. `Configs/GameConfig/Defines/equip.xml`
    - 了解装备层级结构、装备骨架能力和类型差异。
-7. `Configs/GameConfig/Defines/projectile.xml`
+9. `Configs/GameConfig/Defines/projectile.xml`
    - 了解发射物骨架能力、追踪模式和扩展能力入口。
-8. 关键代码入口
+10. 关键代码入口
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/MarbleFactory.cs`
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/EquipmentFactory.cs`
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Projectile/ProjectileFactory.cs`
+   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Battlefield/BattlefieldFactory.cs`
    - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/MarbleRuntimeData.cs`
 
 ## 2. 项目核心目录
@@ -46,7 +51,9 @@
 - `Equipment`
   - 附着在 Marble 上的装备。护甲负责承伤或减伤，武器负责瞄准、伤害计算与发射/碰撞。
 - `Projectile`
-  - 独立飞行的发射物，不注册到 CombatManager，自行依据 SourceCamp 做敌我判断。
+  - 独立飞行的发射物，不注册到 CombatManager，自行依据 SourceCombatSide 做敌我判断。
+- `Battlefield`
+  - Combat 场地组件，负责按 CombatSide 将 Marble 放入双方出生 Bounds。
 - `Factory`
   - 负责“实例化 + RuntimeData 初始化 + 固定骨架能力挂载 + 配置扩展能力挂载”。
 - `Ability`
@@ -67,9 +74,12 @@
 ## 5. 进入 Expedition 前需要记住的约定
 
 - Expedition 层统一使用 `Combat` 术语，不新建并行的 `Battle` 命名体系。
-- 局外数据使用 `MarblePersistentData`，远征内运行使用 `MarblePersistentDataSnapshot`。
+- 局外数据使用 `MarblePersistentData`；远征运行中会基于这些数据建立本次 ExpeditionRunState 内的 Marble 状态。
 - 远征只通过 `CombatSessionRequest / CombatSessionResult` 与 Combat 域交互。
 - `ExpeditionNodeRecord` 记录节点实际运行结果，不再用 `Progress` 来描述节点执行记录。
+- Event 只提供内容和选项，Node 才负责路由出口。
+- RandomEvent 节点从当前激活随机事件池抽事件，但出口仍由当前 Node 的 route_policy 决定。
+- 环境当前只负责随机事件池和场地候选，不实现 Buff / GameTag。
 - UI 必须走 `UIWindow/UIModule` 流程；如果未来要改 Prefab 或 Canvas，优先通过 Unity MCP。
 
 ## 6. AI 修改时的优先检查点
@@ -86,9 +96,10 @@
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/Ability/Core/MarbleReceiveDamageAbility.cs`
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Marble/Ability/Core/MarbleDamagePipelineAbility.cs`
 - 远征主流程
-  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionModels.cs`
-  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionFlowController.cs`
-  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/ExpeditionFlowStates.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/Data/ExpeditionRunState.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/Data/ExpeditionRouting.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/Controller/ExpeditionFlowController.cs`
+  - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/Controller/States/ExpeditionFlowStateEnterNode.cs`
 - 远程武器链路
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/Ability/Core/WeaponCalculateDamageAbility.cs`
   - `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Equipment/Ability/Core/BowFireAbility.cs`

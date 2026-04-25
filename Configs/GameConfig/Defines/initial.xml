@@ -1,5 +1,6 @@
 <module name="Gameplay.Initial">
 
+    <!-- 游戏当前使用的初始配置。当前阶段只配置玩家从哪个 CampConfig 开始。 -->
     <bean name="InitialConfig" valueType="false" sep=",">
         <var name="camp_config_id" type="string" />
     </bean>

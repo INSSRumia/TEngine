@@ -1,8 +1,11 @@
 <module name="Gameplay.Combat">
+    <!-- Combat 场地配置。远征只传递 battlefield_config_id，场地解析和 prefab 加载由 Combat 层负责。 -->
     <bean name="CombatBattlefieldConfig" valueType="false" sep=",">
+        <!-- 场地配置 Id，同时也是 prefab 名称。加载路径为 Assets/AssetRaw/Actor/Prefabs/Battlefield/{battlefield_config_id}。 -->
         <var name="battlefield_config_id" type="string" />
         <var name="name" type="string" />
         <var name="description" type="string" />
     </bean>
+
     <table name="TbCombatBattlefield" value="CombatBattlefieldConfig" input="combat_battlefield.xlsx" index="battlefield_config_id" />
 </module>
