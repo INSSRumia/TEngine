@@ -11,29 +11,27 @@ using Luban;
 using Luban.SimpleJSON;
 
 
-namespace GameConfig.Gameplay.Expedition
+namespace GameConfig.Gameplay.Combat
 {
-public sealed partial class ExpeditionEnemyMarbleConfig : Luban.BeanBase
+public sealed partial class MarbleSpawnConfig : Luban.BeanBase
 {
-    public ExpeditionEnemyMarbleConfig(JSONNode _buf) 
+    public MarbleSpawnConfig(JSONNode _buf) 
     {
-        { if(!_buf["enemy_config_id"].IsString) { throw new SerializationException(); }  EnemyConfigId = _buf["enemy_config_id"]; }
         { if(!_buf["marble_config_id"].IsString) { throw new SerializationException(); }  MarbleConfigId = _buf["marble_config_id"]; }
-        { if(!_buf["display_name"].IsString) { throw new SerializationException(); }  DisplayName = _buf["display_name"]; }
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
+        { if(!_buf["camp_config_id"].IsString) { throw new SerializationException(); }  CampConfigId = _buf["camp_config_id"]; }
     }
 
-    public static ExpeditionEnemyMarbleConfig DeserializeExpeditionEnemyMarbleConfig(JSONNode _buf)
+    public static MarbleSpawnConfig DeserializeMarbleSpawnConfig(JSONNode _buf)
     {
-        return new Gameplay.Expedition.ExpeditionEnemyMarbleConfig(_buf);
+        return new Gameplay.Combat.MarbleSpawnConfig(_buf);
     }
 
-    public readonly string EnemyConfigId;
     public readonly string MarbleConfigId;
-    public readonly string DisplayName;
     public readonly int Level;
+    public readonly string CampConfigId;
    
-    public const int __ID__ = 471875265;
+    public const int __ID__ = -527833778;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)
@@ -43,10 +41,9 @@ public sealed partial class ExpeditionEnemyMarbleConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
-        + "enemyConfigId:" + EnemyConfigId + ","
         + "marbleConfigId:" + MarbleConfigId + ","
-        + "displayName:" + DisplayName + ","
         + "level:" + Level + ","
+        + "campConfigId:" + CampConfigId + ","
         + "}";
     }
 }

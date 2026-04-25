@@ -5,7 +5,7 @@ using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -198,7 +198,7 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        private void SpawnEnemyMarbles(List<ExpeditionEnemyMarbleConfig> enemies)
+        private void SpawnEnemyMarbles(List<MarbleSpawnConfig> enemies)
         {
             if (enemies == null)
             {
@@ -214,7 +214,6 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
                 }
 
-                marble.name = enemy.EnemyConfigId;
                 marble.transform.SetParent(_sessionRoot.transform, false);
                 marble.transform.position = new Vector3(5f, 0f, GetLineOffset(index, enemies.Count));
                 _combatManager.Register(marble);

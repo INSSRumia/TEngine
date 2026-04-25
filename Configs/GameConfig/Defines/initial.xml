@@ -1,0 +1,8 @@
+<module name="Gameplay.Initial">
+
+    <bean name="InitialConfig" valueType="false" sep=",">
+        <var name="camp_config_id" type="string" />
+    </bean>
+
+    <table name="TbInitial" value="InitialConfig" mode="single" input="initial.xlsx" />
+</module>

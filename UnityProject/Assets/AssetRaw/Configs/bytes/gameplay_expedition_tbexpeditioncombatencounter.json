@@ -19,16 +19,14 @@
     ],
     "enemy_marbles": [
       {
-        "enemy_config_id": "1",
         "marble_config_id": "soldier",
-        "display_name": "巡逻剑士",
-        "level": 0
+        "level": 0,
+        "camp_config_id": "human"
       },
       {
-        "enemy_config_id": "2",
         "marble_config_id": "archer",
-        "display_name": "巡逻弓箭手",
-        "level": 0
+        "level": 0,
+        "camp_config_id": "human"
       }
     ]
   }

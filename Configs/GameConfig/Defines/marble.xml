@@ -30,5 +30,12 @@
         <var name="name" type="string" />
         <var name="lst_level_config" type="list, MarbleLevelConfig" />
     </bean>
+
+    <bean name="MarbleSpawnConfig" valueType="false" sep=",">
+        <var name="marble_config_id" type="string" />
+        <var name="level" type="int" />
+        <var name="camp_config_id" type="string" />
+    </bean>
+
     <table name="TbMarble" value="MarbleConfig" input="marble.xlsx" index="config_id" />
 </module>

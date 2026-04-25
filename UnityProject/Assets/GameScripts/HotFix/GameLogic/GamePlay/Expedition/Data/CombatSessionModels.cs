@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Combat;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -12,7 +12,7 @@ namespace GameLogic.Gameplay.Expedition
         public string CombatEncounterConfigId;
         public string Title;
         public List<MarblePersistentData?> LstAlliedMarble = new ();
-        public List<ExpeditionEnemyMarbleConfig> LstEnemyMarble = new ();
+        public List<MarbleSpawnConfig> LstEnemyMarble = new ();
     }
 
     [Serializable]

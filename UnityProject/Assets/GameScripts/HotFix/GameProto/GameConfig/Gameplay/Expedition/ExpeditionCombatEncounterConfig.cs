@@ -22,7 +22,7 @@ public sealed partial class ExpeditionCombatEncounterConfig : Luban.BeanBase
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
         { var __json0 = _buf["lst_victory_effect"]; if(!__json0.IsArray) { throw new SerializationException(); } LstVictoryEffect = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEffectConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEffectConfig.DeserializeExpeditionEffectConfig(__e0);  }  LstVictoryEffect.Add(__v0); }   }
         { var __json0 = _buf["lst_defeat_effect"]; if(!__json0.IsArray) { throw new SerializationException(); } LstDefeatEffect = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEffectConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEffectConfig.DeserializeExpeditionEffectConfig(__e0);  }  LstDefeatEffect.Add(__v0); }   }
-        { var __json0 = _buf["enemy_marbles"]; if(!__json0.IsArray) { throw new SerializationException(); } EnemyMarbles = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnemyMarbleConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEnemyMarbleConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEnemyMarbleConfig.DeserializeExpeditionEnemyMarbleConfig(__e0);  }  EnemyMarbles.Add(__v0); }   }
+        { var __json0 = _buf["enemy_marbles"]; if(!__json0.IsArray) { throw new SerializationException(); } EnemyMarbles = new System.Collections.Generic.List<Gameplay.Combat.MarbleSpawnConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Combat.MarbleSpawnConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Combat.MarbleSpawnConfig.DeserializeMarbleSpawnConfig(__e0);  }  EnemyMarbles.Add(__v0); }   }
     }
 
     public static ExpeditionCombatEncounterConfig DeserializeExpeditionCombatEncounterConfig(JSONNode _buf)
@@ -35,7 +35,7 @@ public sealed partial class ExpeditionCombatEncounterConfig : Luban.BeanBase
     public readonly string Description;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig> LstVictoryEffect;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig> LstDefeatEffect;
-    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnemyMarbleConfig> EnemyMarbles;
+    public readonly System.Collections.Generic.List<Gameplay.Combat.MarbleSpawnConfig> EnemyMarbles;
    
     public const int __ID__ = -1862266373;
     public override int GetTypeId() => __ID__;

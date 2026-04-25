@@ -1,0 +1,16 @@
+<module name="Gameplay.Camp">
+
+    <bean name="CampConfig" valueType="false" sep=",">
+        <var name="camp_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <!-- 阵营颜色 -->
+        <var name="color" type="string" />
+        <var name="initial_money" type="int" />
+        <var name="lst_initial_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
+        <!-- 初始可用的远征配置ID列表 -->
+        <var name="lst_expedition" type="list, string" />
+    </bean>
+
+    <table name="TbCamp" value="CampConfig" input="camp.xlsx" index="camp_config_id" />
+</module>

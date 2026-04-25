@@ -14,19 +14,23 @@ namespace GameConfig
 {
 public partial class Tables
 {
+    public Gameplay.Camp.TbCamp TbCamp {get; }
     public Gameplay.Combat.TbEquipment TbEquipment {get; }
     public Gameplay.Expedition.TbExpedition TbExpedition {get; }
     public Gameplay.Expedition.TbExpeditionEvent TbExpeditionEvent {get; }
     public Gameplay.Expedition.TbExpeditionCombatEncounter TbExpeditionCombatEncounter {get; }
+    public Gameplay.Initial.TbInitial TbInitial {get; }
     public Gameplay.Combat.TbMarble TbMarble {get; }
     public Gameplay.Combat.TbProjectile TbProjectile {get; }
 
     public Tables(System.Func<string, JSONNode> loader)
     {
+        TbCamp = new Gameplay.Camp.TbCamp(loader("gameplay_camp_tbcamp"));
         TbEquipment = new Gameplay.Combat.TbEquipment(loader("gameplay_combat_tbequipment"));
         TbExpedition = new Gameplay.Expedition.TbExpedition(loader("gameplay_expedition_tbexpedition"));
         TbExpeditionEvent = new Gameplay.Expedition.TbExpeditionEvent(loader("gameplay_expedition_tbexpeditionevent"));
         TbExpeditionCombatEncounter = new Gameplay.Expedition.TbExpeditionCombatEncounter(loader("gameplay_expedition_tbexpeditioncombatencounter"));
+        TbInitial = new Gameplay.Initial.TbInitial(loader("gameplay_initial_tbinitial"));
         TbMarble = new Gameplay.Combat.TbMarble(loader("gameplay_combat_tbmarble"));
         TbProjectile = new Gameplay.Combat.TbProjectile(loader("gameplay_combat_tbprojectile"));
         ResolveRef();
@@ -34,10 +38,12 @@ public partial class Tables
     
     private void ResolveRef()
     {
+        TbCamp.ResolveRef(this);
         TbEquipment.ResolveRef(this);
         TbExpedition.ResolveRef(this);
         TbExpeditionEvent.ResolveRef(this);
         TbExpeditionCombatEncounter.ResolveRef(this);
+        TbInitial.ResolveRef(this);
         TbMarble.ResolveRef(this);
         TbProjectile.ResolveRef(this);
     }

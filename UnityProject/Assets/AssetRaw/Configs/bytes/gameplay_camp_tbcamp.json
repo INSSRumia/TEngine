@@ -1,0 +1,34 @@
+[
+  {
+    "camp_config_id": "human",
+    "name": "人类",
+    "description": "人类",
+    "color": "#FFFFFFFF",
+    "initial_money": 1000,
+    "lst_initial_marbles": [
+      {
+        "marble_config_id": "lancer",
+        "level": 0,
+        "camp_config_id": "human"
+      },
+      {
+        "marble_config_id": "lancer",
+        "level": 0,
+        "camp_config_id": "human"
+      },
+      {
+        "marble_config_id": "soldier",
+        "level": 0,
+        "camp_config_id": "human"
+      },
+      {
+        "marble_config_id": "archer",
+        "level": 0,
+        "camp_config_id": "human"
+      }
+    ],
+    "lst_expedition": [
+      "近郊森林"
+    ]
+  }
+]

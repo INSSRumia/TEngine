@@ -5,7 +5,7 @@
     "description": "队伍在废墟中发现两份应急补给，你要立刻决定如何处理。",
     "options": [
       {
-        "option_id": "1",
+        "option_id": "拆解补给箱",
         "title": "拆解补给箱",
         "description": "快速拆解出可回收晶体，但搬运时会造成碰撞损伤。",
         "lst_effect": [
@@ -22,7 +22,7 @@
         ]
       },
       {
-        "option_id": "2",
+        "option_id": "整理战术笔记",
         "title": "整理战术笔记",
         "description": "没有额外晶体，但每名 Marble 都能获得战前经验。",
         "lst_effect": [

@@ -103,20 +103,13 @@
         <var name="options" type="list, ExpeditionEventOptionConfig" />
     </bean>
 
-    <bean name="ExpeditionEnemyMarbleConfig" valueType="false" sep=",">
-        <var name="enemy_config_id" type="string" />
-        <var name="marble_config_id" type="string" />
-        <var name="display_name" type="string" />
-        <var name="level" type="int" />
-    </bean>
-
     <bean name="ExpeditionCombatEncounterConfig" valueType="false" sep=",">
         <var name="combat_encounter_config_id" type="string" />
         <var name="title" type="string" />
         <var name="description" type="string" />
         <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
         <var name="lst_defeat_effect" type="list, ExpeditionEffectConfig" />
-        <var name="enemy_marbles" type="list, ExpeditionEnemyMarbleConfig" />
+        <var name="enemy_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
     </bean>
 
     <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_config_id" />
