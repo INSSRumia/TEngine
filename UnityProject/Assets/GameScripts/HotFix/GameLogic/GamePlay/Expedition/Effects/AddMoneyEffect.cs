@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
-    public sealed class AddMoneyEffect : IExpeditionEffect
+    public class AddMoneyEffect : IExpeditionEffect
     {
         private readonly ExpeditionTable.AddMoneyEffectConfig _config;
 
@@ -13,11 +14,21 @@ namespace GameLogic.Gameplay.Expedition
 
         public void Execute(ExpeditionEffectExecutionContext context)
         {
-            context.RunState.TotalMoneyGained += _config.MoneyDelta;
-            context.AddMoneyDelta(_config.MoneyDelta);
-            context.AddSummary(string.IsNullOrWhiteSpace(_config.Summary)
-                ? $"获得 {_config.MoneyDelta} 晶体。"
-                : _config.Summary);
+            var moneyValue = ExpeditionRewardResolver.ResolveMoney(context, _config.Money);
+            var moneyDelta = _config.Operation == ExpeditionTable.EnumExpeditionRewardOperation.Subtract
+                ? -moneyValue
+                : moneyValue;
+            context.RunState.TotalMoneyGained += moneyDelta;
+            context.AddMoneyDelta(moneyDelta);
+
+            var dictTokenValue = new Dictionary<string, string>
+            {
+                ["money"] = System.Math.Abs(moneyDelta).ToString(),
+            };
+            var fallbackSummary = moneyDelta >= 0
+                ? $"获得 {moneyDelta} 晶体。"
+                : $"失去 {System.Math.Abs(moneyDelta)} 晶体。";
+            context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
         }
     }
 }

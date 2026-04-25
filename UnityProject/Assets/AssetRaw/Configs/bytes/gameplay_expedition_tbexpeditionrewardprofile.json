@@ -1,0 +1,344 @@
+[
+  {
+    "reward_profile_config_id": "配置1",
+    "name": "配置1",
+    "description": "配置1",
+    "lst_money": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      }
+    ],
+    "lst_exp": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      }
+    ],
+    "lst_hp": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 10
+          },
+          {
+            "reward_tier": 1,
+            "value": 25
+          },
+          {
+            "reward_tier": 2,
+            "value": 50
+          },
+          {
+            "reward_tier": 3,
+            "value": 100
+          },
+          {
+            "reward_tier": 4,
+            "value": 200
+          }
+        ]
+      }
+    ],
+    "lst_marble_count": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 1
+          },
+          {
+            "reward_tier": 1,
+            "value": 2
+          },
+          {
+            "reward_tier": 2,
+            "value": 3
+          },
+          {
+            "reward_tier": 3,
+            "value": 4
+          },
+          {
+            "reward_tier": 4,
+            "value": 5
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 1
+          },
+          {
+            "reward_tier": 1,
+            "value": 2
+          },
+          {
+            "reward_tier": 2,
+            "value": 3
+          },
+          {
+            "reward_tier": 3,
+            "value": 4
+          },
+          {
+            "reward_tier": 4,
+            "value": 5
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "reward_tier": 0,
+            "value": 1
+          },
+          {
+            "reward_tier": 1,
+            "value": 2
+          },
+          {
+            "reward_tier": 2,
+            "value": 3
+          },
+          {
+            "reward_tier": 3,
+            "value": 4
+          },
+          {
+            "reward_tier": 4,
+            "value": 5
+          }
+        ]
+      }
+    ],
+    "lst_recruit_candidate": [
+      {
+        "reward_tier": 2,
+        "marble_spawn_config": {
+          "marble_config_id": "lancer",
+          "level": 0,
+          "camp_config_id": "human"
+        },
+        "weight": 10
+      },
+      {
+        "reward_tier": 2,
+        "marble_spawn_config": {
+          "marble_config_id": "soldier",
+          "level": 0,
+          "camp_config_id": "human"
+        },
+        "weight": 10
+      },
+      {
+        "reward_tier": 2,
+        "marble_spawn_config": {
+          "marble_config_id": "archer",
+          "level": 0,
+          "camp_config_id": "human"
+        },
+        "weight": 10
+      }
+    ]
+  }
+]

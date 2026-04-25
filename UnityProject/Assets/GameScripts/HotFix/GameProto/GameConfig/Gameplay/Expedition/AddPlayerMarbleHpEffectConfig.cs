@@ -17,7 +17,8 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
 {
     public AddPlayerMarbleHpEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["hp_delta"].IsNumber) { throw new SerializationException(); }  HpDelta = _buf["hp_delta"]; }
+        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.Expedition.EnumExpeditionRewardOperation)_buf["operation"].AsInt; }
+        { if(!_buf["hp"].IsObject) { throw new SerializationException(); }  Hp = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["hp"]);  }
     }
 
     public static AddPlayerMarbleHpEffectConfig DeserializeAddPlayerMarbleHpEffectConfig(JSONNode _buf)
@@ -25,7 +26,8 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
         return new Gameplay.Expedition.AddPlayerMarbleHpEffectConfig(_buf);
     }
 
-    public readonly int HpDelta;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardOperation Operation;
+    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Hp;
    
     public const int __ID__ = 1896911477;
     public override int GetTypeId() => __ID__;
@@ -33,13 +35,15 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        Hp?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "hpDelta:" + HpDelta + ","
+        + "operation:" + Operation + ","
+        + "hp:" + Hp + ","
         + "}";
     }
 }

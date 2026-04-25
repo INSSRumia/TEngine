@@ -11,13 +11,19 @@
         "lst_effect": [
           {
             "$type": "AddMoneyEffectConfig",
-            "summary": "获得 60 晶体。",
-            "money_delta": 60
+            "summary": "获得 {money} 晶体。",
+            "operation": 0,
+            "money": {
+              "reward_tier": 2
+            }
           },
           {
             "$type": "AddPlayerMarbleHpEffectConfig",
-            "summary": "全队失去 8 点生命",
-            "hp_delta": -8
+            "summary": "全队失去 {hp} 点生命",
+            "operation": 1,
+            "hp": {
+              "reward_tier": 0
+            }
           }
         ]
       },
@@ -28,8 +34,10 @@
         "lst_effect": [
           {
             "$type": "AddPlayerMarbleExpEffectConfig",
-            "summary": "全队获得 12 点经验。",
-            "exp_delta": 12
+            "summary": "全队获得 {exp} 点经验。",
+            "exp": {
+              "reward_tier": 2
+            }
           }
         ]
       }
@@ -47,8 +55,11 @@
         "lst_effect": [
           {
             "$type": "AddPlayerMarbleHpEffectConfig",
-            "summary": "全队回复 50 点生命",
-            "hp_delta": 50
+            "summary": "全队回复 {hp} 点生命",
+            "operation": 0,
+            "hp": {
+              "reward_tier": 2
+            }
           }
         ]
       },
@@ -59,8 +70,11 @@
         "lst_effect": [
           {
             "$type": "AddMoneyEffectConfig",
-            "summary": "获得 1000 晶体",
-            "money_delta": 1000
+            "summary": "获得 {money} 晶体",
+            "operation": 0,
+            "money": {
+              "reward_tier": 3
+            }
           }
         ]
       }

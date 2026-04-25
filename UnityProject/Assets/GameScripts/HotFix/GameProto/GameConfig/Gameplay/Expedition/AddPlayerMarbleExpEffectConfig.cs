@@ -17,7 +17,7 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
 {
     public AddPlayerMarbleExpEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["exp_delta"].IsNumber) { throw new SerializationException(); }  ExpDelta = _buf["exp_delta"]; }
+        { if(!_buf["exp"].IsObject) { throw new SerializationException(); }  Exp = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["exp"]);  }
     }
 
     public static AddPlayerMarbleExpEffectConfig DeserializeAddPlayerMarbleExpEffectConfig(JSONNode _buf)
@@ -25,7 +25,7 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
         return new Gameplay.Expedition.AddPlayerMarbleExpEffectConfig(_buf);
     }
 
-    public readonly int ExpDelta;
+    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Exp;
    
     public const int __ID__ = -798641898;
     public override int GetTypeId() => __ID__;
@@ -33,13 +33,14 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        Exp?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "expDelta:" + ExpDelta + ","
+        + "exp:" + Exp + ","
         + "}";
     }
 }

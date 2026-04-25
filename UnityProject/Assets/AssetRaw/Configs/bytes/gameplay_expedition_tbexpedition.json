@@ -3,6 +3,7 @@
     "expedition_config_id": "近郊森林",
     "name": "近郊森林",
     "description": "附加的森林，不算太危险",
+    "reward_profile_config_id": "配置1",
     "initial_environment_config_id": "普通森林",
     "lst_random_event_pool_config_id": [],
     "route": [

@@ -6,15 +6,20 @@
     "lst_victory_effect": [
       {
         "$type": "AddMoneyEffectConfig",
-        "summary": "获得120晶体",
-        "money_delta": 120
+        "summary": "获得{money}晶体",
+        "operation": 0,
+        "money": {
+          "reward_tier": 3
+        }
       }
     ],
     "lst_defeat_effect": [
       {
         "$type": "AddPlayerMarbleExpEffectConfig",
-        "summary": "全队获得 15 经验",
-        "exp_delta": 15
+        "summary": "全队获得 {exp} 经验",
+        "exp": {
+          "reward_tier": 0
+        }
       }
     ],
     "enemy_marbles": [

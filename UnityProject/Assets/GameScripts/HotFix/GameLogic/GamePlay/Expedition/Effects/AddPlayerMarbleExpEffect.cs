@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
-    public sealed class AddPlayerMarbleExpEffect : IExpeditionEffect
+    public class AddPlayerMarbleExpEffect : IExpeditionEffect
     {
         private readonly ExpeditionTable.AddPlayerMarbleExpEffectConfig _config;
 
@@ -14,25 +15,28 @@ namespace GameLogic.Gameplay.Expedition
         public void Execute(ExpeditionEffectExecutionContext context)
         {
             if (context.RunState.MarbleSnapshots == null)
-            {
                 return;
-            }
+
+            var expDelta = ExpeditionRewardResolver.ResolveExp(context, _config.Exp);
 
             for (int i = 0; i < context.RunState.MarbleSnapshots.Count; i++)
             {
                 if (!context.RunState.MarbleSnapshots[i].HasValue)
-                {
                     continue;
-                }
 
                 var snapshot = context.RunState.MarbleSnapshots[i].Value;
-                snapshot.Exp += _config.ExpDelta;
+                snapshot.Exp += expDelta;
                 context.RunState.MarbleSnapshots[i] = snapshot;
             }
 
-            context.AddSummary(string.IsNullOrWhiteSpace(_config.Summary)
-                ? $"全队获得 {_config.ExpDelta} 点经验。"
-                : _config.Summary);
+            var dictTokenValue = new Dictionary<string, string>
+            {
+                ["exp"] = expDelta.ToString(),
+            };
+            var fallbackSummary = expDelta >= 0
+                ? $"全队获得 {expDelta} 点经验。"
+                : $"全队失去 {System.Math.Abs(expDelta)} 点经验。";
+            context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
         }
     }
 }

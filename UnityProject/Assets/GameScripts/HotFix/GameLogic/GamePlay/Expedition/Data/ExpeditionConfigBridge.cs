@@ -98,6 +98,14 @@ namespace GameLogic.Gameplay.Expedition
             return runState;
         }
 
+        public static ExpeditionConfig ResolveExpedition(string expeditionConfigId)
+        {
+            if (string.IsNullOrWhiteSpace(expeditionConfigId))
+                return null;
+
+            return ConfigSystem.Instance.Tables?.TbExpedition?.GetOrDefault(expeditionConfigId);
+        }
+
         public static ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionConfigId)
         {
             var expeditionTable = ConfigSystem.Instance.Tables?.TbExpedition;
@@ -166,6 +174,14 @@ namespace GameLogic.Gameplay.Expedition
             return ConfigSystem.Instance.Tables?.TbExpeditionEnvironment?.GetOrDefault(environmentConfigId);
         }
 
+        public static ExpeditionRewardProfileConfig ResolveRewardProfile(string rewardProfileConfigId)
+        {
+            if (string.IsNullOrWhiteSpace(rewardProfileConfigId))
+                return null;
+
+            return ConfigSystem.Instance.Tables?.TbExpeditionRewardProfile?.GetOrDefault(rewardProfileConfigId);
+        }
+
         public static ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
         {
             var lstPreferredExpedition = ResolveAvailableExpeditionConfigIds();
@@ -223,7 +239,11 @@ namespace GameLogic.Gameplay.Expedition
         private static bool ValidateExpedition(ExpeditionConfig expedition)
         {
             if (expedition == null || expedition.Route == null || expedition.Route.Count == 0)
+                return false;
+
+            if (ResolveRewardProfile(expedition.RewardProfileConfigId) == null)
             {
+                Log.Warning($"[远征] 远征缺少有效奖励档位配置。expeditionConfigId:{expedition.ExpeditionConfigId} rewardProfileConfigId:{expedition.RewardProfileConfigId}");
                 return false;
             }
 
@@ -362,6 +382,51 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             return true;
+        }
+    }
+
+    public class ExpeditionRewardContext
+    {
+        public ExpeditionConfig ExpeditionConfig;
+        public ExpeditionRewardProfileConfig RewardProfileConfig;
+        public EnumExpeditionRewardProgressStage ProgressStage;
+        public int CurrentNodeOrder;
+        public int TotalConfiguredNodeCount;
+
+        public static ExpeditionRewardContext Create(ExpeditionRunState runState, ExpeditionNodeRecord nodeRecord)
+        {
+            var expeditionConfig = ExpeditionConfigBridge.ResolveExpedition(runState?.ExpeditionConfigId);
+            var rewardProfileConfig = ExpeditionConfigBridge.ResolveRewardProfile(expeditionConfig?.RewardProfileConfigId);
+            var currentNodeOrder = nodeRecord?.EntryOrder ?? runState?.EnteredNodeCount ?? 0;
+            var totalConfiguredNodeCount = runState?.Route?.Count ?? 0;
+
+            return new ExpeditionRewardContext
+            {
+                ExpeditionConfig = expeditionConfig,
+                RewardProfileConfig = rewardProfileConfig,
+                ProgressStage = ResolveProgressStage(currentNodeOrder, totalConfiguredNodeCount),
+                CurrentNodeOrder = currentNodeOrder,
+                TotalConfiguredNodeCount = totalConfiguredNodeCount,
+            };
+        }
+
+        private static EnumExpeditionRewardProgressStage ResolveProgressStage(int currentNodeOrder, int totalConfiguredNodeCount)
+        {
+            if (currentNodeOrder <= 0 || totalConfiguredNodeCount <= 1)
+                return EnumExpeditionRewardProgressStage.Early;
+
+            var denominator = totalConfiguredNodeCount - 1;
+            if (denominator <= 0)
+                return EnumExpeditionRewardProgressStage.Early;
+
+            var progress01 = (float)(currentNodeOrder - 1) / denominator;
+            if (progress01 < 0.34f)
+                return EnumExpeditionRewardProgressStage.Early;
+
+            if (progress01 < 0.67f)
+                return EnumExpeditionRewardProgressStage.Mid;
+
+            return EnumExpeditionRewardProgressStage.Late;
         }
     }
 }

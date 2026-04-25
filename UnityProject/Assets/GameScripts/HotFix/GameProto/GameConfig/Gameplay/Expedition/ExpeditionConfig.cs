@@ -20,6 +20,7 @@ public sealed partial class ExpeditionConfig : Luban.BeanBase
         { if(!_buf["expedition_config_id"].IsString) { throw new SerializationException(); }  ExpeditionConfigId = _buf["expedition_config_id"]; }
         { if(!_buf["name"].IsString) { throw new SerializationException(); }  Name = _buf["name"]; }
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
+        { if(!_buf["reward_profile_config_id"].IsString) { throw new SerializationException(); }  RewardProfileConfigId = _buf["reward_profile_config_id"]; }
         { if(!_buf["initial_environment_config_id"].IsString) { throw new SerializationException(); }  InitialEnvironmentConfigId = _buf["initial_environment_config_id"]; }
         { var __json0 = _buf["lst_random_event_pool_config_id"]; if(!__json0.IsArray) { throw new SerializationException(); } LstRandomEventPoolConfigId = new System.Collections.Generic.List<string>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  LstRandomEventPoolConfigId.Add(__v0); }   }
         { var __json0 = _buf["route"]; if(!__json0.IsArray) { throw new SerializationException(); } Route = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionRouteNodeConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionRouteNodeConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionRouteNodeConfig.DeserializeExpeditionRouteNodeConfig(__e0);  }  Route.Add(__v0); }   }
@@ -33,6 +34,7 @@ public sealed partial class ExpeditionConfig : Luban.BeanBase
     public readonly string ExpeditionConfigId;
     public readonly string Name;
     public readonly string Description;
+    public readonly string RewardProfileConfigId;
     public readonly string InitialEnvironmentConfigId;
     public readonly System.Collections.Generic.List<string> LstRandomEventPoolConfigId;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionRouteNodeConfig> Route;
@@ -51,6 +53,7 @@ public sealed partial class ExpeditionConfig : Luban.BeanBase
         + "expeditionConfigId:" + ExpeditionConfigId + ","
         + "name:" + Name + ","
         + "description:" + Description + ","
+        + "rewardProfileConfigId:" + RewardProfileConfigId + ","
         + "initialEnvironmentConfigId:" + InitialEnvironmentConfigId + ","
         + "lstRandomEventPoolConfigId:" + Luban.StringUtil.CollectionToString(LstRandomEventPoolConfigId) + ","
         + "route:" + Luban.StringUtil.CollectionToString(Route) + ","

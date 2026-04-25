@@ -17,7 +17,8 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
 {
     public AddMoneyEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["money_delta"].IsNumber) { throw new SerializationException(); }  MoneyDelta = _buf["money_delta"]; }
+        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.Expedition.EnumExpeditionRewardOperation)_buf["operation"].AsInt; }
+        { if(!_buf["money"].IsObject) { throw new SerializationException(); }  Money = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["money"]);  }
     }
 
     public static AddMoneyEffectConfig DeserializeAddMoneyEffectConfig(JSONNode _buf)
@@ -25,7 +26,8 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
         return new Gameplay.Expedition.AddMoneyEffectConfig(_buf);
     }
 
-    public readonly int MoneyDelta;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardOperation Operation;
+    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Money;
    
     public const int __ID__ = -625639017;
     public override int GetTypeId() => __ID__;
@@ -33,13 +35,15 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
+        Money?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "moneyDelta:" + MoneyDelta + ","
+        + "operation:" + Operation + ","
+        + "money:" + Money + ","
         + "}";
     }
 }

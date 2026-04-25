@@ -17,8 +17,7 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
 {
     public AddPlayerMarbleEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["marble_spawn_config"].IsObject) { throw new SerializationException(); }  MarbleSpawnConfig = global::GameConfig.Gameplay.Combat.MarbleSpawnConfig.DeserializeMarbleSpawnConfig(_buf["marble_spawn_config"]);  }
-        { if(!_buf["count"].IsNumber) { throw new SerializationException(); }  Count = _buf["count"]; }
+        { if(!_buf["marble_count"].IsObject) { throw new SerializationException(); }  MarbleCount = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["marble_count"]);  }
     }
 
     public static AddPlayerMarbleEffectConfig DeserializeAddPlayerMarbleEffectConfig(JSONNode _buf)
@@ -26,8 +25,7 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
         return new Gameplay.Expedition.AddPlayerMarbleEffectConfig(_buf);
     }
 
-    public readonly Gameplay.Combat.MarbleSpawnConfig MarbleSpawnConfig;
-    public readonly int Count;
+    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig MarbleCount;
    
     public const int __ID__ = 831192013;
     public override int GetTypeId() => __ID__;
@@ -35,15 +33,14 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
-        MarbleSpawnConfig?.ResolveRef(tables);
+        MarbleCount?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "marbleSpawnConfig:" + MarbleSpawnConfig + ","
-        + "count:" + Count + ","
+        + "marbleCount:" + MarbleCount + ","
         + "}";
     }
 }
