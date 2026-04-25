@@ -43,4 +43,14 @@
             <option name="constructor" value="ExternalTypeUtil.NewVector3" />
         </mapper>
     </bean>
+    <bean name="color32" valueType="0" sep=",">
+        <var name="r" type="byte" />
+        <var name="g" type="byte" />
+        <var name="b" type="byte" />
+        <var name="a" type="byte" />
+        <mapper target="client" codeTarget="cs-bin,cs-simple-json,cs-newtonsoft-json">
+            <option name="type" value="UnityEngine.Color32" />
+            <option name="constructor" value="ExternalTypeUtil.NewColor32" />
+        </mapper>
+    </bean>
 </module>

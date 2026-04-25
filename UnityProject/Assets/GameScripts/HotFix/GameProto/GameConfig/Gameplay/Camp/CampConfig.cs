@@ -20,7 +20,7 @@ public sealed partial class CampConfig : Luban.BeanBase
         { if(!_buf["camp_config_id"].IsString) { throw new SerializationException(); }  CampConfigId = _buf["camp_config_id"]; }
         { if(!_buf["name"].IsString) { throw new SerializationException(); }  Name = _buf["name"]; }
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
-        { if(!_buf["color"].IsString) { throw new SerializationException(); }  Color = _buf["color"]; }
+        { if(!_buf["color"].IsObject) { throw new SerializationException(); }  Color = ExternalTypeUtil.NewColor32(global::GameConfig.color32.Deserializecolor32(_buf["color"]));  }
         { if(!_buf["initial_money"].IsNumber) { throw new SerializationException(); }  InitialMoney = _buf["initial_money"]; }
         { var __json0 = _buf["lst_initial_marbles"]; if(!__json0.IsArray) { throw new SerializationException(); } LstInitialMarbles = new System.Collections.Generic.List<Gameplay.Combat.MarbleSpawnConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Combat.MarbleSpawnConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Combat.MarbleSpawnConfig.DeserializeMarbleSpawnConfig(__e0);  }  LstInitialMarbles.Add(__v0); }   }
         { var __json0 = _buf["lst_expedition"]; if(!__json0.IsArray) { throw new SerializationException(); } LstExpedition = new System.Collections.Generic.List<string>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  LstExpedition.Add(__v0); }   }
@@ -34,7 +34,7 @@ public sealed partial class CampConfig : Luban.BeanBase
     public readonly string CampConfigId;
     public readonly string Name;
     public readonly string Description;
-    public readonly string Color;
+    public readonly UnityEngine.Color32 Color;
     public readonly int InitialMoney;
     public readonly System.Collections.Generic.List<Gameplay.Combat.MarbleSpawnConfig> LstInitialMarbles;
     public readonly System.Collections.Generic.List<string> LstExpedition;

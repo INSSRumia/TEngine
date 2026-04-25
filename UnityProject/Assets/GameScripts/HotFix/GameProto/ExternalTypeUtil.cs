@@ -26,4 +26,9 @@ public static class ExternalTypeUtil
     {
         return new Vector3Int(v.X, v.Y, v.Z);
     }
+
+    public static Color32 NewColor32(GameConfig.color32 v)
+    {
+        return new Color32(v.R, v.G, v.B, v.A);
+    }
 }

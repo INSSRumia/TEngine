@@ -4,6 +4,7 @@ using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.Rendering;
 
 namespace GameLogic.Gameplay.Combat.Marble
 {
@@ -52,10 +53,18 @@ namespace GameLogic.Gameplay.Combat.Marble
             if (collider != null)
                 collider.enabled = false;
 
+            var sortingGroup = Owner.GetComponentInChildren<SortingGroup>();
+            if (sortingGroup != null)
+                sortingGroup.sortingLayerName = "Death";
+
             var sprite = Owner.GetComponentInChildren<SpriteRenderer>();
             if (sprite != null)
             {
-                sprite.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                var color = sprite.color;
+                color.r *= 0.5f;
+                color.g *= 0.5f;
+                color.b *= 0.5f;
+                sprite.color = color;
                 sprite.transform.localScale *= 0.8f;            
             }
 

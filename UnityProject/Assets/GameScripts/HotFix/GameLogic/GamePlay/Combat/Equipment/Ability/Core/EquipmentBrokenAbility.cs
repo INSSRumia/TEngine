@@ -1,6 +1,7 @@
 using GameConfig.Gameplay.Combat;
 using TEngine;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace GameLogic.Gameplay.Combat.Equipment
 {
@@ -34,10 +35,15 @@ namespace GameLogic.Gameplay.Combat.Equipment
             foreach (var joint in EquipmentOwner.GetComponentsInChildren<Joint2D>())
                 joint.enabled = false;
 
+            var sortingGroup = EquipmentOwner.GetComponentInChildren<SortingGroup>();
+            if (sortingGroup != null)
+                sortingGroup.sortingLayerName = "Broken";
+
             EquipmentOwner.transform.localScale *= 0.8f;
             var sprite = EquipmentOwner.GetComponentInChildren<SpriteRenderer>();
             if (sprite != null)
                 sprite.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+
         }
     }
 }

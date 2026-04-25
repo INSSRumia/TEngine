@@ -35,7 +35,7 @@ namespace GameLogic.Gameplay.Combat
         public IReadOnlyList<IAbility> OptionalAbilities => _optionalAbilities;
         public IReadOnlyList<IAbility> DynamicAbilities => _dynamicAbilities;
 
-        public void Init(TRuntimeData data)
+        public virtual void Init(TRuntimeData data)
         {
             RuntimeData = data;
         }

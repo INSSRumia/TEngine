@@ -5,7 +5,7 @@
         <var name="name" type="string" />
         <var name="description" type="string" />
         <!-- 阵营颜色 -->
-        <var name="color" type="string" />
+        <var name="color" type="color32" />
         <var name="initial_money" type="int" />
         <var name="lst_initial_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
         <!-- 初始可用的远征配置ID列表 -->

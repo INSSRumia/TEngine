@@ -3,7 +3,12 @@
     "camp_config_id": "human",
     "name": "人类",
     "description": "人类",
-    "color": "#FFFFFFFF",
+    "color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 255
+    },
     "initial_money": 1000,
     "lst_initial_marbles": [
       {
@@ -30,5 +35,19 @@
     "lst_expedition": [
       "近郊森林"
     ]
+  },
+  {
+    "camp_config_id": "hollow",
+    "name": "虚空",
+    "description": "虚空",
+    "color": {
+      "r": 103,
+      "g": 123,
+      "b": 255,
+      "a": 255
+    },
+    "initial_money": 1000,
+    "lst_initial_marbles": [],
+    "lst_expedition": []
   }
 ]

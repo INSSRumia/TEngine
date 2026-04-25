@@ -16,6 +16,11 @@ namespace GameLogic.Gameplay.Combat.Marble
             base.Awake();
             InitEquipmentSlotPoint();
         }
+        public override void Init(MarbleRuntimeData data)
+        {
+            base.Init(data);
+            SetCampColor(data.CampConfigId);
+        }
 
         public override void OnUpdate(float elapseSeconds, float realElapseSeconds)
         {
@@ -32,6 +37,13 @@ namespace GameLogic.Gameplay.Combat.Marble
             {
                 _slotPointMap[(EnumEquipmentSlot)i] = _lstEquipmentPoints[i];
             }
+        }
+
+        private void SetCampColor(string campConfigId)
+        {
+            var campConfig = ConfigSystem.Instance.Tables.TbCamp.Get(campConfigId);
+            var color = campConfig.Color;
+            GetComponentInChildren<SpriteRenderer>().color = color;
         }
 
         public Transform GetEquipmentSlotPoint(EnumEquipmentSlot slot)

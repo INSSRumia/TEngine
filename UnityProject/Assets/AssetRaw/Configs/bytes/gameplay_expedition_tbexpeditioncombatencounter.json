@@ -21,12 +21,12 @@
       {
         "marble_config_id": "soldier",
         "level": 0,
-        "camp_config_id": "human"
+        "camp_config_id": "hollow"
       },
       {
         "marble_config_id": "archer",
         "level": 0,
-        "camp_config_id": "human"
+        "camp_config_id": "hollow"
       }
     ]
   }
