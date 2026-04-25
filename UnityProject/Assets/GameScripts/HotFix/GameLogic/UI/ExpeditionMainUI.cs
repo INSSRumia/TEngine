@@ -25,7 +25,7 @@ namespace GameLogic
 
         private static string BuildMarbleSummary(ExpeditionPersistentDataStore persistentData)
         {
-            return string.Join("\n", persistentData.Marbles.Where(marble => marble.HasValue).Select(marble =>
+            return string.Join("\n", persistentData.LstMarbles.Where(marble => marble.HasValue).Select(marble =>
                 $"- {marble.Value.DisplayName} ({marble.Value.ConfigId}) HP {marble.Value.CurrentHp}/{marble.Value.MaxHp} EXP {marble.Value.Exp} {(marble.Value.IsDead ? "[不可用]" : "[可出征]")}"));
         }
         protected override void OnRefresh()

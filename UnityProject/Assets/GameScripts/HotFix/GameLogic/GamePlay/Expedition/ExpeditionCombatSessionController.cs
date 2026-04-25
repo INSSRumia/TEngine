@@ -5,7 +5,7 @@ using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -39,8 +39,8 @@ namespace GameLogic.Gameplay.Expedition
             _runningTime = 0f;
 
             _sessionRoot = new GameObject("ExpeditionCombatSessionRoot");
-            SpawnAlliedMarbles(request.AlliedMarbles);
-            SpawnEnemyMarbles(request.EnemyMarbles);
+            SpawnAlliedMarbles(request.LstAlliedMarble);
+            SpawnEnemyMarbles(request.LstEnemyMarble);
             Log.Info($"[远征战斗会话控制器] 开始会话 {request.SessionId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
             return true;
         }
@@ -140,12 +140,12 @@ namespace GameLogic.Gameplay.Expedition
                 Summary = isVictory ? "Combat 胜利，队伍完成了本节点。" : "Combat 失败，远征被迫结束。",
             };
 
-            for (int i = 0; i < _currentRequest.AlliedMarbles.Count; i++)
+            for (int i = 0; i < _currentRequest.LstAlliedMarble.Count; i++)
             {
-                if(!_currentRequest.AlliedMarbles[i].HasValue)
+                if(!_currentRequest.LstAlliedMarble[i].HasValue)
                     continue;
 
-                var snapshot = _currentRequest.AlliedMarbles[i].Value;
+                var snapshot = _currentRequest.LstAlliedMarble[i].Value;
                 _playerMarbles.TryGetValue(snapshot.PersistentId, out var marble);
                 if(marble == null || marble.RuntimeData == null)
                     continue;
@@ -160,7 +160,7 @@ namespace GameLogic.Gameplay.Expedition
                 snapshot.Level = marble.RuntimeData.Level;
                 snapshot.IsDead = isDead;
 
-                result.MarbleResults.Add(snapshot);
+                result.LstMarbleResult.Add(snapshot);
             }
 
             return result;
@@ -195,7 +195,7 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        private void SpawnEnemyMarbles(List<ExpeditionTable.ExpeditionEnemyMarbleConfig> enemies)
+        private void SpawnEnemyMarbles(List<ExpeditionEnemyMarbleConfig> enemies)
         {
             if (enemies == null)
             {

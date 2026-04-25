@@ -8,11 +8,11 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionBlackboard
     {
-        private readonly List<string> _lstFlag = new List<string>();
-        private readonly List<string> _lstInventoryItemId = new List<string>();
-        private readonly List<string> _lstChosenOptionId = new List<string>();
-        private readonly List<string> _lstCompletedEventId = new List<string>();
-        private readonly Dictionary<string, int> _dictCounter = new Dictionary<string, int>();
+        private readonly List<string> _lstFlag = new ();
+        private readonly List<string> _lstInventoryItemId = new ();
+        private readonly List<string> _lstChosenOptionId = new ();
+        private readonly List<string> _lstCompletedEventId = new ();
+        private readonly Dictionary<string, int> _dictCounter = new ();
 
         public bool HasFlag(string flagId)
         {
@@ -83,7 +83,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public string ToDebugString()
         {
-            var builder = new StringBuilder();
+            StringBuilder builder = new ();
             builder.Append("flags=[");
             builder.Append(string.Join(",", _lstFlag));
             builder.Append("]\nitems=[");

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -10,7 +10,7 @@ namespace GameLogic.Gameplay.Expedition
     {
         public string QueueEntryId;
         public string NodeId;
-        public ExpeditionTable.EnumExpeditionNodeType NodeType;
+        public EnumExpeditionNodeType NodeType;
         public EnumExpeditionNodeProcessStatus Status;
         public int EntryOrder;
         public string SourceNodeId;
@@ -28,10 +28,10 @@ namespace GameLogic.Gameplay.Expedition
         public string QueueAfterRoute;
         public string BlackboardBefore;
         public string BlackboardAfter;
-        public List<string> LstAppliedBuffId = new List<string>();
-        public List<string> LstEffectSummarie = new List<string>();
-        public List<string> LstRouteDecisionLog = new List<string>();
-        public List<string> LstInsertedNodeId = new List<string>();
+        public List<string> LstAppliedBuffId = new ();
+        public List<string> LstEffectSummarie = new ();
+        public List<string> LstRouteDecisionLog = new ();
+        public List<string> LstInsertedNodeId = new ();
         public string Summary;
         public CombatSessionResult CombatResult;
 
@@ -132,8 +132,8 @@ namespace GameLogic.Gameplay.Expedition
         public bool IsVictory;
         public EnumExpeditionEndReason EndReason;
         public int MoneyDelta;
-        public List<ExpeditionMarbleSummary> LstMarbleSummarie = new List<ExpeditionMarbleSummary>();
-        public List<string> LstNodeSummarie = new List<string>();
+        public List<ExpeditionMarbleSummary> LstMarbleSummarie = new ();
+        public List<string> LstNodeSummarie = new ();
 
         public string ToDisplayText()
         {
