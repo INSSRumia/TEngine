@@ -73,11 +73,11 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
                 }
 
-                if (marble.RuntimeData.Camp == ExpeditionConstants.PlayerCamp)
+                if (marble.RuntimeData.CombatSide == ExpeditionConstants.PlayerCombatSide)
                 {
                     allyAlive++;
                 }
-                else if (marble.RuntimeData.Camp == ExpeditionConstants.EnemyCamp)
+                else if (marble.RuntimeData.CombatSide == ExpeditionConstants.EnemyCombatSide)
                 {
                     enemyAlive++;
                 }
@@ -182,7 +182,7 @@ namespace GameLogic.Gameplay.Expedition
                 if (snapshot.IsDead || snapshot.CurrentHp <= 0)
                     continue;
 
-                var marble = MarbleFactory.CreateMarble(snapshot.MarbleConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
+                var marble = MarbleFactory.CreateMarble(snapshot.MarbleConfigId, snapshot.CampConfigId, ExpeditionConstants.PlayerCombatSide, snapshot.Level);
                 if (marble == null)
                 {
                     continue;
@@ -208,7 +208,7 @@ namespace GameLogic.Gameplay.Expedition
             for (int index = 0; index < enemies.Count; index++)
             {
                 var enemy = enemies[index];
-                var marble = MarbleFactory.CreateMarble(enemy.MarbleConfigId, ExpeditionConstants.EnemyCamp, enemy.Level);
+                var marble = MarbleFactory.CreateMarble(enemy.MarbleConfigId, enemy.CampConfigId, ExpeditionConstants.EnemyCombatSide, enemy.Level);
                 if (marble == null)
                 {
                     continue;

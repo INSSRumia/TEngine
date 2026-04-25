@@ -6,7 +6,7 @@ namespace GameLogic.Gameplay.Combat
 {
     public class ProjectileRuntimeData : RuntimeData
     {
-        public int SourceCamp { get; set; }
+        public int SourceCombatSide { get; set; }
         public int SourceMarbleInstId { get; set; }
         public int TargetMarbleInstId { get; set; }
         public Vector2 TargetPoint { get; set; }

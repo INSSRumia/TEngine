@@ -13,7 +13,9 @@ namespace GameLogic.Gameplay.Combat.Marble
     public partial class MarbleRuntimeData : RuntimeData
     {
         [ShowInInspector]
-        public int Camp { get; set; }
+        public int CombatSide { get; set; }
+        [ShowInInspector]
+        public string CampConfigId { get; set; }
         [ShowInInspector]
         public MarbleStateData State { get; } = new MarbleStateData();
         [ShowInInspector]

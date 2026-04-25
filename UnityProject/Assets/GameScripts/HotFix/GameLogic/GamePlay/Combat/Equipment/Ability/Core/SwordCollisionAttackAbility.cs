@@ -38,24 +38,24 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if(target == null)
                 return;
 
-            int targetCamp = _owner.OwnerMarble.RuntimeData.Camp;
+            int targetCombatSide = _owner.OwnerMarble.RuntimeData.CombatSide;
             IReceiveDamage targetReceiveDamage = null;
             switch(target)
             {
                 case Marble.Marble marble:
-                    targetCamp = marble.RuntimeData.Camp;
+                    targetCombatSide = marble.RuntimeData.CombatSide;
                     targetReceiveDamage = marble.GetAbility<IReceiveDamage>();
                     break;
 
                 case Equipment equipment:
-                    targetCamp = equipment.OwnerMarble.RuntimeData.Camp;
+                    targetCombatSide = equipment.OwnerMarble.RuntimeData.CombatSide;
                     targetReceiveDamage = equipment.GetAbility<IReceiveDamage>();
                     break;
                 default:
                     return;
             }
 
-            if (targetCamp == _owner.OwnerMarble.RuntimeData.Camp)
+            if (targetCombatSide == _owner.OwnerMarble.RuntimeData.CombatSide)
                 return;
 
             if (targetReceiveDamage == null)
@@ -66,7 +66,6 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 return;
 
             var damage = _owner.GetAbility<WeaponCalculateDamageAbility>()?.CalculateDamage() ?? 0;
-            //TODO: 这里需要优化，如果装备是按速度伤害，则需要计算速度伤害,否则直接使用伤害
             if(IsDamageByVelocity)
             {
                 var relativeVelocity = collision.relativeVelocity.magnitude;

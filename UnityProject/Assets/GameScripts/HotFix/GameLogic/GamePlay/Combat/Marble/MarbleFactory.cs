@@ -26,16 +26,23 @@ namespace GameLogic.Gameplay.Combat.Marble
 
         private static readonly string _path = Utility.Path.GetRegularPath("Assets/AssetRaw/Actor/Prefabs/Marbles/Marble");
 
-        public static Marble CreateMarble(string id, int camp, int level = 0)
+        public static Marble CreateMarble(string id, int combatSide, int level = 0)
+        {
+            return CreateMarble(id, string.Empty, combatSide, level);
+        }
+
+        public static Marble CreateMarble(string id, string campConfigId, int combatSide, int level = 0)
         {
             var config = ConfigSystem.Instance.Tables.TbMarble.Get(id);
             var levelData = GetMarbleLevelConfig(id, level);
             if (config == null || levelData == null)
-            {
                 return null;
-            }
 
-            var runtimeData = new MarbleRuntimeData(config, levelData) { Camp = camp };
+            var runtimeData = new MarbleRuntimeData(config, levelData)
+            {
+                CampConfigId = campConfigId,
+                CombatSide = combatSide,
+            };
 
             return CreateMarble(runtimeData);
         }

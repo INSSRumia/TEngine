@@ -14,7 +14,7 @@ namespace GameLogic
 
 		private partial void OnClickStartExpeditionBtn()
 		{
-            ExpeditionFlowController.Instance.StartMinimalExpedition();
+            ExpeditionFlowController.Instance.StartDefaultExpedition();
 		}
 
 		private partial void OnClickCombatDebugBtn()

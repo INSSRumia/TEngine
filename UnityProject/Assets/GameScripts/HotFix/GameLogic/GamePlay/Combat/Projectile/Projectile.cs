@@ -58,20 +58,20 @@ namespace GameLogic.Gameplay.Combat
             if (target == null)
                 return false;
 
-            int targetCamp = RuntimeData.SourceCamp;
+            int targetCombatSide = RuntimeData.SourceCombatSide;
             IReceiveDamage targetReceiveDamage = null;
             int targetMarbleInstId = -1;
             Rigidbody2D targetRigidbody = null;
             switch (target)
             {
                 case Marble.Marble marble:
-                    targetCamp = marble.RuntimeData.Camp;
+                    targetCombatSide = marble.RuntimeData.CombatSide;
                     targetReceiveDamage = marble.GetAbility<IReceiveDamage>();
                     targetMarbleInstId = marble.RuntimeData.InstId;
                     targetRigidbody = marble.Rigidbody;
                     break;
                 case Equipment.Equipment equipment:
-                    targetCamp = equipment.OwnerMarble.RuntimeData.Camp;
+                    targetCombatSide = equipment.OwnerMarble.RuntimeData.CombatSide;
                     targetReceiveDamage = equipment.GetAbility<IReceiveDamage>();
                     targetMarbleInstId = equipment.OwnerMarble.RuntimeData.InstId;
                     targetRigidbody = equipment.Rigidbody;
@@ -80,7 +80,7 @@ namespace GameLogic.Gameplay.Combat
                     return false;
             }
 
-            if (targetCamp == RuntimeData.SourceCamp || targetReceiveDamage == null)
+            if (targetCombatSide == RuntimeData.SourceCombatSide || targetReceiveDamage == null)
                 return false;
 
             context = MemoryPool.Alloc<ProjectileHitContext>();

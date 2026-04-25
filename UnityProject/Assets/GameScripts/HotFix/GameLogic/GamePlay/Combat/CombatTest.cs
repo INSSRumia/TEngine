@@ -16,12 +16,12 @@ namespace GameLogic.Gameplay.Combat
         [Header("阵营1设置")]
         [SerializeField] private string _camp1ConfigId = "Marble_001";
         [SerializeField] private int _camp1Count = 3;
-        [SerializeField] private int _camp1Camp = 1;
+        [SerializeField] private int _camp1CombatSide = 1;
 
         [Header("阵营2设置")]
         [SerializeField] private string _camp2ConfigId = "Marble_001";
         [SerializeField] private int _camp2Count = 3;
-        [SerializeField] private int _camp2Camp = 2;
+        [SerializeField] private int _camp2CombatSide = 2;
 
         [Header("生成设置")]
         [SerializeField] private float _spawnRadius = 5f;
@@ -44,21 +44,21 @@ namespace GameLogic.Gameplay.Combat
         [Button("生成所有士兵")]
         public void SpawnAllSoldiers()
         {
-            SpawnCampSoldiers(_camp1ConfigId, _camp1Camp, _camp1Count);
-            SpawnCampSoldiers(_camp2ConfigId, _camp2Camp, _camp2Count);
+            SpawnCampSoldiers(_camp1ConfigId, _camp1CombatSide, _camp1Count);
+            SpawnCampSoldiers(_camp2ConfigId, _camp2CombatSide, _camp2Count);
             Log.Warning($"[战斗测试] 共生成 {_testSoldiers.Count} 个士兵");
         }
 
         [Button("生成阵营1士兵")]
         public void SpawnCamp1Soldiers()
         {
-            SpawnCampSoldiers(_camp1ConfigId, _camp1Camp, _camp1Count);
+            SpawnCampSoldiers(_camp1ConfigId, _camp1CombatSide, _camp1Count);
         }
 
         [Button("生成阵营2士兵")]
         public void SpawnCamp2Soldiers()
         {
-            SpawnCampSoldiers(_camp2ConfigId, _camp2Camp, _camp2Count);
+            SpawnCampSoldiers(_camp2ConfigId, _camp2CombatSide, _camp2Count);
         }
 
         [Button("清理所有士兵")]
@@ -94,27 +94,27 @@ namespace GameLogic.Gameplay.Combat
             {
                 if (marble?.RuntimeData == null) continue;
                 var status = marble.RuntimeData.State.IsAlive ? "存活" : "死亡";
-                Log.Warning($"[战斗测试] [{marble.RuntimeData.InstId}] 阵营:{marble.RuntimeData.Camp} HP:{marble.RuntimeData.State.Hp}/{marble.RuntimeData.State.MaxHp} {status}");
+                Log.Warning($"[战斗测试] [{marble.RuntimeData.InstId}] CombatSide:{marble.RuntimeData.CombatSide} HP:{marble.RuntimeData.State.Hp}/{marble.RuntimeData.State.MaxHp} {status}");
 
-                if (marble.RuntimeData.Camp == _camp1Camp) camp1Alive++;
-                else if (marble.RuntimeData.Camp == _camp2Camp) camp2Alive++;
+                if (marble.RuntimeData.CombatSide == _camp1CombatSide) camp1Alive++;
+                else if (marble.RuntimeData.CombatSide == _camp2CombatSide) camp2Alive++;
             }
 
             Log.Warning($"[战斗测试] 阵营1存活: {camp1Alive}, 阵营2存活: {camp2Alive}");
         }
 
-        private void SpawnCampSoldiers(string configId, int camp, int count)
+        private void SpawnCampSoldiers(string configId, int combatSide, int count)
         {
             if (count <= 0)
             {
-                Log.Warning($"[战斗测试] 阵营 {camp} 数量为0，跳过生成");
+                Log.Warning($"[战斗测试] CombatSide {combatSide} 数量为0，跳过生成");
                 return;
             }
 
             for (int i = 0; i < count; i++)
             {
-                Vector3 spawnPos = GetSpawnPosition(camp, i, count);
-                var soldier = MarbleFactory.CreateMarble(configId, camp);
+                Vector3 spawnPos = GetSpawnPosition(combatSide, i, count);
+                var soldier = MarbleFactory.CreateMarble(configId, combatSide);
                 if (soldier != null)
                 {
                     soldier.transform.position = spawnPos;
@@ -122,23 +122,23 @@ namespace GameLogic.Gameplay.Combat
                     _combatManager.Register(soldier);
                     _testSoldiers.Add(soldier);
 
-                    Log.Warning($"[战斗测试] 生成士兵 阵营:{camp} 位置:{spawnPos} InstId:{soldier.RuntimeData.InstId}");
+                    Log.Warning($"[战斗测试] 生成士兵 CombatSide:{combatSide} 位置:{spawnPos} InstId:{soldier.RuntimeData.InstId}");
                 }
             }
         }
 
-        private Vector3 GetSpawnPosition(int camp, int index, int total)
+        private Vector3 GetSpawnPosition(int combatSide, int index, int total)
         {
             float angleStep = 360f / total;
             float angle = angleStep * index;
             float radius = _spawnRadius * 0.5f;
 
-            float xOffset = camp == _camp1Camp ? -_spawnRadius : _spawnRadius;
-            Vector3 campCenter = _spawnCenter + new Vector3(xOffset, 0, 0);
+            float xOffset = combatSide == _camp1CombatSide ? -_spawnRadius : _spawnRadius;
+            Vector3 sideCenter = _spawnCenter + new Vector3(xOffset, 0, 0);
 
             float rad = angle * Mathf.Deg2Rad;
-            float x = campCenter.x + Mathf.Cos(rad) * radius;
-            float z = campCenter.z + Mathf.Sin(rad) * radius;
+            float x = sideCenter.x + Mathf.Cos(rad) * radius;
+            float z = sideCenter.z + Mathf.Sin(rad) * radius;
 
             return new Vector3(x, 0, z);
         }

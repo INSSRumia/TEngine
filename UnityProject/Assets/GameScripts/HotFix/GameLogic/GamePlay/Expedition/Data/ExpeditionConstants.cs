@@ -2,9 +2,8 @@ namespace GameLogic.Gameplay.Expedition
 {
     public static class ExpeditionConstants
     {
-        public const string MinimalExpeditionId = "MinimalExpedition";
-        public const int PlayerCamp = 1;
-        public const int EnemyCamp = 2;
+        public const int PlayerCombatSide = 1;
+        public const int EnemyCombatSide = 2;
     }
 
     public enum EnumExpeditionFlowPhase

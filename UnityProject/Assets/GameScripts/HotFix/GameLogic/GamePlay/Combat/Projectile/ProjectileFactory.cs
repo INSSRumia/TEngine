@@ -79,7 +79,7 @@ namespace GameLogic.Gameplay.Combat
         {
             return new ProjectileRuntimeData(config, levelConfig)
             {
-                SourceCamp = sourceMarble.RuntimeData.Camp,
+                SourceCombatSide = sourceMarble.RuntimeData.CombatSide,
                 SourceMarbleInstId = sourceMarble.RuntimeData.InstId,
                 TargetMarbleInstId = targetMarble?.RuntimeData?.InstId ?? 0,
                 TargetPoint = targetPoint,

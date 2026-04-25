@@ -51,14 +51,14 @@ namespace GameLogic.Gameplay.Combat
 
             Marble.Marble nearest = null;
             float minDist = float.MaxValue;
-            var selfCamp = marble.RuntimeData.Camp;
+            var selfCombatSide = marble.RuntimeData.CombatSide;
 
             foreach (var other in _activeMarbles)
             {
                 if (other == null || other.RuntimeData == null || !other.RuntimeData.State.IsAlive)
                     continue;
 
-                if (other.RuntimeData.Camp == selfCamp)
+                if (other.RuntimeData.CombatSide == selfCombatSide)
                     continue;
 
                 float dist = Vector2.Distance(marble.transform.position, other.transform.position);
@@ -86,7 +86,7 @@ namespace GameLogic.Gameplay.Combat
         {
             if (a?.RuntimeData == null || b?.RuntimeData == null)
                 return false;
-            return a.RuntimeData.Camp != b.RuntimeData.Camp;
+            return a.RuntimeData.CombatSide != b.RuntimeData.CombatSide;
         }
 
         public IReadOnlyList<Marble.Marble> GetAllActiveMarbles()

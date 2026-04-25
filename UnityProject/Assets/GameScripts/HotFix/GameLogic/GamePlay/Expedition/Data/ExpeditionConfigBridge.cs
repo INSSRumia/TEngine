@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GameConfig.Gameplay.Camp;
+using GameConfig.Gameplay.Initial;
 using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
 using GameConfig.Gameplay.Expedition;
@@ -9,6 +11,56 @@ namespace GameLogic.Gameplay.Expedition
 {
     public static class ExpeditionConfigBridge
     {
+        public static InitialConfig ResolveInitialConfig()
+        {
+            var initialTable = ConfigSystem.Instance.Tables?.TbInitial;
+            if (initialTable?.Data == null)
+            {
+                Log.Warning("[远征] 无法解析 InitialConfig。请确认 initial 配置已生成并成功加载。");
+                return null;
+            }
+
+            return initialTable.Data;
+        }
+
+        public static CampConfig ResolveCurrentCampConfig()
+        {
+            var initialConfig = ResolveInitialConfig();
+            if (initialConfig == null)
+                return null;
+
+            if (string.IsNullOrWhiteSpace(initialConfig.CampConfigId))
+            {
+                Log.Warning("[远征] InitialConfig 缺少 camp_config_id，无法解析开局阵营。");
+                return null;
+            }
+
+            var campConfig = ConfigSystem.Instance.Tables?.TbCamp?.GetOrDefault(initialConfig.CampConfigId);
+            if (campConfig == null)
+            {
+                Log.Warning($"[远征] 未找到 CampConfig。campConfigId:{initialConfig.CampConfigId}");
+                return null;
+            }
+
+            return campConfig;
+        }
+
+        public static List<string> ResolveAvailableExpeditionConfigIds()
+        {
+            var campConfig = ResolveCurrentCampConfig();
+            if (campConfig == null)
+                return new List<string>();
+
+            var lstAvailableExpedition = campConfig.LstExpedition?
+                .Where(expeditionConfigId => !string.IsNullOrWhiteSpace(expeditionConfigId))
+                .Distinct()
+                .ToList() ?? new List<string>();
+            if (lstAvailableExpedition.Count == 0)
+                Log.Warning($"[远征] 当前 CampConfig 没有可用远征。campConfigId:{campConfig.CampConfigId}");
+
+            return lstAvailableExpedition;
+        }
+
         public static ExpeditionRunState CreateConfiguredRun(IEnumerable<MarblePersistentData?> marbles, string preferredExpeditionConfigId)
         {
             var expedition = ResolveStartupExpedition(preferredExpeditionConfigId);
@@ -49,20 +101,32 @@ namespace GameLogic.Gameplay.Expedition
         {
             var expeditionTable = ConfigSystem.Instance.Tables?.TbExpedition;
             if (expeditionTable == null)
-            {
                 return null;
-            }
 
-            if (!string.IsNullOrEmpty(preferredExpeditionConfigId))
+            var lstAvailableExpedition = ResolveAvailableExpeditionConfigIds();
+            if (lstAvailableExpedition.Count == 0)
+                return null;
+
+            if (!string.IsNullOrEmpty(preferredExpeditionConfigId) && lstAvailableExpedition.Contains(preferredExpeditionConfigId))
             {
                 var expedition = expeditionTable.GetOrDefault(preferredExpeditionConfigId);
                 if (expedition != null)
-                {
                     return expedition;
-                }
+
+                Log.Warning($"[远征] 首选远征不在配置表中。expeditionConfigId:{preferredExpeditionConfigId}");
             }
 
-            return expeditionTable.DataList.Count > 0 ? expeditionTable.DataList[0] : null;
+            foreach (var expeditionConfigId in lstAvailableExpedition)
+            {
+                var expedition = expeditionTable.GetOrDefault(expeditionConfigId);
+                if (expedition != null)
+                    return expedition;
+
+                Log.Warning($"[远征] CampConfig 引用了不存在的远征。expeditionConfigId:{expeditionConfigId}");
+            }
+
+            Log.Warning("[远征] 当前 CampConfig 的可用远征均未找到有效配置。");
+            return null;
         }
 
         public static ExpeditionEventConfig ResolveEvent(string eventConfigId)
@@ -87,26 +151,38 @@ namespace GameLogic.Gameplay.Expedition
 
         public static ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
         {
-            var expedition = ResolveStartupExpedition(preferredExpeditionConfigId);
-            if (expedition?.Route != null)
+            var lstPreferredExpedition = ResolveAvailableExpeditionConfigIds();
+            if (!string.IsNullOrWhiteSpace(preferredExpeditionConfigId) && !lstPreferredExpedition.Contains(preferredExpeditionConfigId))
+                lstPreferredExpedition.Insert(0, preferredExpeditionConfigId);
+
+            foreach (var expeditionConfigId in lstPreferredExpedition)
             {
+                var expedition = ResolveStartupExpedition(expeditionConfigId);
+                if (expedition?.Route == null)
+                    continue;
+
                 foreach (var node in expedition.Route)
                 {
                     if (node == null || node.NodeType != EnumExpeditionNodeType.Combat)
-                    {
                         continue;
-                    }
 
                     var encounter = ResolveCombatEncounter(node.CombatEncounterConfigId);
                     if (encounter != null)
-                    {
                         return encounter;
-                    }
                 }
             }
 
-            var encounterTable = ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter;
-            return encounterTable != null && encounterTable.DataList.Count > 0 ? encounterTable.DataList[0] : null;
+            Log.Warning("[远征] 当前可用远征中未找到可调试的战斗遭遇。");
+            return null;
+        }
+
+        public static string ResolveMarbleDisplayName(string marbleConfigId)
+        {
+            if (string.IsNullOrWhiteSpace(marbleConfigId))
+                return string.Empty;
+
+            var marbleConfig = ConfigSystem.Instance.Tables?.TbMarble?.GetOrDefault(marbleConfigId);
+            return marbleConfig?.Name ?? marbleConfigId;
         }
 
         public static int ResolveMarbleMaxHp(string marbleConfigId, int level)

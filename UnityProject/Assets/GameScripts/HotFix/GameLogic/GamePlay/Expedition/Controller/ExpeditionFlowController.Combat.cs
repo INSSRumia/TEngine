@@ -12,7 +12,7 @@ namespace GameLogic.Gameplay.Expedition
             if (IsFlowRunning || ExpeditionCombatSessionController.Instance.IsRunning)
                 return false;
 
-            var encounter = ExpeditionConfigBridge.ResolveDebugCombatEncounter(ExpeditionConstants.MinimalExpeditionId);
+            var encounter = ExpeditionConfigBridge.ResolveDebugCombatEncounter(string.Empty);
             if (encounter == null)
             {
                 Log.Warning("[远征流程控制器] StartCombatDebug 已中止，因为未找到战斗遭遇配置。");

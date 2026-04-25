@@ -1,4 +1,5 @@
 using TEngine;
+using System.Collections.Generic;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -16,7 +17,22 @@ namespace GameLogic.Gameplay.Expedition
             GameModule.UI.ShowUIAsync<ExpeditionMainUI>();
         }
 
+        public IReadOnlyList<string> GetAvailableExpeditionConfigIds()
+        {
+            return ExpeditionConfigBridge.ResolveAvailableExpeditionConfigIds();
+        }
+
+        public bool StartDefaultExpedition()
+        {
+            return StartConfiguredExpedition(string.Empty);
+        }
+
         public bool StartMinimalExpedition()
+        {
+            return StartDefaultExpedition();
+        }
+
+        public bool StartConfiguredExpedition(string expeditionConfigId)
         {
             if (IsFlowRunning || ExpeditionCombatSessionController.Instance.IsRunning)
                 return false;
@@ -24,10 +40,10 @@ namespace GameLogic.Gameplay.Expedition
             _persistentData.EnsureInitialized();
             DestroyFsmIfNeeded();
 
-            CurrentRun = ExpeditionConfigBridge.CreateConfiguredRun(_persistentData.LstMarbles, ExpeditionConstants.MinimalExpeditionId);
+            CurrentRun = ExpeditionConfigBridge.CreateConfiguredRun(_persistentData.LstMarbles, expeditionConfigId);
             if (CurrentRun == null)
             {
-                Log.Warning("[远征流程控制器] StartMinimalExpedition 已中止，因为无法解析远征配置。");
+                Log.Warning("[远征流程控制器] StartConfiguredExpedition 已中止，因为无法解析远征配置。");
                 return false;
             }
 
