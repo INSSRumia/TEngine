@@ -154,7 +154,7 @@ namespace GameLogic.Gameplay.Expedition
                 var maxHp = marble.RuntimeData.State.MaxHp;
                 var isDead = !marble.RuntimeData.State.IsAlive || currentHp <= 0;
 
-                snapshot.CurrentHp = currentHp;
+                snapshot.CurrentHp = Mathf.Max(0, currentHp);
                 snapshot.MaxHp = maxHp;
                 snapshot.Exp = marble.RuntimeData.State.Exp;
                 snapshot.Level = marble.RuntimeData.Level;
@@ -179,6 +179,9 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
 
                 var snapshot = snapshots[index].Value;
+                if (snapshot.IsDead || snapshot.CurrentHp <= 0)
+                    continue;
+
                 var marble = MarbleFactory.CreateMarble(snapshot.MarbleConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
                 if (marble == null)
                 {

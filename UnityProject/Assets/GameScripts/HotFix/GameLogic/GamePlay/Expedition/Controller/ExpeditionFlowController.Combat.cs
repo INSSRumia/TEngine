@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TEngine;
 using GameConfig.Gameplay.Expedition;
 
@@ -24,7 +25,9 @@ namespace GameLogic.Gameplay.Expedition
                 NodeConfigId = "combat_debug_node",
                 CombatEncounterConfigId = encounter.CombatEncounterConfigId,
                 Title = encounter.Title,
-                LstAlliedMarble = new List<MarblePersistentData?>(_persistentData.LstMarbles),
+                LstAlliedMarble = _persistentData.LstMarbles
+                    .Where(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0)
+                    .ToList(),
                 LstEnemyMarble = new List<ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
             };
 
@@ -45,7 +48,9 @@ namespace GameLogic.Gameplay.Expedition
                 NodeConfigId = node.NodeConfigId,
                 CombatEncounterConfigId = combatConfig.CombatEncounterConfigId,
                 Title = combatConfig.Title,
-                LstAlliedMarble = new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
+                LstAlliedMarble = CurrentRun.MarbleSnapshots
+                    .Where(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0)
+                    .ToList(),
                 LstEnemyMarble = new List<ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),
             };
         }
