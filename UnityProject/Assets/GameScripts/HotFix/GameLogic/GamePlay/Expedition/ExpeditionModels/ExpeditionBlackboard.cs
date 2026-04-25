@@ -6,91 +6,74 @@ using System.Text;
 namespace GameLogic.Gameplay.Expedition
 {
     [Serializable]
-    public sealed class ExpeditionBlackboardCounter
-    {
-        public string CounterId;
-        public int Value;
-    }
-
-    [Serializable]
     public sealed class ExpeditionBlackboard
     {
-        public List<string> Flags = new List<string>();
-        public List<string> InventoryItemIds = new List<string>();
-        public List<string> ChosenOptionIds = new List<string>();
-        public List<string> CompletedEventIds = new List<string>();
-        public List<ExpeditionBlackboardCounter> Counters = new List<ExpeditionBlackboardCounter>();
+        private readonly List<string> _lstFlag = new List<string>();
+        private readonly List<string> _lstInventoryItemId = new List<string>();
+        private readonly List<string> _lstChosenOptionId = new List<string>();
+        private readonly List<string> _lstCompletedEventId = new List<string>();
+        private readonly Dictionary<string, int> _dictCounter = new Dictionary<string, int>();
 
         public bool HasFlag(string flagId)
         {
-            return !string.IsNullOrWhiteSpace(flagId) && Flags.Contains(flagId);
+            return !string.IsNullOrWhiteSpace(flagId) && _lstFlag.Contains(flagId);
         }
 
         public void AddFlag(string flagId)
         {
-            AddUnique(Flags, flagId);
+            AddUnique(_lstFlag, flagId);
         }
 
         public bool HasItem(string itemId)
         {
-            return !string.IsNullOrWhiteSpace(itemId) && InventoryItemIds.Contains(itemId);
+            return !string.IsNullOrWhiteSpace(itemId) && _lstInventoryItemId.Contains(itemId);
         }
 
         public void AddItem(string itemId)
         {
-            AddUnique(InventoryItemIds, itemId);
+            AddUnique(_lstInventoryItemId, itemId);
         }
 
         public bool HasChosenOption(string optionId)
         {
-            return !string.IsNullOrWhiteSpace(optionId) && ChosenOptionIds.Contains(optionId);
+            return !string.IsNullOrWhiteSpace(optionId) && _lstChosenOptionId.Contains(optionId);
         }
 
         public void AddChosenOption(string optionId)
         {
-            AddUnique(ChosenOptionIds, optionId);
+            AddUnique(_lstChosenOptionId, optionId);
         }
 
         public bool HasCompletedEvent(string eventId)
         {
-            return !string.IsNullOrWhiteSpace(eventId) && CompletedEventIds.Contains(eventId);
+            return !string.IsNullOrWhiteSpace(eventId) && _lstCompletedEventId.Contains(eventId);
         }
 
         public void AddCompletedEvent(string eventId)
         {
-            AddUnique(CompletedEventIds, eventId);
+            AddUnique(_lstCompletedEventId, eventId);
         }
 
         public int GetCounterValue(string counterId)
         {
             if (string.IsNullOrWhiteSpace(counterId))
-            {
                 return 0;
-            }
 
-            var counter = Counters.Find(item => item != null && item.CounterId == counterId);
-            return counter?.Value ?? 0;
+            if(_dictCounter.TryGetValue(counterId, out var value))
+                return value;
+
+            return 0;
         }
 
         public void SetCounterValue(string counterId, int value)
         {
             if (string.IsNullOrWhiteSpace(counterId))
-            {
                 return;
-            }
 
-            var counter = Counters.Find(item => item != null && item.CounterId == counterId);
-            if (counter == null)
-            {
-                Counters.Add(new ExpeditionBlackboardCounter
-                {
-                    CounterId = counterId,
-                    Value = value,
-                });
-                return;
-            }
-
-            counter.Value = value;
+            if(_dictCounter.ContainsKey(counterId))
+                _dictCounter[counterId] = value;
+            else
+                _dictCounter.Add(counterId, value);
         }
 
         public void AddCounterValue(string counterId, int delta)
@@ -102,15 +85,15 @@ namespace GameLogic.Gameplay.Expedition
         {
             var builder = new StringBuilder();
             builder.Append("flags=[");
-            builder.Append(string.Join(",", Flags));
+            builder.Append(string.Join(",", _lstFlag));
             builder.Append("]\nitems=[");
-            builder.Append(string.Join(",", InventoryItemIds));
+            builder.Append(string.Join(",", _lstInventoryItemId));
             builder.Append("]\nchosen=[");
-            builder.Append(string.Join(",", ChosenOptionIds));
+            builder.Append(string.Join(",", _lstChosenOptionId));
             builder.Append("]\ncompleted=[");
-            builder.Append(string.Join(",", CompletedEventIds));
+            builder.Append(string.Join(",", _lstCompletedEventId));
             builder.Append("]\ncounters=[");
-            builder.Append(string.Join(",", Counters.Where(counter => counter != null).Select(counter => $"{counter.CounterId}:{counter.Value}")));
+            builder.Append(string.Join(",", _dictCounter.Select(counter => $"{counter.Key}:{counter.Value}")));
             builder.Append("]\n");
             return builder.ToString();
         }

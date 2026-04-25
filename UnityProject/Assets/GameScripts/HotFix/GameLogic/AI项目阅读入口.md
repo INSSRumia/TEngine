@@ -7,7 +7,7 @@
 1. `README.md`
    - 了解 TEngine、HybridCLR、YooAsset、Luban 和当前仓库的整体结构。
 2. `UnityProject/CLAUDE.md`
-   - 了解项目约束、热更边界、模块访问方式，以及 AI 工作流要求。
+   - 了解项目约束、热更边界、模块访问方式、AI 工作流要求，以及必须遵守的代码规范。
 3. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Combat/Combat模块说明.md`
    - 建立 Combat 模块整体结构、数据流、Factory 装配模型和 Runtime 黑板认知。
 4. `UnityProject/Assets/GameScripts/HotFix/GameLogic/Gameplay/Expedition/远征流程设计.md`
@@ -78,6 +78,7 @@
 - 先确认能力由哪个 Factory 挂载，而不是在能力类里反推来源。
 - 先确认数据应写入 `State`、`Config` 还是 `Frame`，避免把长期状态和逐帧临时值混在一起。
 - 先确认改动是否同时影响 Luban schema、运行时工厂和关键文档。
+- 先阅读 `UnityProject/CLAUDE.md` 中的“代码规范（新增/修改代码必须遵守）”后再开始编码。
 
 ## 7. 推荐继续深读的文件
 

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -12,7 +12,7 @@ namespace GameLogic.Gameplay.Expedition
     {
         public ExpeditionConditionExecutionContext(
             ExpeditionRunState runState,
-            ExpeditionTable.ExpeditionRouteNodeConfig currentNode,
+            ExpeditionRouteNodeConfig currentNode,
             ExpeditionNodeRecord currentRecord)
         {
             RunState = runState;
@@ -22,7 +22,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public ExpeditionRunState RunState { get; }
 
-        public ExpeditionTable.ExpeditionRouteNodeConfig CurrentNode { get; }
+        public ExpeditionRouteNodeConfig CurrentNode { get; }
 
         public ExpeditionNodeRecord CurrentRecord { get; }
     }
@@ -30,7 +30,7 @@ namespace GameLogic.Gameplay.Expedition
     public static class ExpeditionConditionFactory
     {
         public static bool AreAllSatisfied(
-            IEnumerable<ExpeditionTable.ExpeditionConditionConfig> configs,
+            IEnumerable<ExpeditionConditionConfig> configs,
             ExpeditionConditionExecutionContext context)
         {
             if (configs == null)
@@ -49,14 +49,14 @@ namespace GameLogic.Gameplay.Expedition
             return true;
         }
 
-        public static IExpeditionCondition CreateCondition(ExpeditionTable.ExpeditionConditionConfig config)
+        public static IExpeditionCondition CreateCondition(ExpeditionConditionConfig config)
         {
             return config switch
             {
-                ExpeditionTable.HasFlagConditionConfig hasFlagConfig => new HasFlagCondition(hasFlagConfig),
-                ExpeditionTable.HasItemConditionConfig hasItemConfig => new HasItemCondition(hasItemConfig),
-                ExpeditionTable.HasChosenOptionConditionConfig chosenOptionConfig => new HasChosenOptionCondition(chosenOptionConfig),
-                ExpeditionTable.CounterAtLeastConditionConfig counterConfig => new CounterAtLeastCondition(counterConfig),
+                HasFlagConditionConfig hasFlagConfig => new HasFlagCondition(hasFlagConfig),
+                HasItemConditionConfig hasItemConfig => new HasItemCondition(hasItemConfig),
+                HasChosenOptionConditionConfig chosenOptionConfig => new HasChosenOptionCondition(chosenOptionConfig),
+                CounterAtLeastConditionConfig counterConfig => new CounterAtLeastCondition(counterConfig),
                 _ => new AlwaysFalseCondition(),
             };
         }
@@ -64,9 +64,9 @@ namespace GameLogic.Gameplay.Expedition
 
     public sealed class HasFlagCondition : IExpeditionCondition
     {
-        private readonly ExpeditionTable.HasFlagConditionConfig _config;
+        private readonly HasFlagConditionConfig _config;
 
-        public HasFlagCondition(ExpeditionTable.HasFlagConditionConfig config)
+        public HasFlagCondition(HasFlagConditionConfig config)
         {
             _config = config;
         }
@@ -79,9 +79,9 @@ namespace GameLogic.Gameplay.Expedition
 
     public sealed class HasItemCondition : IExpeditionCondition
     {
-        private readonly ExpeditionTable.HasItemConditionConfig _config;
+        private readonly HasItemConditionConfig _config;
 
-        public HasItemCondition(ExpeditionTable.HasItemConditionConfig config)
+        public HasItemCondition(HasItemConditionConfig config)
         {
             _config = config;
         }
@@ -94,9 +94,9 @@ namespace GameLogic.Gameplay.Expedition
 
     public sealed class HasChosenOptionCondition : IExpeditionCondition
     {
-        private readonly ExpeditionTable.HasChosenOptionConditionConfig _config;
+        private readonly HasChosenOptionConditionConfig _config;
 
-        public HasChosenOptionCondition(ExpeditionTable.HasChosenOptionConditionConfig config)
+        public HasChosenOptionCondition(HasChosenOptionConditionConfig config)
         {
             _config = config;
         }
@@ -109,9 +109,9 @@ namespace GameLogic.Gameplay.Expedition
 
     public sealed class CounterAtLeastCondition : IExpeditionCondition
     {
-        private readonly ExpeditionTable.CounterAtLeastConditionConfig _config;
+        private readonly CounterAtLeastConditionConfig _config;
 
-        public CounterAtLeastCondition(ExpeditionTable.CounterAtLeastConditionConfig config)
+        public CounterAtLeastCondition(CounterAtLeastConditionConfig config)
         {
             _config = config;
         }

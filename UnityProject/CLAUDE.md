@@ -102,6 +102,38 @@ TEngine 基于 HybridCLR + YooAsset + UniTask + Luban 构建。
 
 ---
 
+## 代码规范（新增/修改代码必须遵守）
+
+### 命名规范
+
+1. 公共字段使用大驼峰命名法
+2. 私有字段使用下划线开头加小驼峰命名法
+3. 临时变量使用小驼峰命名法
+4. 所有 `List` 字段必须以 `Lst` 开头，并遵守字段命名规则
+   - 公共字段示例：`LstMarbles`
+   - 私有字段示例：`_lstMarbles`
+5. 所有数组字段必须以 `Arr` 开头，并遵守字段命名规则
+   - 公共字段示例：`ArrSpawnPoints`
+   - 私有字段示例：`_arrSpawnPoints`
+6. 所有字典字段必须以 `Dict` 开头，并遵守字段命名规则
+   - 公共字段示例：`DictMarbleById`
+   - 私有字段示例：`_dictMarbleById`
+7. 所有队列字段必须以 `Que` 开头，并遵守字段命名规则
+   - 公共字段示例：`QuePendingNodes`
+   - 私有字段示例：`_quePendingNodes`
+8. 所有栈字段必须以 `Stack` 开头，并遵守字段命名规则
+   - 公共字段示例：`StackStateHistory`
+   - 私有字段示例：`_stackStateHistory`
+
+### 代码风格
+
+1. 当代码块中只有一行代码时，不使用 `{}`
+2. 使用 `{}` 时，左花括号和右花括号都必须单独占一行
+3. 所有类和方法都不加 `internal`
+4. 所有类都不加 `sealed`
+
+---
+
 ## 📚 Wiki 知识库
 
 > **唯一权威来源：`repowiki/zh/content/`**
