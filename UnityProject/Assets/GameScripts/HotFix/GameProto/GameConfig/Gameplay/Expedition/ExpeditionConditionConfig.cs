@@ -28,6 +28,9 @@ public abstract partial class ExpeditionConditionConfig : Luban.BeanBase
             case "HasItemConditionConfig": return new Gameplay.Expedition.HasItemConditionConfig(_buf);
             case "HasChosenOptionConditionConfig": return new Gameplay.Expedition.HasChosenOptionConditionConfig(_buf);
             case "CounterAtLeastConditionConfig": return new Gameplay.Expedition.CounterAtLeastConditionConfig(_buf);
+            case "AndConditionConfig": return new Gameplay.Expedition.AndConditionConfig(_buf);
+            case "OrConditionConfig": return new Gameplay.Expedition.OrConditionConfig(_buf);
+            case "NotConditionConfig": return new Gameplay.Expedition.NotConditionConfig(_buf);
             default: throw new SerializationException();
         }
     }

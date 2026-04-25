@@ -49,6 +49,32 @@ namespace GameLogic.Gameplay.Expedition
             return true;
         }
 
+        public static bool IsAnySatisfied(
+            IEnumerable<ExpeditionConditionConfig> configs,
+            ExpeditionConditionExecutionContext context)
+        {
+            if (configs == null)
+                return false;
+
+            foreach (var config in configs)
+            {
+                if (EvaluateCondition(config, context))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool EvaluateCondition(
+            ExpeditionConditionConfig config,
+            ExpeditionConditionExecutionContext context)
+        {
+            if (config == null)
+                return false;
+
+            return CreateCondition(config).Evaluate(context);
+        }
+
         public static IExpeditionCondition CreateCondition(ExpeditionConditionConfig config)
         {
             return config switch
@@ -57,6 +83,9 @@ namespace GameLogic.Gameplay.Expedition
                 HasItemConditionConfig hasItemConfig => new HasItemCondition(hasItemConfig),
                 HasChosenOptionConditionConfig chosenOptionConfig => new HasChosenOptionCondition(chosenOptionConfig),
                 CounterAtLeastConditionConfig counterConfig => new CounterAtLeastCondition(counterConfig),
+                AndConditionConfig andConfig => new AndCondition(andConfig),
+                OrConditionConfig orConfig => new OrCondition(orConfig),
+                NotConditionConfig notConfig => new NotCondition(notConfig),
                 _ => new AlwaysFalseCondition(),
             };
         }
@@ -119,6 +148,60 @@ namespace GameLogic.Gameplay.Expedition
         public bool Evaluate(ExpeditionConditionExecutionContext context)
         {
             return (context?.RunState?.Blackboard?.GetCounterValue(_config.CounterId) ?? 0) >= _config.MinValue;
+        }
+    }
+
+    public sealed class AndCondition : IExpeditionCondition
+    {
+        private readonly AndConditionConfig _config;
+
+        public AndCondition(AndConditionConfig config)
+        {
+            _config = config;
+        }
+
+        public bool Evaluate(ExpeditionConditionExecutionContext context)
+        {
+            if (_config?.Conditions == null || _config.Conditions.Count == 0)
+                return false;
+
+            return ExpeditionConditionFactory.AreAllSatisfied(_config.Conditions, context);
+        }
+    }
+
+    public sealed class OrCondition : IExpeditionCondition
+    {
+        private readonly OrConditionConfig _config;
+
+        public OrCondition(OrConditionConfig config)
+        {
+            _config = config;
+        }
+
+        public bool Evaluate(ExpeditionConditionExecutionContext context)
+        {
+            if (_config?.Conditions == null || _config.Conditions.Count == 0)
+                return false;
+
+            return ExpeditionConditionFactory.IsAnySatisfied(_config.Conditions, context);
+        }
+    }
+
+    public sealed class NotCondition : IExpeditionCondition
+    {
+        private readonly NotConditionConfig _config;
+
+        public NotCondition(NotConditionConfig config)
+        {
+            _config = config;
+        }
+
+        public bool Evaluate(ExpeditionConditionExecutionContext context)
+        {
+            if (_config?.Condition == null)
+                return false;
+
+            return !ExpeditionConditionFactory.EvaluateCondition(_config.Condition, context);
         }
     }
 

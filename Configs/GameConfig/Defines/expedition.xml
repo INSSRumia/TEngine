@@ -32,6 +32,18 @@
         <var name="min_value" type="int" />
     </bean>
 
+    <bean name="AndConditionConfig" alias="and" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <bean name="OrConditionConfig" alias="or" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <bean name="NotConditionConfig" alias="not" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="condition" type="ExpeditionConditionConfig" />
+    </bean>
+
     <bean name="ExpeditionNodeTransitionConfig" valueType="false" sep=",">
         <var name="transition_id" type="string" />
         <var name="target_node_config_id" type="string" />
