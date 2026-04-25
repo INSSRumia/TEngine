@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TEngine;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -71,7 +71,7 @@ namespace GameLogic.Gameplay.Expedition
 
         #region UI 交互输入
 
-        public ExpeditionTable.ExpeditionEventConfig GetCurrentEventNode()
+        public ExpeditionEventConfig GetCurrentEventNode()
         {
             var node = CurrentRun?.GetCurrentNode();
             return node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
@@ -174,7 +174,7 @@ namespace GameLogic.Gameplay.Expedition
             return CurrentRun?.PendingCombatResult != null;
         }
 
-        public ExpeditionTable.ExpeditionRouteNodeConfig GetCurrentNode()
+        public ExpeditionRouteNodeConfig GetCurrentNode()
         {
             return CurrentRun?.GetCurrentNode();
         }
@@ -196,10 +196,10 @@ namespace GameLogic.Gameplay.Expedition
             record.QueueBeforeRoute = CurrentRun.DescribeQueue();
             switch (node.NodeType)
             {
-                case ExpeditionTable.EnumExpeditionNodeType.Event:
+                case EnumExpeditionNodeType.Event:
                     ApplyEventNodeResult(node, record);
                     break;
-                case ExpeditionTable.EnumExpeditionNodeType.Combat:
+                case EnumExpeditionNodeType.Combat:
                     ApplyCombatNodeResult(node, record);
                     break;
             }
@@ -258,7 +258,7 @@ namespace GameLogic.Gameplay.Expedition
                 CombatId = encounter.CombatEncounterId,
                 Title = encounter.Title,
                 AlliedMarbles = new List<MarblePersistentData?>(_persistentData.Marbles),
-                EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
+                EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
             };
 
             GameModule.UI.CloseUI<global::GameLogic.ExpeditionMainUI>();
@@ -281,7 +281,7 @@ namespace GameLogic.Gameplay.Expedition
                 CombatId = combatConfig.CombatEncounterId,
                 Title = combatConfig.Title,
                 AlliedMarbles = new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
-                EnemyMarbles = new List<ExpeditionTable.ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),
+                EnemyMarbles = new List<ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),
             };
         }
 
@@ -323,7 +323,7 @@ namespace GameLogic.Gameplay.Expedition
             _persistentData.LastResult = CurrentRun.ResultSummary;
         }
 
-        private void ApplyEventNodeResult(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
             var eventConfig = node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
             var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
@@ -342,7 +342,7 @@ namespace GameLogic.Gameplay.Expedition
             CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventId);
         }
 
-        private void ApplyCombatNodeResult(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyCombatNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
             var result = CurrentRun.PendingCombatResult;
             if (result == null)
@@ -393,7 +393,7 @@ namespace GameLogic.Gameplay.Expedition
             record.RecordInsertedNodeIds(insertedEntries.Select(entry => entry.NodeId));
         }
 
-        private void ApplyRouteDecision(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyRouteDecision(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
             if (CurrentRun == null || node == null || record == null)
                 return;
