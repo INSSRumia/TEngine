@@ -8,13 +8,33 @@
         "node_id": "1",
         "node_type": 1,
         "event_id": "废墟补给点",
-        "combat_encounter_id": ""
+        "combat_encounter_id": "",
+        "route_policy": 0,
+        "default_transition_id": "1",
+        "transitions": [
+          {
+            "transition_id": "1",
+            "target_node_id": "2",
+            "priority": 1,
+            "conditions": []
+          }
+        ],
+        "option_routes": [
+          {
+            "option_id": "1",
+            "transition_id": "1"
+          }
+        ]
       },
       {
         "node_id": "2",
         "node_type": 2,
         "event_id": "",
-        "combat_encounter_id": "前哨遭遇战"
+        "combat_encounter_id": "前哨遭遇战",
+        "route_policy": 0,
+        "default_transition_id": "1",
+        "transitions": [],
+        "option_routes": []
       }
     ]
   }

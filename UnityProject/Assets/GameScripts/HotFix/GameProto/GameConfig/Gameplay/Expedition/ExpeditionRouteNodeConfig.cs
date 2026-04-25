@@ -21,6 +21,10 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
         { if(!_buf["node_type"].IsNumber) { throw new SerializationException(); }  NodeType = (Gameplay.Expedition.EnumExpeditionNodeType)_buf["node_type"].AsInt; }
         { if(!_buf["event_id"].IsString) { throw new SerializationException(); }  EventId = _buf["event_id"]; }
         { if(!_buf["combat_encounter_id"].IsString) { throw new SerializationException(); }  CombatEncounterId = _buf["combat_encounter_id"]; }
+        { if(!_buf["route_policy"].IsNumber) { throw new SerializationException(); }  RoutePolicy = (Gameplay.Expedition.EnumExpeditionRoutePolicy)_buf["route_policy"].AsInt; }
+        { if(!_buf["default_transition_id"].IsString) { throw new SerializationException(); }  DefaultTransitionId = _buf["default_transition_id"]; }
+        { var __json0 = _buf["transitions"]; if(!__json0.IsArray) { throw new SerializationException(); } Transitions = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionNodeTransitionConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionNodeTransitionConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionNodeTransitionConfig.DeserializeExpeditionNodeTransitionConfig(__e0);  }  Transitions.Add(__v0); }   }
+        { var __json0 = _buf["option_routes"]; if(!__json0.IsArray) { throw new SerializationException(); } OptionRoutes = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionOptionRouteConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionOptionRouteConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionOptionRouteConfig.DeserializeExpeditionOptionRouteConfig(__e0);  }  OptionRoutes.Add(__v0); }   }
     }
 
     public static ExpeditionRouteNodeConfig DeserializeExpeditionRouteNodeConfig(JSONNode _buf)
@@ -32,12 +36,18 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
     public readonly Gameplay.Expedition.EnumExpeditionNodeType NodeType;
     public readonly string EventId;
     public readonly string CombatEncounterId;
+    public readonly Gameplay.Expedition.EnumExpeditionRoutePolicy RoutePolicy;
+    public readonly string DefaultTransitionId;
+    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionNodeTransitionConfig> Transitions;
+    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionOptionRouteConfig> OptionRoutes;
    
     public const int __ID__ = 435800007;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)
     {
+        foreach (var _e in Transitions) { _e?.ResolveRef(tables); }
+        foreach (var _e in OptionRoutes) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
@@ -47,6 +57,10 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
         + "nodeType:" + NodeType + ","
         + "eventId:" + EventId + ","
         + "combatEncounterId:" + CombatEncounterId + ","
+        + "routePolicy:" + RoutePolicy + ","
+        + "defaultTransitionId:" + DefaultTransitionId + ","
+        + "transitions:" + Luban.StringUtil.CollectionToString(Transitions) + ","
+        + "optionRoutes:" + Luban.StringUtil.CollectionToString(OptionRoutes) + ","
         + "}";
     }
 }

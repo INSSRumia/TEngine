@@ -14,7 +14,9 @@ namespace GameLogic.Gameplay.Expedition
         private readonly ExpeditionPersistentDataStore _persistentData = new ExpeditionPersistentDataStore();
 
         public ExpeditionPersistentDataStore PersistentData => _persistentData;
+
         public ExpeditionRunState CurrentRun { get; private set; }
+
         public IFsm<ExpeditionFlowController> Fsm { get; private set; }
 
         public bool IsFlowRunning => CurrentRun != null && Fsm != null;
@@ -118,6 +120,40 @@ namespace GameLogic.Gameplay.Expedition
 
         #endregion
 
+        #region 黑板与动态插入能力
+
+        public void AddBlackboardFlag(string flagId)
+        {
+            CurrentRun?.Blackboard?.AddFlag(flagId);
+        }
+
+        public void AddBlackboardItem(string itemId)
+        {
+            CurrentRun?.Blackboard?.AddItem(itemId);
+        }
+
+        public void AddBlackboardCounter(string counterId, int delta)
+        {
+            CurrentRun?.Blackboard?.AddCounterValue(counterId, delta);
+        }
+
+        public void SetBlackboardCounter(string counterId, int value)
+        {
+            CurrentRun?.Blackboard?.SetCounterValue(counterId, value);
+        }
+
+        public void InsertNodeNext(string nodeId, string reason)
+        {
+            CurrentRun?.InsertNodeAtFront(nodeId, true, CurrentRun?.GetCurrentNode()?.NodeId, string.Empty, reason);
+        }
+
+        public void ScheduleNodeInsertionAfterNode(string triggerNodeId, string nodeId, string reason, int priority = 0)
+        {
+            CurrentRun?.ScheduleInsertionAfterNode(triggerNodeId, nodeId, reason, priority);
+        }
+
+        #endregion
+
         #region FSM/节点推进
 
         public void SetPhase(EnumExpeditionFlowPhase phase)
@@ -145,13 +181,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public ExpeditionNodeRecord EnterCurrentNode()
         {
-            var record = CurrentRun?.GetCurrentRecord();
-            if (record != null)
-            {
-                record.Status = EnumExpeditionNodeProcessStatus.Entered;
-            }
-
-            return record;
+            return CurrentRun?.EnterNextPendingNode();
         }
 
         public void ApplyCurrentNodeResult()
@@ -163,32 +193,36 @@ namespace GameLogic.Gameplay.Expedition
                 return;
             }
 
+            record.QueueBeforeRoute = CurrentRun.DescribeQueue();
             switch (node.NodeType)
             {
                 case ExpeditionTable.EnumExpeditionNodeType.Event:
                     ApplyEventNodeResult(node, record);
                     break;
                 case ExpeditionTable.EnumExpeditionNodeType.Combat:
-                    ApplyCombatNodeResult(record);
+                    ApplyCombatNodeResult(node, record);
                     break;
             }
-
-            record.Status = EnumExpeditionNodeProcessStatus.Resolved;
-            CurrentRun.PendingEventOptionId = null;
-            CurrentRun.PendingCombatResult = null;
 
             if (CurrentRun.AreAllPlayerMarblesDead())
             {
                 CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
             }
 
-            if (CurrentRun.EndReason == EnumExpeditionEndReason.None)
+            ApplyDynamicInsertions(record);
+            ApplyRouteDecision(node, record);
+
+            record.Status = EnumExpeditionNodeProcessStatus.Resolved;
+            record.BlackboardAfter = CurrentRun.Blackboard?.ToDebugString() ?? string.Empty;
+            record.QueueAfterRoute = CurrentRun.DescribeQueue();
+
+            CurrentRun.PendingEventOptionId = null;
+            CurrentRun.PendingCombatResult = null;
+            CurrentRun.ClearCurrentNode();
+
+            if (CurrentRun.EndReason == EnumExpeditionEndReason.None && !CurrentRun.HasPendingNodes())
             {
-                CurrentRun.CurrentNodeIndex++;
-                if (CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count)
-                {
-                    CurrentRun.EndReason = EnumExpeditionEndReason.Victory;
-                }
+                CurrentRun.EndReason = EnumExpeditionEndReason.Victory;
             }
         }
 
@@ -196,7 +230,7 @@ namespace GameLogic.Gameplay.Expedition
         {
             return CurrentRun == null
                    || CurrentRun.EndReason != EnumExpeditionEndReason.None
-                   || CurrentRun.CurrentNodeIndex >= CurrentRun.Route.Count;
+                   || !CurrentRun.HasPendingNodes();
         }
 
         #endregion
@@ -295,6 +329,7 @@ namespace GameLogic.Gameplay.Expedition
             var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
             if (option == null)
             {
+                record.RouteDecisionLogs.Add($"节点 {node?.NodeId} 没有收到合法选项输入。");
                 return;
             }
 
@@ -304,18 +339,21 @@ namespace GameLogic.Gameplay.Expedition
             record.GainedMoney = context.AppliedMoneyDelta;
             record.EffectSummaries = context.SummaryLines.ToList();
             record.Summary = JoinSummaryLines(record.EffectSummaries);
+
+            CurrentRun.Blackboard?.AddChosenOption(option.OptionId);
+            CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventId);
         }
 
-        private void ApplyCombatNodeResult(ExpeditionNodeRecord record)
+        private void ApplyCombatNodeResult(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
             var result = CurrentRun.PendingCombatResult;
             if (result == null)
             {
+                record.RouteDecisionLogs.Add($"节点 {node.NodeId} 没有收到 Combat 结果。");
                 return;
             }
 
             record.CombatResult = result;
-
             for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
             {
                 var snapshot = CurrentRun.MarbleSnapshots[i];
@@ -333,8 +371,7 @@ namespace GameLogic.Gameplay.Expedition
                 CurrentRun.MarbleSnapshots[i] = marbleResult;
             }
 
-            var node = GetCurrentNode();
-            var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
+            var combatConfig = ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
             var effectConfigs = result.IsVictory ? combatConfig?.LstVictoryEffect : combatConfig?.LstDefeatEffect;
             var context = new ExpeditionEffectExecutionContext(CurrentRun, _persistentData, record);
             ExpeditionEffectFactory.ExecuteEffects(effectConfigs, context);
@@ -346,6 +383,58 @@ namespace GameLogic.Gameplay.Expedition
             {
                 CurrentRun.EndReason = EnumExpeditionEndReason.Defeat;
             }
+        }
+
+        private void ApplyDynamicInsertions(ExpeditionNodeRecord record)
+        {
+            if (CurrentRun == null || record == null)
+            {
+                return;
+            }
+
+            var insertedEntries = CurrentRun.TriggerScheduledInsertions(record.NodeId);
+            if (insertedEntries.Count == 0)
+            {
+                record.RouteDecisionLogs.Add("当前节点没有触发动态插入。");
+                return;
+            }
+
+            record.InsertedNodeIds.AddRange(insertedEntries.Select(entry => entry.NodeId));
+            record.RouteDecisionLogs.Add($"动态插入节点: {string.Join(", ", record.InsertedNodeIds)}");
+        }
+
+        private void ApplyRouteDecision(ExpeditionTable.ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        {
+            if (CurrentRun == null || node == null || record == null)
+            {
+                return;
+            }
+
+            if (CurrentRun.EndReason != EnumExpeditionEndReason.None)
+            {
+                record.RouteDecisionLogs.Add($"远征已结束，跳过节点 {node.NodeId} 的出口解析。");
+                return;
+            }
+
+            var decision = ExpeditionRouteResolver.Resolve(CurrentRun, node, record);
+            if (!string.IsNullOrWhiteSpace(decision?.Summary))
+            {
+                record.RouteDecisionLogs.Add(decision.Summary);
+            }
+
+            if (decision == null || string.IsNullOrWhiteSpace(decision.TargetNodeId))
+            {
+                return;
+            }
+
+            var enqueuedNode = CurrentRun.EnqueueNode(
+                decision.TargetNodeId,
+                false,
+                node.NodeId,
+                decision.TransitionId,
+                "route_transition");
+            record.ResolvedTransitionId = decision.TransitionId;
+            record.NextNodeId = enqueuedNode?.NodeId;
         }
 
         private static string JoinSummaryLines(IEnumerable<string> summaries)
@@ -370,11 +459,42 @@ namespace GameLogic.Gameplay.Expedition
                     Exp = snapshot.Value.Exp,
                     IsDead = snapshot.Value.IsDead,
                 }).ToList(),
-                NodeSummaries = runState.NodeRecords
-                    .Where(record => !string.IsNullOrEmpty(record.Summary))
-                    .Select(record => record.Summary)
-                    .ToList(),
+                NodeSummaries = runState.NodeRecords.Select(BuildNodeSummary).Where(summary => !string.IsNullOrWhiteSpace(summary)).ToList(),
             };
+        }
+
+        private static string BuildNodeSummary(ExpeditionNodeRecord record)
+        {
+            if (record == null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new List<string>
+            {
+                $"#{record.EntryOrder} 节点 {record.NodeId}"
+            };
+            if (!string.IsNullOrWhiteSpace(record.Summary))
+            {
+                parts.Add(record.Summary);
+            }
+
+            if (!string.IsNullOrWhiteSpace(record.ResolvedTransitionId))
+            {
+                parts.Add($"出口 {record.ResolvedTransitionId} -> {record.NextNodeId}");
+            }
+
+            if (record.InsertedNodeIds.Count > 0)
+            {
+                parts.Add($"插入节点 [{string.Join(",", record.InsertedNodeIds)}]");
+            }
+
+            if (record.RouteDecisionLogs.Count > 0)
+            {
+                parts.Add(string.Join(" / ", record.RouteDecisionLogs));
+            }
+
+            return string.Join(" | ", parts);
         }
 
         #endregion

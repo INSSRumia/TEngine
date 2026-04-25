@@ -5,11 +5,54 @@
         <var name="Combat" alias="combat" value="2" />
     </enum>
 
+    <enum name="EnumExpeditionRoutePolicy">
+        <var name="FixedNext" alias="fixed_next" value="0" />
+        <var name="BySelectedOption" alias="by_selected_option" value="1" />
+        <var name="ByConditions" alias="by_conditions" value="2" />
+    </enum>
+
+    <bean name="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="summary" type="string" />
+    </bean>
+
+    <bean name="HasFlagConditionConfig" alias="has_flag" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="flag_id" type="string" />
+    </bean>
+
+    <bean name="HasItemConditionConfig" alias="has_item" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="item_id" type="string" />
+    </bean>
+
+    <bean name="HasChosenOptionConditionConfig" alias="has_chosen_option" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+    </bean>
+
+    <bean name="CounterAtLeastConditionConfig" alias="counter_at_least" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="counter_id" type="string" />
+        <var name="min_value" type="int" />
+    </bean>
+
+    <bean name="ExpeditionNodeTransitionConfig" valueType="false" sep=",">
+        <var name="transition_id" type="string" />
+        <var name="target_node_id" type="string" />
+        <var name="priority" type="int" />
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <bean name="ExpeditionOptionRouteConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+        <var name="transition_id" type="string" />
+    </bean>
+
     <bean name="ExpeditionRouteNodeConfig" valueType="false" sep=",">
         <var name="node_id" type="string" />
         <var name="node_type" type="EnumExpeditionNodeType" />
         <var name="event_id" type="string" />
         <var name="combat_encounter_id" type="string" />
+        <var name="route_policy" type="EnumExpeditionRoutePolicy" />
+        <var name="default_transition_id" type="string" />
+        <var name="transitions" type="list, ExpeditionNodeTransitionConfig" />
+        <var name="option_routes" type="list, ExpeditionOptionRouteConfig" />
     </bean>
 
     <bean name="ExpeditionConfig" valueType="false" sep=",">

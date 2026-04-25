@@ -124,11 +124,10 @@ namespace GameLogic.Gameplay.Expedition
             if (Owner(fsm).ShouldEnterSettlement())
             {
                 ChangeState<ExpeditionFlowStateSettlement>(fsm);
+                return;
             }
-            else
-            {
-                ChangeState<ExpeditionFlowStateEnterNode>(fsm);
-            }
+
+            ChangeState<ExpeditionFlowStateEnterNode>(fsm);
         }
     }
 
