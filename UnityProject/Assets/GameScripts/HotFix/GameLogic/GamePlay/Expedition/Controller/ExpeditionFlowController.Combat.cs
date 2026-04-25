@@ -20,9 +20,9 @@ namespace GameLogic.Gameplay.Expedition
 
             var request = new CombatSessionRequest
             {
-                SessionId = "combat_debug_session",
-                NodeId = "combat_debug_node",
-                CombatId = encounter.CombatEncounterId,
+                CombatSessionInstId = "combat_debug_session",
+                NodeConfigId = "combat_debug_node",
+                CombatEncounterConfigId = encounter.CombatEncounterConfigId,
                 Title = encounter.Title,
                 LstAlliedMarble = new List<MarblePersistentData?>(_persistentData.LstMarbles),
                 LstEnemyMarble = new List<ExpeditionEnemyMarbleConfig>(encounter.EnemyMarbles),
@@ -35,15 +35,15 @@ namespace GameLogic.Gameplay.Expedition
         public CombatSessionRequest BuildCombatSessionRequest()
         {
             var node = GetCurrentNode();
-            var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
+            var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterConfigId);
             if (combatConfig == null || CurrentRun == null)
                 return null;
 
             return new CombatSessionRequest
             {
-                SessionId = $"{CurrentRun.RunId}_{combatConfig.CombatEncounterId}",
-                NodeId = node.NodeId,
-                CombatId = combatConfig.CombatEncounterId,
+                CombatSessionInstId = $"{CurrentRun.ExpeditionInstId}_{combatConfig.CombatEncounterConfigId}",
+                NodeConfigId = node.NodeConfigId,
+                CombatEncounterConfigId = combatConfig.CombatEncounterConfigId,
                 Title = combatConfig.Title,
                 LstAlliedMarble = new List<MarblePersistentData?>(CurrentRun.MarbleSnapshots),
                 LstEnemyMarble = new List<ExpeditionEnemyMarbleConfig>(combatConfig.EnemyMarbles),

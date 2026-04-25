@@ -34,7 +34,7 @@
 
     <bean name="ExpeditionNodeTransitionConfig" valueType="false" sep=",">
         <var name="transition_id" type="string" />
-        <var name="target_node_id" type="string" />
+        <var name="target_node_config_id" type="string" />
         <var name="priority" type="int" />
         <var name="conditions" type="list, ExpeditionConditionConfig" />
     </bean>
@@ -45,10 +45,10 @@
     </bean>
 
     <bean name="ExpeditionRouteNodeConfig" valueType="false" sep=",">
-        <var name="node_id" type="string" />
+        <var name="node_config_id" type="string" />
         <var name="node_type" type="EnumExpeditionNodeType" />
-        <var name="event_id" type="string" />
-        <var name="combat_encounter_id" type="string" />
+        <var name="event_config_id" type="string" />
+        <var name="combat_encounter_config_id" type="string" />
         <var name="route_policy" type="EnumExpeditionRoutePolicy" />
         <var name="default_transition_id" type="string" />
         <var name="transitions" type="list, ExpeditionNodeTransitionConfig" />
@@ -56,7 +56,7 @@
     </bean>
 
     <bean name="ExpeditionConfig" valueType="false" sep=",">
-        <var name="expedition_id" type="string" />
+        <var name="expedition_config_id" type="string" />
         <var name="name" type="string" />
         <var name="description" type="string" />
         <var name="route" type="list, ExpeditionRouteNodeConfig" />
@@ -86,21 +86,21 @@
     </bean>
 
     <bean name="ExpeditionEventConfig" valueType="false" sep=",">
-        <var name="event_id" type="string" />
+        <var name="event_config_id" type="string" />
         <var name="title" type="string" />
         <var name="description" type="string" />
         <var name="options" type="list, ExpeditionEventOptionConfig" />
     </bean>
 
     <bean name="ExpeditionEnemyMarbleConfig" valueType="false" sep=",">
-        <var name="enemy_id" type="string" />
-        <var name="config_id" type="string" />
+        <var name="enemy_config_id" type="string" />
+        <var name="marble_config_id" type="string" />
         <var name="display_name" type="string" />
         <var name="level" type="int" />
     </bean>
 
     <bean name="ExpeditionCombatEncounterConfig" valueType="false" sep=",">
-        <var name="combat_encounter_id" type="string" />
+        <var name="combat_encounter_config_id" type="string" />
         <var name="title" type="string" />
         <var name="description" type="string" />
         <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
@@ -108,7 +108,7 @@
         <var name="enemy_marbles" type="list, ExpeditionEnemyMarbleConfig" />
     </bean>
 
-    <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_id" />
-    <table name="TbExpeditionEvent" value="ExpeditionEventConfig" input="expedition_event.xlsx" index="event_id" />
-    <table name="TbExpeditionCombatEncounter" value="ExpeditionCombatEncounterConfig" input="expedition_combat_encounter.xlsx" index="combat_encounter_id" />
+    <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_config_id" />
+    <table name="TbExpeditionEvent" value="ExpeditionEventConfig" input="expedition_event.xlsx" index="event_config_id" />
+    <table name="TbExpeditionCombatEncounter" value="ExpeditionCombatEncounterConfig" input="expedition_combat_encounter.xlsx" index="combat_encounter_config_id" />
 </module>

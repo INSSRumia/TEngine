@@ -29,7 +29,7 @@ public partial class TbExpedition
             Gameplay.Expedition.ExpeditionConfig _v;
             { if(!_ele.IsObject) { throw new SerializationException(); }  _v = global::GameConfig.Gameplay.Expedition.ExpeditionConfig.DeserializeExpeditionConfig(_ele);  }
             _dataList.Add(_v);
-            _dataMap.Add(_v.ExpeditionId, _v);
+            _dataMap.Add(_v.ExpeditionConfigId, _v);
         }
     }
 

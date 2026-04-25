@@ -22,14 +22,14 @@ namespace GameLogic.Gameplay.Expedition
             CurrentRun?.Blackboard?.SetCounterValue(counterId, value);
         }
 
-        public void InsertNodeNext(string nodeId, string reason)
+        public void InsertNodeNext(string nodeConfigId, string reason)
         {
-            CurrentRun?.InsertNodeAtFront(nodeId, true, CurrentRun?.GetCurrentNode()?.NodeId, string.Empty, reason);
+            CurrentRun?.InsertNodeAtFront(nodeConfigId, true, CurrentRun?.GetCurrentNode()?.NodeConfigId, string.Empty, reason);
         }
 
-        public void ScheduleNodeInsertionAfterNode(string triggerNodeId, string nodeId, string reason, int priority = 0)
+        public void ScheduleNodeInsertionAfterNode(string triggerNodeConfigId, string nodeConfigId, string reason, int priority = 0)
         {
-            CurrentRun?.ScheduleInsertionAfterNode(triggerNodeId, nodeId, reason, priority);
+            CurrentRun?.ScheduleInsertionAfterNode(triggerNodeConfigId, nodeConfigId, reason, priority);
         }
     }
 }

@@ -1,6 +1,6 @@
 [
   {
-    "combat_encounter_id": "前哨遭遇战",
+    "combat_encounter_config_id": "前哨遭遇战",
     "title": "前哨遭遇战",
     "description": "敌方巡逻 Marble 正在封锁出口，击败它们即可带走补给。",
     "lst_victory_effect": [
@@ -19,14 +19,14 @@
     ],
     "enemy_marbles": [
       {
-        "enemy_id": "1",
-        "config_id": "soldier",
+        "enemy_config_id": "1",
+        "marble_config_id": "soldier",
         "display_name": "巡逻剑士",
         "level": 0
       },
       {
-        "enemy_id": "2",
-        "config_id": "archer",
+        "enemy_config_id": "2",
+        "marble_config_id": "archer",
         "display_name": "巡逻弓箭手",
         "level": 0
       }

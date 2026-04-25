@@ -17,8 +17,8 @@ public sealed partial class ExpeditionEnemyMarbleConfig : Luban.BeanBase
 {
     public ExpeditionEnemyMarbleConfig(JSONNode _buf) 
     {
-        { if(!_buf["enemy_id"].IsString) { throw new SerializationException(); }  EnemyId = _buf["enemy_id"]; }
-        { if(!_buf["config_id"].IsString) { throw new SerializationException(); }  ConfigId = _buf["config_id"]; }
+        { if(!_buf["enemy_config_id"].IsString) { throw new SerializationException(); }  EnemyConfigId = _buf["enemy_config_id"]; }
+        { if(!_buf["marble_config_id"].IsString) { throw new SerializationException(); }  MarbleConfigId = _buf["marble_config_id"]; }
         { if(!_buf["display_name"].IsString) { throw new SerializationException(); }  DisplayName = _buf["display_name"]; }
         { if(!_buf["level"].IsNumber) { throw new SerializationException(); }  Level = _buf["level"]; }
     }
@@ -28,8 +28,8 @@ public sealed partial class ExpeditionEnemyMarbleConfig : Luban.BeanBase
         return new Gameplay.Expedition.ExpeditionEnemyMarbleConfig(_buf);
     }
 
-    public readonly string EnemyId;
-    public readonly string ConfigId;
+    public readonly string EnemyConfigId;
+    public readonly string MarbleConfigId;
     public readonly string DisplayName;
     public readonly int Level;
    
@@ -43,8 +43,8 @@ public sealed partial class ExpeditionEnemyMarbleConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
-        + "enemyId:" + EnemyId + ","
-        + "configId:" + ConfigId + ","
+        + "enemyConfigId:" + EnemyConfigId + ","
+        + "marbleConfigId:" + MarbleConfigId + ","
         + "displayName:" + DisplayName + ","
         + "level:" + Level + ","
         + "}";

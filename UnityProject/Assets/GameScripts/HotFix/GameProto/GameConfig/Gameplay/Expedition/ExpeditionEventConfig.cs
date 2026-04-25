@@ -17,7 +17,7 @@ public sealed partial class ExpeditionEventConfig : Luban.BeanBase
 {
     public ExpeditionEventConfig(JSONNode _buf) 
     {
-        { if(!_buf["event_id"].IsString) { throw new SerializationException(); }  EventId = _buf["event_id"]; }
+        { if(!_buf["event_config_id"].IsString) { throw new SerializationException(); }  EventConfigId = _buf["event_config_id"]; }
         { if(!_buf["title"].IsString) { throw new SerializationException(); }  Title = _buf["title"]; }
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
         { var __json0 = _buf["options"]; if(!__json0.IsArray) { throw new SerializationException(); } Options = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEventOptionConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEventOptionConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEventOptionConfig.DeserializeExpeditionEventOptionConfig(__e0);  }  Options.Add(__v0); }   }
@@ -28,7 +28,7 @@ public sealed partial class ExpeditionEventConfig : Luban.BeanBase
         return new Gameplay.Expedition.ExpeditionEventConfig(_buf);
     }
 
-    public readonly string EventId;
+    public readonly string EventConfigId;
     public readonly string Title;
     public readonly string Description;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEventOptionConfig> Options;
@@ -44,7 +44,7 @@ public sealed partial class ExpeditionEventConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
-        + "eventId:" + EventId + ","
+        + "eventConfigId:" + EventConfigId + ","
         + "title:" + Title + ","
         + "description:" + Description + ","
         + "options:" + Luban.StringUtil.CollectionToString(Options) + ","

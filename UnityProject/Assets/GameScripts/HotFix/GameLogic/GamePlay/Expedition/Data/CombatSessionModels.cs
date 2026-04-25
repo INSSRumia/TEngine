@@ -7,9 +7,9 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class CombatSessionRequest
     {
-        public string SessionId;
-        public string NodeId;
-        public string CombatId;
+        public string CombatSessionInstId;
+        public string NodeConfigId;
+        public string CombatEncounterConfigId;
         public string Title;
         public List<MarblePersistentData?> LstAlliedMarble = new ();
         public List<ExpeditionEnemyMarbleConfig> LstEnemyMarble = new ();

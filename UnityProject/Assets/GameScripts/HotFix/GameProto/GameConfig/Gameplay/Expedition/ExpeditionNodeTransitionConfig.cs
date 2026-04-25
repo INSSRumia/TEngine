@@ -18,7 +18,7 @@ public sealed partial class ExpeditionNodeTransitionConfig : Luban.BeanBase
     public ExpeditionNodeTransitionConfig(JSONNode _buf) 
     {
         { if(!_buf["transition_id"].IsString) { throw new SerializationException(); }  TransitionId = _buf["transition_id"]; }
-        { if(!_buf["target_node_id"].IsString) { throw new SerializationException(); }  TargetNodeId = _buf["target_node_id"]; }
+        { if(!_buf["target_node_config_id"].IsString) { throw new SerializationException(); }  TargetNodeConfigId = _buf["target_node_config_id"]; }
         { if(!_buf["priority"].IsNumber) { throw new SerializationException(); }  Priority = _buf["priority"]; }
         { var __json0 = _buf["conditions"]; if(!__json0.IsArray) { throw new SerializationException(); } Conditions = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionConditionConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionConditionConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionConditionConfig.DeserializeExpeditionConditionConfig(__e0);  }  Conditions.Add(__v0); }   }
     }
@@ -29,7 +29,7 @@ public sealed partial class ExpeditionNodeTransitionConfig : Luban.BeanBase
     }
 
     public readonly string TransitionId;
-    public readonly string TargetNodeId;
+    public readonly string TargetNodeConfigId;
     public readonly int Priority;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionConditionConfig> Conditions;
    
@@ -45,7 +45,7 @@ public sealed partial class ExpeditionNodeTransitionConfig : Luban.BeanBase
     {
         return "{ "
         + "transitionId:" + TransitionId + ","
-        + "targetNodeId:" + TargetNodeId + ","
+        + "targetNodeConfigId:" + TargetNodeConfigId + ","
         + "priority:" + Priority + ","
         + "conditions:" + Luban.StringUtil.CollectionToString(Conditions) + ","
         + "}";

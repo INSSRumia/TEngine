@@ -9,25 +9,25 @@ namespace GameLogic.Gameplay.Expedition
 {
     public static class ExpeditionConfigBridge
     {
-        public static ExpeditionRunState CreateConfiguredRun(IEnumerable<MarblePersistentData?> marbles, string preferredExpeditionId)
+        public static ExpeditionRunState CreateConfiguredRun(IEnumerable<MarblePersistentData?> marbles, string preferredExpeditionConfigId)
         {
-            var expedition = ResolveStartupExpedition(preferredExpeditionId);
+            var expedition = ResolveStartupExpedition(preferredExpeditionConfigId);
             if (expedition == null)
             {
-                Log.Warning($"[远征] 无法解析启动远征配置。首选Id:{preferredExpeditionId}");
+                Log.Warning($"[远征] 无法解析启动远征配置。首选ConfigId:{preferredExpeditionConfigId}");
                 return null;
             }
 
             if (!ValidateExpedition(expedition))
             {
-                Log.Warning($"[远征] 远征配置校验失败。远征Id:{expedition.ExpeditionId}");
+                Log.Warning($"[远征] 远征配置校验失败。远征ConfigId:{expedition.ExpeditionConfigId}");
                 return null;
             }
 
             var runState = new ExpeditionRunState
             {
-                RunId = Guid.NewGuid().ToString("N"),
-                ExpeditionId = expedition.ExpeditionId,
+                ExpeditionInstId = Guid.NewGuid().ToString("N"),
+                ExpeditionConfigId = expedition.ExpeditionConfigId,
                 Phase = EnumExpeditionFlowPhase.None,
                 EndReason = EnumExpeditionEndReason.None,
                 MarbleSnapshots = marbles?
@@ -39,13 +39,13 @@ namespace GameLogic.Gameplay.Expedition
             var firstNode = runState.Route.FirstOrDefault(node => node != null);
             if (firstNode != null)
             {
-                runState.EnqueueNode(firstNode.NodeId, false, string.Empty, string.Empty, "initial_entry");
+                runState.EnqueueNode(firstNode.NodeConfigId, false, string.Empty, string.Empty, "initial_entry");
             }
 
             return runState;
         }
 
-        public static ExpeditionTable.ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionId)
+        public static ExpeditionTable.ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionConfigId)
         {
             var expeditionTable = ConfigSystem.Instance.Tables?.TbExpedition;
             if (expeditionTable == null)
@@ -53,9 +53,9 @@ namespace GameLogic.Gameplay.Expedition
                 return null;
             }
 
-            if (!string.IsNullOrEmpty(preferredExpeditionId))
+            if (!string.IsNullOrEmpty(preferredExpeditionConfigId))
             {
-                var expedition = expeditionTable.GetOrDefault(preferredExpeditionId);
+                var expedition = expeditionTable.GetOrDefault(preferredExpeditionConfigId);
                 if (expedition != null)
                 {
                     return expedition;
@@ -65,29 +65,29 @@ namespace GameLogic.Gameplay.Expedition
             return expeditionTable.DataList.Count > 0 ? expeditionTable.DataList[0] : null;
         }
 
-        public static ExpeditionTable.ExpeditionEventConfig ResolveEvent(string eventId)
+        public static ExpeditionTable.ExpeditionEventConfig ResolveEvent(string eventConfigId)
         {
-            if (string.IsNullOrEmpty(eventId))
+            if (string.IsNullOrEmpty(eventConfigId))
             {
                 return null;
             }
 
-            return ConfigSystem.Instance.Tables?.TbExpeditionEvent?.GetOrDefault(eventId);
+            return ConfigSystem.Instance.Tables?.TbExpeditionEvent?.GetOrDefault(eventConfigId);
         }
 
-        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveCombatEncounter(string encounterId)
+        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveCombatEncounter(string combatEncounterConfigId)
         {
-            if (string.IsNullOrEmpty(encounterId))
+            if (string.IsNullOrEmpty(combatEncounterConfigId))
             {
                 return null;
             }
 
-            return ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter?.GetOrDefault(encounterId);
+            return ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter?.GetOrDefault(combatEncounterConfigId);
         }
 
-        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionId)
+        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
         {
-            var expedition = ResolveStartupExpedition(preferredExpeditionId);
+            var expedition = ResolveStartupExpedition(preferredExpeditionConfigId);
             if (expedition?.Route != null)
             {
                 foreach (var node in expedition.Route)
@@ -97,7 +97,7 @@ namespace GameLogic.Gameplay.Expedition
                         continue;
                     }
 
-                    var encounter = ResolveCombatEncounter(node.CombatEncounterId);
+                    var encounter = ResolveCombatEncounter(node.CombatEncounterConfigId);
                     if (encounter != null)
                     {
                         return encounter;
@@ -109,11 +109,11 @@ namespace GameLogic.Gameplay.Expedition
             return encounterTable != null && encounterTable.DataList.Count > 0 ? encounterTable.DataList[0] : null;
         }
 
-        public static int ResolveMarbleMaxHp(string configId, int level)
+        public static int ResolveMarbleMaxHp(string marbleConfigId, int level)
         {
             try
             {
-                var levelConfig = MarbleFactory.GetMarbleLevelConfig(configId, level);
+                var levelConfig = MarbleFactory.GetMarbleLevelConfig(marbleConfigId, level);
                 if (levelConfig != null)
                 {
                     return levelConfig.Hp;
@@ -121,7 +121,7 @@ namespace GameLogic.Gameplay.Expedition
             }
             catch (Exception exception)
             {
-                Log.Warning($"[远征] ResolveMarbleMaxHp 回退处理 {configId}:{level}。{exception.Message}");
+                Log.Warning($"[远征] ResolveMarbleMaxHp 回退处理 {marbleConfigId}:{level}。{exception.Message}");
             }
 
             return 100;
@@ -137,7 +137,7 @@ namespace GameLogic.Gameplay.Expedition
             var nodeIdSet = new HashSet<string>();
             foreach (var node in expedition.Route)
             {
-                if (node == null || string.IsNullOrWhiteSpace(node.NodeId) || !nodeIdSet.Add(node.NodeId))
+                if (node == null || string.IsNullOrWhiteSpace(node.NodeConfigId) || !nodeIdSet.Add(node.NodeConfigId))
                 {
                     return false;
                 }
@@ -145,23 +145,23 @@ namespace GameLogic.Gameplay.Expedition
                 switch (node.NodeType)
                 {
                     case ExpeditionTable.EnumExpeditionNodeType.Event:
-                        if (ResolveEvent(node.EventId) == null)
+                        if (ResolveEvent(node.EventConfigId) == null)
                         {
-                            Log.Warning($"[远征] 节点:{node.NodeId} 缺少事件配置 eventId:{node.EventId}");
+                            Log.Warning($"[远征] 节点:{node.NodeConfigId} 缺少事件配置 eventConfigId:{node.EventConfigId}");
                             return false;
                         }
 
                         break;
                     case ExpeditionTable.EnumExpeditionNodeType.Combat:
-                        if (ResolveCombatEncounter(node.CombatEncounterId) == null)
+                        if (ResolveCombatEncounter(node.CombatEncounterConfigId) == null)
                         {
-                            Log.Warning($"[远征] 节点:{node.NodeId} 缺少战斗遭遇配置 encounterId:{node.CombatEncounterId}");
+                            Log.Warning($"[远征] 节点:{node.NodeConfigId} 缺少战斗遭遇配置 combatEncounterConfigId:{node.CombatEncounterConfigId}");
                             return false;
                         }
 
                         break;
                     default:
-                        Log.Warning($"[远征] 不支持的节点类型:{node.NodeType} nodeId:{node.NodeId}");
+                        Log.Warning($"[远征] 不支持的节点类型:{node.NodeType} nodeConfigId:{node.NodeConfigId}");
                         return false;
                 }
 
@@ -188,7 +188,7 @@ namespace GameLogic.Gameplay.Expedition
                 case ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption:
                     if (node.OptionRoutes == null || node.OptionRoutes.Count == 0)
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 使用了 BySelectedOption 但没有选项路由。");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 使用了 BySelectedOption 但没有选项路由。");
                         return false;
                     }
 
@@ -196,13 +196,13 @@ namespace GameLogic.Gameplay.Expedition
                 case ExpeditionTable.EnumExpeditionRoutePolicy.ByConditions:
                     if (node.Transitions == null || node.Transitions.Count == 0)
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 使用了 ByConditions 但没有转换条件。");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 使用了 ByConditions 但没有转换条件。");
                         return false;
                     }
 
                     return true;
                 default:
-                    Log.Warning($"[远征] 不支持的路由策略:{node.RoutePolicy} nodeId:{node.NodeId}");
+                    Log.Warning($"[远征] 不支持的路由策略:{node.RoutePolicy} nodeConfigId:{node.NodeConfigId}");
                     return false;
             }
         }
@@ -216,21 +216,21 @@ namespace GameLogic.Gameplay.Expedition
                 {
                     if (transition == null || string.IsNullOrWhiteSpace(transition.TransitionId))
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 包含无效的转换条目。");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 包含无效的转换条目。");
                         return false;
                     }
 
                     transitionIds.Add(transition.TransitionId);
 
-                    if (string.IsNullOrWhiteSpace(transition.TargetNodeId))
+                    if (string.IsNullOrWhiteSpace(transition.TargetNodeConfigId))
                     {
                         continue;
                     }
 
-                    var targetNodeExists = expedition.Route.Any(routeNode => routeNode != null && routeNode.NodeId == transition.TargetNodeId);
+                    var targetNodeExists = expedition.Route.Any(routeNode => routeNode != null && routeNode.NodeConfigId == transition.TargetNodeConfigId);
                     if (!targetNodeExists)
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 的转换:{transition.TransitionId} 指向不存在的节点:{transition.TargetNodeId}");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 的转换:{transition.TransitionId} 指向不存在的节点:{transition.TargetNodeConfigId}");
                         return false;
                     }
                 }
@@ -238,25 +238,25 @@ namespace GameLogic.Gameplay.Expedition
 
             if (node.RoutePolicy == ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption)
             {
-                var eventConfig = ResolveEvent(node.EventId);
+                var eventConfig = ResolveEvent(node.EventConfigId);
                 foreach (var optionRoute in node.OptionRoutes)
                 {
                     if (optionRoute == null || string.IsNullOrWhiteSpace(optionRoute.OptionId))
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 包含无效的选项路由。");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 包含无效的选项路由。");
                         return false;
                     }
 
                     var optionExists = eventConfig?.Options?.Any(option => option != null && option.OptionId == optionRoute.OptionId) ?? false;
                     if (!optionExists)
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 选项路由引用了不存在的选项:{optionRoute.OptionId}");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 选项路由引用了不存在的选项:{optionRoute.OptionId}");
                         return false;
                     }
 
                     if (!string.IsNullOrWhiteSpace(optionRoute.TransitionId) && !transitionIds.Contains(optionRoute.TransitionId))
                     {
-                        Log.Warning($"[远征] 节点:{node.NodeId} 选项路由引用了不存在的转换:{optionRoute.TransitionId}");
+                        Log.Warning($"[远征] 节点:{node.NodeConfigId} 选项路由引用了不存在的转换:{optionRoute.TransitionId}");
                         return false;
                     }
                 }

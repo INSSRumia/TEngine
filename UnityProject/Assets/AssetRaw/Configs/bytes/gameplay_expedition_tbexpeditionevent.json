@@ -1,6 +1,6 @@
 [
   {
-    "event_id": "废墟补给点",
+    "event_config_id": "废墟补给点",
     "title": "废墟补给点",
     "description": "队伍在废墟中发现两份应急补给，你要立刻决定如何处理。",
     "options": [

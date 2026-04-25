@@ -8,10 +8,10 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionPendingNodeEntry
     {
-        public string QueueEntryId;
-        public string NodeId;
+        public string QueueEntryInstId;
+        public string NodeConfigId;
         public bool IsDynamic;
-        public string SourceNodeId;
+        public string SourceNodeConfigId;
         public string SourceTransitionId;
         public string Reason;
     }
@@ -19,9 +19,9 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionScheduledNodeInsertion
     {
-        public string RequestId;
-        public string TriggerNodeId;
-        public string NodeId;
+        public string InsertionRequestInstId;
+        public string TriggerNodeConfigId;
+        public string NodeConfigId;
         public int Priority;
         public string Reason;
         public bool IsConsumed;
@@ -30,8 +30,8 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionRunState
     {
-        public string RunId;
-        public string ExpeditionId;
+        public string ExpeditionInstId;
+        public string ExpeditionConfigId;
         public EnumExpeditionFlowPhase Phase;
         public EnumExpeditionEndReason EndReason;
         public int TotalMoneyGained;
@@ -51,14 +51,14 @@ namespace GameLogic.Gameplay.Expedition
 
         public ExpeditionTable.ExpeditionRouteNodeConfig GetCurrentNode()
         {
-            return CurrentNodeEntry == null ? null : GetNode(CurrentNodeEntry.NodeId);
+            return CurrentNodeEntry == null ? null : GetNode(CurrentNodeEntry.NodeConfigId);
         }
 
-        public ExpeditionTable.ExpeditionRouteNodeConfig GetNode(string nodeId)
+        public ExpeditionTable.ExpeditionRouteNodeConfig GetNode(string nodeConfigId)
         {
-            return string.IsNullOrWhiteSpace(nodeId)
+            return string.IsNullOrWhiteSpace(nodeConfigId)
                 ? null
-                : Route?.FirstOrDefault(node => node != null && node.NodeId == nodeId);
+                : Route?.FirstOrDefault(node => node != null && node.NodeConfigId == nodeConfigId);
         }
 
         public ExpeditionNodeRecord GetCurrentRecord()
@@ -68,7 +68,7 @@ namespace GameLogic.Gameplay.Expedition
                 return null;
             }
 
-            return NodeRecords.LastOrDefault(record => record != null && record.QueueEntryId == CurrentNodeEntry.QueueEntryId);
+            return NodeRecords.LastOrDefault(record => record != null && record.QueueEntryInstId == CurrentNodeEntry.QueueEntryInstId);
         }
 
         public ExpeditionNodeRecord EnterNextPendingNode()
@@ -86,7 +86,7 @@ namespace GameLogic.Gameplay.Expedition
             var node = GetCurrentNode();
             if (node == null)
             {
-                DebugLogs.Add($"[缺失节点] queueEntry={CurrentNodeEntry.QueueEntryId} nodeId={CurrentNodeEntry.NodeId}");
+                DebugLogs.Add($"[缺失节点] queueEntry={CurrentNodeEntry.QueueEntryInstId} nodeConfigId={CurrentNodeEntry.NodeConfigId}");
                 CurrentNodeEntry = null;
                 EndReason = EnumExpeditionEndReason.Defeat;
                 return null;
@@ -94,13 +94,13 @@ namespace GameLogic.Gameplay.Expedition
 
             var record = new ExpeditionNodeRecord
             {
-                QueueEntryId = CurrentNodeEntry.QueueEntryId,
-                NodeId = node.NodeId,
+                QueueEntryInstId = CurrentNodeEntry.QueueEntryInstId,
+                NodeConfigId = node.NodeConfigId,
                 NodeType = node.NodeType,
                 Status = EnumExpeditionNodeProcessStatus.Entered,
                 EntryOrder = ++EnteredNodeCount,
                 RoutePolicy = node.RoutePolicy.ToString(),
-                SourceNodeId = CurrentNodeEntry.SourceNodeId,
+                SourceNodeConfigId = CurrentNodeEntry.SourceNodeConfigId,
                 SourceTransitionId = CurrentNodeEntry.SourceTransitionId,
                 EnqueueReason = CurrentNodeEntry.Reason,
                 WasDynamicallyInserted = CurrentNodeEntry.IsDynamic,
@@ -109,7 +109,7 @@ namespace GameLogic.Gameplay.Expedition
                 BlackboardBefore = Blackboard?.ToDebugString() ?? string.Empty,
             };
             NodeRecords.Add(record);
-            DebugLogs.Add($"[进入节点] {record.NodeId} queue={record.QueueAfterEnter}");
+            DebugLogs.Add($"[进入节点] {record.NodeConfigId} queue={record.QueueAfterEnter}");
             return record;
         }
 
@@ -124,66 +124,66 @@ namespace GameLogic.Gameplay.Expedition
         }
 
         public ExpeditionPendingNodeEntry EnqueueNode(
-            string nodeId,
+            string nodeConfigId,
             bool isDynamic,
-            string sourceNodeId,
+            string sourceNodeConfigId,
             string sourceTransitionId,
             string reason)
         {
-            if (string.IsNullOrWhiteSpace(nodeId))
+            if (string.IsNullOrWhiteSpace(nodeConfigId))
             {
                 return null;
             }
 
-            var entry = CreatePendingNodeEntry(nodeId, isDynamic, sourceNodeId, sourceTransitionId, reason);
+            var entry = CreatePendingNodeEntry(nodeConfigId, isDynamic, sourceNodeConfigId, sourceTransitionId, reason);
             PendingNodeQueue.Add(entry);
             return entry;
         }
 
         public ExpeditionPendingNodeEntry InsertNodeAtFront(
-            string nodeId,
+            string nodeConfigId,
             bool isDynamic,
-            string sourceNodeId,
+            string sourceNodeConfigId,
             string sourceTransitionId,
             string reason)
         {
-            if (string.IsNullOrWhiteSpace(nodeId))
+            if (string.IsNullOrWhiteSpace(nodeConfigId))
             {
                 return null;
             }
 
-            var entry = CreatePendingNodeEntry(nodeId, isDynamic, sourceNodeId, sourceTransitionId, reason);
+            var entry = CreatePendingNodeEntry(nodeConfigId, isDynamic, sourceNodeConfigId, sourceTransitionId, reason);
             PendingNodeQueue.Insert(0, entry);
             return entry;
         }
 
-        public void ScheduleInsertionAfterNode(string triggerNodeId, string nodeId, string reason, int priority = 0)
+        public void ScheduleInsertionAfterNode(string triggerNodeConfigId, string nodeConfigId, string reason, int priority = 0)
         {
-            if (string.IsNullOrWhiteSpace(triggerNodeId) || string.IsNullOrWhiteSpace(nodeId))
+            if (string.IsNullOrWhiteSpace(triggerNodeConfigId) || string.IsNullOrWhiteSpace(nodeConfigId))
             {
                 return;
             }
 
             ScheduledInsertions.Add(new ExpeditionScheduledNodeInsertion
             {
-                RequestId = Guid.NewGuid().ToString("N"),
-                TriggerNodeId = triggerNodeId,
-                NodeId = nodeId,
+                InsertionRequestInstId = Guid.NewGuid().ToString("N"),
+                TriggerNodeConfigId = triggerNodeConfigId,
+                NodeConfigId = nodeConfigId,
                 Priority = priority,
                 Reason = reason,
                 IsConsumed = false,
             });
         }
 
-        public List<ExpeditionPendingNodeEntry> TriggerScheduledInsertions(string triggerNodeId)
+        public List<ExpeditionPendingNodeEntry> TriggerScheduledInsertions(string triggerNodeConfigId)
         {
-            if (string.IsNullOrWhiteSpace(triggerNodeId) || ScheduledInsertions == null || ScheduledInsertions.Count == 0)
+            if (string.IsNullOrWhiteSpace(triggerNodeConfigId) || ScheduledInsertions == null || ScheduledInsertions.Count == 0)
             {
                 return new List<ExpeditionPendingNodeEntry>();
             }
 
             var insertions = ScheduledInsertions
-                .Where(item => item != null && !item.IsConsumed && item.TriggerNodeId == triggerNodeId)
+                .Where(item => item != null && !item.IsConsumed && item.TriggerNodeConfigId == triggerNodeConfigId)
                 .OrderByDescending(item => item.Priority)
                 .ToList();
             var insertedEntries = new List<ExpeditionPendingNodeEntry>(insertions.Count);
@@ -192,9 +192,9 @@ namespace GameLogic.Gameplay.Expedition
                 var insertion = insertions[i];
                 insertion.IsConsumed = true;
                 var entry = InsertNodeAtFront(
-                    insertion.NodeId,
+                    insertion.NodeConfigId,
                     true,
-                    triggerNodeId,
+                    triggerNodeConfigId,
                     string.Empty,
                     insertion.Reason);
                 if (entry != null)
@@ -228,23 +228,23 @@ namespace GameLogic.Gameplay.Expedition
                 }
 
                 var suffix = entry.IsDynamic ? "[动态]" : string.Empty;
-                return $"{entry.NodeId}{suffix}";
+                return $"{entry.NodeConfigId}{suffix}";
             }));
         }
 
         private static ExpeditionPendingNodeEntry CreatePendingNodeEntry(
-            string nodeId,
+            string nodeConfigId,
             bool isDynamic,
-            string sourceNodeId,
+            string sourceNodeConfigId,
             string sourceTransitionId,
             string reason)
         {
             return new ExpeditionPendingNodeEntry
             {
-                QueueEntryId = Guid.NewGuid().ToString("N"),
-                NodeId = nodeId,
+                QueueEntryInstId = Guid.NewGuid().ToString("N"),
+                NodeConfigId = nodeConfigId,
                 IsDynamic = isDynamic,
-                SourceNodeId = sourceNodeId,
+                SourceNodeConfigId = sourceNodeConfigId,
                 SourceTransitionId = sourceTransitionId,
                 Reason = reason,
             };

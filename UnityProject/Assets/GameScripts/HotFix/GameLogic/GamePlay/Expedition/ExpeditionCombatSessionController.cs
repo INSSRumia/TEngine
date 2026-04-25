@@ -41,7 +41,7 @@ namespace GameLogic.Gameplay.Expedition
             _sessionRoot = new GameObject("ExpeditionCombatSessionRoot");
             SpawnAlliedMarbles(request.LstAlliedMarble);
             SpawnEnemyMarbles(request.LstEnemyMarble);
-            Log.Info($"[远征战斗会话控制器] 开始会话 {request.SessionId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
+            Log.Info($"[远征战斗会话控制器] 开始会话 {request.CombatSessionInstId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
             return true;
         }
 
@@ -146,7 +146,7 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
 
                 var snapshot = _currentRequest.LstAlliedMarble[i].Value;
-                _playerMarbles.TryGetValue(snapshot.PersistentId, out var marble);
+                _playerMarbles.TryGetValue(snapshot.MarbleInstId, out var marble);
                 if(marble == null || marble.RuntimeData == null)
                     continue;
 
@@ -179,19 +179,19 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
 
                 var snapshot = snapshots[index].Value;
-                var marble = MarbleFactory.CreateMarble(snapshot.ConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
+                var marble = MarbleFactory.CreateMarble(snapshot.MarbleConfigId, ExpeditionConstants.PlayerCamp, snapshot.Level);
                 if (marble == null)
                 {
                     continue;
                 }
 
-                marble.name = snapshot.PersistentId;
+                marble.name = snapshot.MarbleInstId;
                 marble.transform.SetParent(_sessionRoot.transform, false);
                 marble.transform.position = new Vector3(-5f, 0f, GetLineOffset(index, snapshots.Count));
                 marble.RuntimeData.State.Hp = Mathf.Clamp(snapshot.CurrentHp, 1, marble.RuntimeData.State.MaxHp);
                 marble.RuntimeData.State.Exp = snapshot.Exp;
                 _combatManager.Register(marble);
-                _playerMarbles[snapshot.PersistentId] = marble;
+                _playerMarbles[snapshot.MarbleInstId] = marble;
             }
         }
 
@@ -205,13 +205,13 @@ namespace GameLogic.Gameplay.Expedition
             for (int index = 0; index < enemies.Count; index++)
             {
                 var enemy = enemies[index];
-                var marble = MarbleFactory.CreateMarble(enemy.ConfigId, ExpeditionConstants.EnemyCamp, enemy.Level);
+                var marble = MarbleFactory.CreateMarble(enemy.MarbleConfigId, ExpeditionConstants.EnemyCamp, enemy.Level);
                 if (marble == null)
                 {
                     continue;
                 }
 
-                marble.name = enemy.EnemyId;
+                marble.name = enemy.EnemyConfigId;
                 marble.transform.SetParent(_sessionRoot.transform, false);
                 marble.transform.position = new Vector3(5f, 0f, GetLineOffset(index, enemies.Count));
                 _combatManager.Register(marble);

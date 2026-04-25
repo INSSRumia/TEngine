@@ -23,16 +23,16 @@ namespace GameLogic.Gameplay.Expedition
             LstMarbles.Add(MarblePersistentData.CreateDefault("marble_player_3", "soldier", "先锋三号", 0));
         }
 
-        public MarblePersistentData? GetMarble(string persistentId)
+        public MarblePersistentData? GetMarble(string marbleInstId)
         {
-            return LstMarbles.Find(marble => marble.HasValue && marble.Value.PersistentId == persistentId);
+            return LstMarbles.Find(marble => marble.HasValue && marble.Value.MarbleInstId == marbleInstId);
         }
 
         public void SetMarble(MarblePersistentData marble)
         {
             for (int i = 0; i < LstMarbles.Count; i++)
             {
-                if (!LstMarbles[i].HasValue || LstMarbles[i].Value.PersistentId != marble.PersistentId)
+                if (!LstMarbles[i].HasValue || LstMarbles[i].Value.MarbleInstId != marble.MarbleInstId)
                 {
                     continue;
                 }

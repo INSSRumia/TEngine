@@ -8,7 +8,7 @@ namespace GameLogic.Gameplay.Expedition
         public ExpeditionEventConfig GetCurrentEventNode()
         {
             var node = CurrentRun?.GetCurrentNode();
-            return node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
+            return node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventConfigId);
         }
 
         public ExpeditionResultSummary GetDisplayableResult()

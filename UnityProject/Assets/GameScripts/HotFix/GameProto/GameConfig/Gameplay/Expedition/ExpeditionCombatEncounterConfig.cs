@@ -17,7 +17,7 @@ public sealed partial class ExpeditionCombatEncounterConfig : Luban.BeanBase
 {
     public ExpeditionCombatEncounterConfig(JSONNode _buf) 
     {
-        { if(!_buf["combat_encounter_id"].IsString) { throw new SerializationException(); }  CombatEncounterId = _buf["combat_encounter_id"]; }
+        { if(!_buf["combat_encounter_config_id"].IsString) { throw new SerializationException(); }  CombatEncounterConfigId = _buf["combat_encounter_config_id"]; }
         { if(!_buf["title"].IsString) { throw new SerializationException(); }  Title = _buf["title"]; }
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
         { var __json0 = _buf["lst_victory_effect"]; if(!__json0.IsArray) { throw new SerializationException(); } LstVictoryEffect = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEffectConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEffectConfig.DeserializeExpeditionEffectConfig(__e0);  }  LstVictoryEffect.Add(__v0); }   }
@@ -30,7 +30,7 @@ public sealed partial class ExpeditionCombatEncounterConfig : Luban.BeanBase
         return new Gameplay.Expedition.ExpeditionCombatEncounterConfig(_buf);
     }
 
-    public readonly string CombatEncounterId;
+    public readonly string CombatEncounterConfigId;
     public readonly string Title;
     public readonly string Description;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEffectConfig> LstVictoryEffect;
@@ -50,7 +50,7 @@ public sealed partial class ExpeditionCombatEncounterConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
-        + "combatEncounterId:" + CombatEncounterId + ","
+        + "combatEncounterConfigId:" + CombatEncounterConfigId + ","
         + "title:" + Title + ","
         + "description:" + Description + ","
         + "lstVictoryEffect:" + Luban.StringUtil.CollectionToString(LstVictoryEffect) + ","

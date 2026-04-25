@@ -76,11 +76,11 @@ namespace GameLogic.Gameplay.Expedition
 
         private void ApplyEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
         {
-            var eventConfig = node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventId);
+            var eventConfig = node == null ? null : ExpeditionConfigBridge.ResolveEvent(node.EventConfigId);
             var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
             if (option == null)
             {
-                record.AddRouteDecisionLog($"节点 {node?.NodeId} 没有收到合法选项输入。");
+                record.AddRouteDecisionLog($"节点 {node?.NodeConfigId} 没有收到合法选项输入。");
                 return;
             }
 
@@ -90,7 +90,7 @@ namespace GameLogic.Gameplay.Expedition
             record.RecordEffectSummary(context.AppliedMoneyDelta, context.SummaryLines);
 
             CurrentRun.Blackboard?.AddChosenOption(option.OptionId);
-            CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventId);
+            CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventConfigId);
         }
 
         private void ApplyCombatNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
@@ -98,7 +98,7 @@ namespace GameLogic.Gameplay.Expedition
             var result = CurrentRun.PendingCombatResult;
             if (result == null)
             {
-                record.AddRouteDecisionLog($"节点 {node.NodeId} 没有收到 Combat 结果。");
+                record.AddRouteDecisionLog($"节点 {node.NodeConfigId} 没有收到 Combat 结果。");
                 return;
             }
 
@@ -108,14 +108,14 @@ namespace GameLogic.Gameplay.Expedition
                 if (!snapshot.HasValue)
                     continue;
 
-                var marbleResult = result.LstMarbleResult.Find(item => item.HasValue && item.Value.PersistentId == snapshot.Value.PersistentId);
+                var marbleResult = result.LstMarbleResult.Find(item => item.HasValue && item.Value.MarbleInstId == snapshot.Value.MarbleInstId);
                 if (!marbleResult.HasValue)
                     continue;
 
                 CurrentRun.MarbleSnapshots[i] = marbleResult;
             }
 
-            var combatConfig = ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterId);
+            var combatConfig = ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterConfigId);
             var lstEffectConfig = result.IsVictory ? combatConfig?.LstVictoryEffect : combatConfig?.LstDefeatEffect;
             var context = new ExpeditionEffectExecutionContext(CurrentRun, _persistentData, record);
             ExpeditionEffectFactory.ExecuteEffects(lstEffectConfig, context);
@@ -130,14 +130,14 @@ namespace GameLogic.Gameplay.Expedition
             if (CurrentRun == null || record == null)
                 return;
 
-            var lstInsertedEntry = CurrentRun.TriggerScheduledInsertions(record.NodeId);
+            var lstInsertedEntry = CurrentRun.TriggerScheduledInsertions(record.NodeConfigId);
             if (lstInsertedEntry.Count == 0)
             {
                 record.AddRouteDecisionLog("当前节点没有触发动态插入。");
                 return;
             }
 
-            record.RecordInsertedNodeIds(lstInsertedEntry.Select(entry => entry.NodeId));
+            record.RecordInsertedNodeIds(lstInsertedEntry.Select(entry => entry.NodeConfigId));
         }
 
         private void ApplyRouteDecision(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
@@ -147,7 +147,7 @@ namespace GameLogic.Gameplay.Expedition
 
             if (CurrentRun.EndReason != EnumExpeditionEndReason.None)
             {
-                record.AddRouteDecisionLog($"远征已结束，跳过节点 {node.NodeId} 的出口解析。");
+                record.AddRouteDecisionLog($"远征已结束，跳过节点 {node.NodeConfigId} 的出口解析。");
                 return;
             }
 
@@ -155,17 +155,17 @@ namespace GameLogic.Gameplay.Expedition
             if (!string.IsNullOrWhiteSpace(decision?.Summary))
                 record.AddRouteDecisionLog(decision.Summary);
 
-            if (decision == null || string.IsNullOrWhiteSpace(decision.TargetNodeId))
+            if (decision == null || string.IsNullOrWhiteSpace(decision.TargetNodeConfigId))
                 return;
 
             var enqueuedNode = CurrentRun.EnqueueNode(
-                decision.TargetNodeId,
+                decision.TargetNodeConfigId,
                 false,
-                node.NodeId,
+                node.NodeConfigId,
                 decision.TransitionId,
                 "route_transition");
             record.ResolvedTransitionId = decision.TransitionId;
-            record.NextNodeId = enqueuedNode?.NodeId;
+            record.NextNodeConfigId = enqueuedNode?.NodeConfigId;
         }
     }
 }

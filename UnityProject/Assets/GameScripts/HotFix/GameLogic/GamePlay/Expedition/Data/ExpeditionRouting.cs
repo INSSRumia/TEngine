@@ -7,7 +7,7 @@ namespace GameLogic.Gameplay.Expedition
     public sealed class ExpeditionRouteDecision
     {
         public string TransitionId;
-        public string TargetNodeId;
+        public string TargetNodeConfigId;
         public string Summary;
     }
 
@@ -37,7 +37,7 @@ namespace GameLogic.Gameplay.Expedition
                 default:
                     return new ExpeditionRouteDecision
                     {
-                        Summary = $"节点 {node.NodeId} 使用了不支持的路由策略 {node.RoutePolicy}。",
+                        Summary = $"节点 {node.NodeConfigId} 使用了不支持的路由策略 {node.RoutePolicy}。",
                     };
             }
         }
@@ -48,11 +48,11 @@ namespace GameLogic.Gameplay.Expedition
             {
                 return new ExpeditionRouteDecision
                 {
-                    Summary = $"节点 {node.NodeId} 为固定出口模式，但未配置默认出口，按叶子节点处理。",
+                    Summary = $"节点 {node.NodeConfigId} 为固定出口模式，但未配置默认出口，按叶子节点处理。",
                 };
             }
 
-            return ResolveTransition(node, node.DefaultTransitionId, $"节点 {node.NodeId} 按固定出口推进。");
+            return ResolveTransition(node, node.DefaultTransitionId, $"节点 {node.NodeConfigId} 按固定出口推进。");
         }
 
         private static ExpeditionRouteDecision ResolveBySelectedOption(
@@ -64,7 +64,7 @@ namespace GameLogic.Gameplay.Expedition
             {
                 return new ExpeditionRouteDecision
                 {
-                    Summary = $"节点 {node.NodeId} 需要根据选项出口，但当前没有选项输入。",
+                    Summary = $"节点 {node.NodeConfigId} 需要根据选项出口，但当前没有选项输入。",
                 };
             }
 
@@ -74,11 +74,11 @@ namespace GameLogic.Gameplay.Expedition
             {
                 return new ExpeditionRouteDecision
                 {
-                    Summary = $"节点 {node.NodeId} 没有找到选项 {optionId} 对应的出口映射。",
+                    Summary = $"节点 {node.NodeConfigId} 没有找到选项 {optionId} 对应的出口映射。",
                 };
             }
 
-            return ResolveTransition(node, optionRoute.TransitionId, $"节点 {node.NodeId} 根据选项 {optionId} 选择出口。");
+            return ResolveTransition(node, optionRoute.TransitionId, $"节点 {node.NodeConfigId} 根据选项 {optionId} 选择出口。");
         }
 
         private static ExpeditionRouteDecision ResolveByConditions(
@@ -95,15 +95,15 @@ namespace GameLogic.Gameplay.Expedition
             {
                 return new ExpeditionRouteDecision
                 {
-                    Summary = $"节点 {node.NodeId} 的条件出口均未命中。",
+                    Summary = $"节点 {node.NodeConfigId} 的条件出口均未命中。",
                 };
             }
 
             return new ExpeditionRouteDecision
             {
                 TransitionId = matchedTransition.TransitionId,
-                TargetNodeId = matchedTransition.TargetNodeId,
-                Summary = $"节点 {node.NodeId} 命中条件出口 {matchedTransition.TransitionId}，优先级 {matchedTransition.Priority}。",
+                TargetNodeConfigId = matchedTransition.TargetNodeConfigId,
+                Summary = $"节点 {node.NodeConfigId} 命中条件出口 {matchedTransition.TransitionId}，优先级 {matchedTransition.Priority}。",
             };
         }
 
@@ -134,8 +134,8 @@ namespace GameLogic.Gameplay.Expedition
             return new ExpeditionRouteDecision
             {
                 TransitionId = transition.TransitionId,
-                TargetNodeId = transition.TargetNodeId,
-                Summary = $"{prefixSummary} transition={transition.TransitionId} target={transition.TargetNodeId}",
+                TargetNodeConfigId = transition.TargetNodeConfigId,
+                Summary = $"{prefixSummary} transition={transition.TransitionId} target={transition.TargetNodeConfigId}",
             };
         }
     }

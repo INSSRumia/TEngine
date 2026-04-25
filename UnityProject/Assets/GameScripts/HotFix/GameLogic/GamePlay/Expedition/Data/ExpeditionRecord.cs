@@ -8,12 +8,12 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionNodeRecord
     {
-        public string QueueEntryId;
-        public string NodeId;
+        public string QueueEntryInstId;
+        public string NodeConfigId;
         public EnumExpeditionNodeType NodeType;
         public EnumExpeditionNodeProcessStatus Status;
         public int EntryOrder;
-        public string SourceNodeId;
+        public string SourceNodeConfigId;
         public string SourceTransitionId;
         public string EnqueueReason;
         public bool WasDynamicallyInserted;
@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Expedition
         public string ChosenOptionId;
         public int GainedMoney;
         public string ResolvedTransitionId;
-        public string NextNodeId;
+        public string NextNodeConfigId;
         public string QueueBeforeEnter;
         public string QueueAfterEnter;
         public string QueueBeforeRoute;
@@ -83,7 +83,7 @@ namespace GameLogic.Gameplay.Expedition
 
             var parts = new List<string>
             {
-                $"#{record.EntryOrder} 节点 {record.NodeId}"
+                $"#{record.EntryOrder} 节点 {record.NodeConfigId}"
             };
             if (!string.IsNullOrWhiteSpace(record.Summary))
             {
@@ -92,7 +92,7 @@ namespace GameLogic.Gameplay.Expedition
 
             if (!string.IsNullOrWhiteSpace(record.ResolvedTransitionId))
             {
-                parts.Add($"出口 {record.ResolvedTransitionId} -> {record.NextNodeId}");
+                parts.Add($"出口 {record.ResolvedTransitionId} -> {record.NextNodeConfigId}");
             }
 
             if (record.LstInsertedNodeId.Count > 0)
@@ -128,7 +128,7 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionResultSummary
     {
-        public string ExpeditionId;
+        public string ExpeditionConfigId;
         public bool IsVictory;
         public EnumExpeditionEndReason EndReason;
         public int MoneyDelta;
@@ -148,13 +148,13 @@ namespace GameLogic.Gameplay.Expedition
         {
             return new ExpeditionResultSummary
             {
-                ExpeditionId = runState.ExpeditionId,
+                ExpeditionConfigId = runState.ExpeditionConfigId,
                 IsVictory = runState.EndReason == EnumExpeditionEndReason.Victory,
                 EndReason = runState.EndReason,
                 MoneyDelta = runState.TotalMoneyGained,
                 LstMarbleSummarie = runState.MarbleSnapshots.Where(snapshot => snapshot.HasValue).Select(snapshot => new ExpeditionMarbleSummary
                 {
-                    PersistentId = snapshot.Value.PersistentId,
+                    MarbleInstId = snapshot.Value.MarbleInstId,
                     DisplayName = snapshot.Value.DisplayName,
                     CurrentHp = snapshot.Value.CurrentHp,
                     MaxHp = snapshot.Value.MaxHp,
@@ -169,7 +169,7 @@ namespace GameLogic.Gameplay.Expedition
     [Serializable]
     public sealed class ExpeditionMarbleSummary
     {
-        public string PersistentId;
+        public string MarbleInstId;
         public string DisplayName;
         public int CurrentHp;
         public int MaxHp;
