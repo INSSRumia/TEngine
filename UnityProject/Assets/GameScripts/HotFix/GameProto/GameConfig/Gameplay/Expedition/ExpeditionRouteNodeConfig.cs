@@ -22,7 +22,6 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
         { if(!_buf["event_config_id"].IsString) { throw new SerializationException(); }  EventConfigId = _buf["event_config_id"]; }
         { if(!_buf["combat_encounter_config_id"].IsString) { throw new SerializationException(); }  CombatEncounterConfigId = _buf["combat_encounter_config_id"]; }
         { if(!_buf["route_policy"].IsNumber) { throw new SerializationException(); }  RoutePolicy = (Gameplay.Expedition.EnumExpeditionRoutePolicy)_buf["route_policy"].AsInt; }
-        { if(!_buf["default_transition_id"].IsString) { throw new SerializationException(); }  DefaultTransitionId = _buf["default_transition_id"]; }
         { var __json0 = _buf["transitions"]; if(!__json0.IsArray) { throw new SerializationException(); } Transitions = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionNodeTransitionConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionNodeTransitionConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionNodeTransitionConfig.DeserializeExpeditionNodeTransitionConfig(__e0);  }  Transitions.Add(__v0); }   }
         { var __json0 = _buf["option_routes"]; if(!__json0.IsArray) { throw new SerializationException(); } OptionRoutes = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionOptionRouteConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionOptionRouteConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionOptionRouteConfig.DeserializeExpeditionOptionRouteConfig(__e0);  }  OptionRoutes.Add(__v0); }   }
     }
@@ -37,7 +36,6 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
     public readonly string EventConfigId;
     public readonly string CombatEncounterConfigId;
     public readonly Gameplay.Expedition.EnumExpeditionRoutePolicy RoutePolicy;
-    public readonly string DefaultTransitionId;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionNodeTransitionConfig> Transitions;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionOptionRouteConfig> OptionRoutes;
    
@@ -58,7 +56,6 @@ public sealed partial class ExpeditionRouteNodeConfig : Luban.BeanBase
         + "eventConfigId:" + EventConfigId + ","
         + "combatEncounterConfigId:" + CombatEncounterConfigId + ","
         + "routePolicy:" + RoutePolicy + ","
-        + "defaultTransitionId:" + DefaultTransitionId + ","
         + "transitions:" + Luban.StringUtil.CollectionToString(Transitions) + ","
         + "optionRoutes:" + Luban.StringUtil.CollectionToString(OptionRoutes) + ","
         + "}";

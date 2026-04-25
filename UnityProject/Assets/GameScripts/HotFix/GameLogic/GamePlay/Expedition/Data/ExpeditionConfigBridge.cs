@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GameLogic.Gameplay.Combat.Marble;
 using TEngine;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -33,7 +33,7 @@ namespace GameLogic.Gameplay.Expedition
                 MarbleSnapshots = marbles?
                     .Where(marble => marble.HasValue && !marble.Value.IsDead)
                     .ToList() ?? new List<MarblePersistentData?>(),
-                Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionTable.ExpeditionRouteNodeConfig>(),
+                Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
             };
 
             var firstNode = runState.Route.FirstOrDefault(node => node != null);
@@ -45,7 +45,7 @@ namespace GameLogic.Gameplay.Expedition
             return runState;
         }
 
-        public static ExpeditionTable.ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionConfigId)
+        public static ExpeditionConfig ResolveStartupExpedition(string preferredExpeditionConfigId)
         {
             var expeditionTable = ConfigSystem.Instance.Tables?.TbExpedition;
             if (expeditionTable == null)
@@ -65,7 +65,7 @@ namespace GameLogic.Gameplay.Expedition
             return expeditionTable.DataList.Count > 0 ? expeditionTable.DataList[0] : null;
         }
 
-        public static ExpeditionTable.ExpeditionEventConfig ResolveEvent(string eventConfigId)
+        public static ExpeditionEventConfig ResolveEvent(string eventConfigId)
         {
             if (string.IsNullOrEmpty(eventConfigId))
             {
@@ -75,7 +75,7 @@ namespace GameLogic.Gameplay.Expedition
             return ConfigSystem.Instance.Tables?.TbExpeditionEvent?.GetOrDefault(eventConfigId);
         }
 
-        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveCombatEncounter(string combatEncounterConfigId)
+        public static ExpeditionCombatEncounterConfig ResolveCombatEncounter(string combatEncounterConfigId)
         {
             if (string.IsNullOrEmpty(combatEncounterConfigId))
             {
@@ -85,14 +85,14 @@ namespace GameLogic.Gameplay.Expedition
             return ConfigSystem.Instance.Tables?.TbExpeditionCombatEncounter?.GetOrDefault(combatEncounterConfigId);
         }
 
-        public static ExpeditionTable.ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
+        public static ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
         {
             var expedition = ResolveStartupExpedition(preferredExpeditionConfigId);
             if (expedition?.Route != null)
             {
                 foreach (var node in expedition.Route)
                 {
-                    if (node == null || node.NodeType != ExpeditionTable.EnumExpeditionNodeType.Combat)
+                    if (node == null || node.NodeType != EnumExpeditionNodeType.Combat)
                     {
                         continue;
                     }
@@ -127,7 +127,7 @@ namespace GameLogic.Gameplay.Expedition
             return 100;
         }
 
-        private static bool ValidateExpedition(ExpeditionTable.ExpeditionConfig expedition)
+        private static bool ValidateExpedition(ExpeditionConfig expedition)
         {
             if (expedition == null || expedition.Route == null || expedition.Route.Count == 0)
             {
@@ -144,7 +144,7 @@ namespace GameLogic.Gameplay.Expedition
 
                 switch (node.NodeType)
                 {
-                    case ExpeditionTable.EnumExpeditionNodeType.Event:
+                    case EnumExpeditionNodeType.Event:
                         if (ResolveEvent(node.EventConfigId) == null)
                         {
                             Log.Warning($"[远征] 节点:{node.NodeConfigId} 缺少事件配置 eventConfigId:{node.EventConfigId}");
@@ -152,7 +152,7 @@ namespace GameLogic.Gameplay.Expedition
                         }
 
                         break;
-                    case ExpeditionTable.EnumExpeditionNodeType.Combat:
+                    case EnumExpeditionNodeType.Combat:
                         if (ResolveCombatEncounter(node.CombatEncounterConfigId) == null)
                         {
                             Log.Warning($"[远征] 节点:{node.NodeConfigId} 缺少战斗遭遇配置 combatEncounterConfigId:{node.CombatEncounterConfigId}");
@@ -179,13 +179,13 @@ namespace GameLogic.Gameplay.Expedition
             return true;
         }
 
-        private static bool ValidateRoutePolicy(ExpeditionTable.ExpeditionRouteNodeConfig node)
+        private static bool ValidateRoutePolicy(ExpeditionRouteNodeConfig node)
         {
             switch (node.RoutePolicy)
             {
-                case ExpeditionTable.EnumExpeditionRoutePolicy.FixedNext:
+                case EnumExpeditionRoutePolicy.FixedNext:
                     return true;
-                case ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption:
+                case EnumExpeditionRoutePolicy.BySelectedOption:
                     if (node.OptionRoutes == null || node.OptionRoutes.Count == 0)
                     {
                         Log.Warning($"[远征] 节点:{node.NodeConfigId} 使用了 BySelectedOption 但没有选项路由。");
@@ -193,7 +193,7 @@ namespace GameLogic.Gameplay.Expedition
                     }
 
                     return true;
-                case ExpeditionTable.EnumExpeditionRoutePolicy.ByConditions:
+                case EnumExpeditionRoutePolicy.ByConditions:
                     if (node.Transitions == null || node.Transitions.Count == 0)
                     {
                         Log.Warning($"[远征] 节点:{node.NodeConfigId} 使用了 ByConditions 但没有转换条件。");
@@ -207,7 +207,7 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        private static bool ValidateTransitions(ExpeditionTable.ExpeditionConfig expedition, ExpeditionTable.ExpeditionRouteNodeConfig node)
+        private static bool ValidateTransitions(ExpeditionConfig expedition, ExpeditionRouteNodeConfig node)
         {
             var transitionIds = new HashSet<string>();
             if (node.Transitions != null)
@@ -236,7 +236,7 @@ namespace GameLogic.Gameplay.Expedition
                 }
             }
 
-            if (node.RoutePolicy == ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption)
+            if (node.RoutePolicy == EnumExpeditionRoutePolicy.BySelectedOption)
             {
                 var eventConfig = ResolveEvent(node.EventConfigId);
                 foreach (var optionRoute in node.OptionRoutes)

@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -15,7 +15,7 @@ namespace GameLogic.Gameplay.Expedition
     {
         public static ExpeditionRouteDecision Resolve(
             ExpeditionRunState runState,
-            ExpeditionTable.ExpeditionRouteNodeConfig node,
+            ExpeditionRouteNodeConfig node,
             ExpeditionNodeRecord record)
         {
             if (runState == null || node == null)
@@ -28,11 +28,11 @@ namespace GameLogic.Gameplay.Expedition
 
             switch (node.RoutePolicy)
             {
-                case ExpeditionTable.EnumExpeditionRoutePolicy.FixedNext:
+                case EnumExpeditionRoutePolicy.FixedNext:
                     return ResolveFixedNext(node);
-                case ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption:
+                case EnumExpeditionRoutePolicy.BySelectedOption:
                     return ResolveBySelectedOption(node, record);
-                case ExpeditionTable.EnumExpeditionRoutePolicy.ByConditions:
+                case EnumExpeditionRoutePolicy.ByConditions:
                     return ResolveByConditions(runState, node, record);
                 default:
                     return new ExpeditionRouteDecision
@@ -42,21 +42,30 @@ namespace GameLogic.Gameplay.Expedition
             }
         }
 
-        private static ExpeditionRouteDecision ResolveFixedNext(ExpeditionTable.ExpeditionRouteNodeConfig node)
+        private static ExpeditionRouteDecision ResolveFixedNext(ExpeditionRouteNodeConfig node)
         {
-            if (string.IsNullOrWhiteSpace(node.DefaultTransitionId))
+            var transition = node.Transitions?
+                .Where(item => item != null)
+                .OrderByDescending(item => item.Priority)
+                .FirstOrDefault();
+            if (transition == null)
             {
                 return new ExpeditionRouteDecision
                 {
-                    Summary = $"节点 {node.NodeConfigId} 为固定出口模式，但未配置默认出口，按叶子节点处理。",
+                    Summary = $"节点 {node.NodeConfigId} 为固定出口模式，但未配置任何出口，按叶子节点处理。",
                 };
             }
 
-            return ResolveTransition(node, node.DefaultTransitionId, $"节点 {node.NodeConfigId} 按固定出口推进。");
+            return new ExpeditionRouteDecision
+            {
+                TransitionId = transition.TransitionId,
+                TargetNodeConfigId = transition.TargetNodeConfigId,
+                Summary = $"节点 {node.NodeConfigId} 按固定出口推进，选择优先级最高的出口 {transition.TransitionId}，优先级 {transition.Priority}。",
+            };
         }
 
         private static ExpeditionRouteDecision ResolveBySelectedOption(
-            ExpeditionTable.ExpeditionRouteNodeConfig node,
+            ExpeditionRouteNodeConfig node,
             ExpeditionNodeRecord record)
         {
             var optionId = record?.ChosenOptionId;
@@ -83,7 +92,7 @@ namespace GameLogic.Gameplay.Expedition
 
         private static ExpeditionRouteDecision ResolveByConditions(
             ExpeditionRunState runState,
-            ExpeditionTable.ExpeditionRouteNodeConfig node,
+            ExpeditionRouteNodeConfig node,
             ExpeditionNodeRecord record)
         {
             var context = new ExpeditionConditionExecutionContext(runState, node, record);
@@ -108,7 +117,7 @@ namespace GameLogic.Gameplay.Expedition
         }
 
         private static ExpeditionRouteDecision ResolveTransition(
-            ExpeditionTable.ExpeditionRouteNodeConfig node,
+            ExpeditionRouteNodeConfig node,
             string transitionId,
             string prefixSummary)
         {

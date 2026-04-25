@@ -50,7 +50,6 @@
         <var name="event_config_id" type="string" />
         <var name="combat_encounter_config_id" type="string" />
         <var name="route_policy" type="EnumExpeditionRoutePolicy" />
-        <var name="default_transition_id" type="string" />
         <var name="transitions" type="list, ExpeditionNodeTransitionConfig" />
         <var name="option_routes" type="list, ExpeditionOptionRouteConfig" />
     </bean>
