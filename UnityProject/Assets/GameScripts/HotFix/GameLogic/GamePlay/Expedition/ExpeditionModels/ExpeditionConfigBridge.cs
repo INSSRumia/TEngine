@@ -14,13 +14,13 @@ namespace GameLogic.Gameplay.Expedition
             var expedition = ResolveStartupExpedition(preferredExpeditionId);
             if (expedition == null)
             {
-                Log.Warning($"[Expedition] Unable to resolve startup expedition. PreferredId:{preferredExpeditionId}");
+                Log.Warning($"[远征] 无法解析启动远征配置。首选Id:{preferredExpeditionId}");
                 return null;
             }
 
             if (!ValidateExpedition(expedition))
             {
-                Log.Warning($"[Expedition] Expedition config validation failed. ExpeditionId:{expedition.ExpeditionId}");
+                Log.Warning($"[远征] 远征配置校验失败。远征Id:{expedition.ExpeditionId}");
                 return null;
             }
 
@@ -121,7 +121,7 @@ namespace GameLogic.Gameplay.Expedition
             }
             catch (Exception exception)
             {
-                Log.Warning($"[Expedition] ResolveMarbleMaxHp fallback for {configId}:{level}. {exception.Message}");
+                Log.Warning($"[远征] ResolveMarbleMaxHp 回退处理 {configId}:{level}。{exception.Message}");
             }
 
             return 100;
@@ -147,7 +147,7 @@ namespace GameLogic.Gameplay.Expedition
                     case ExpeditionTable.EnumExpeditionNodeType.Event:
                         if (ResolveEvent(node.EventId) == null)
                         {
-                            Log.Warning($"[Expedition] Missing event config for node:{node.NodeId} eventId:{node.EventId}");
+                            Log.Warning($"[远征] 节点:{node.NodeId} 缺少事件配置 eventId:{node.EventId}");
                             return false;
                         }
 
@@ -155,13 +155,13 @@ namespace GameLogic.Gameplay.Expedition
                     case ExpeditionTable.EnumExpeditionNodeType.Combat:
                         if (ResolveCombatEncounter(node.CombatEncounterId) == null)
                         {
-                            Log.Warning($"[Expedition] Missing combat encounter config for node:{node.NodeId} encounterId:{node.CombatEncounterId}");
+                            Log.Warning($"[远征] 节点:{node.NodeId} 缺少战斗遭遇配置 encounterId:{node.CombatEncounterId}");
                             return false;
                         }
 
                         break;
                     default:
-                        Log.Warning($"[Expedition] Unsupported node type:{node.NodeType} nodeId:{node.NodeId}");
+                        Log.Warning($"[远征] 不支持的节点类型:{node.NodeType} nodeId:{node.NodeId}");
                         return false;
                 }
 
@@ -188,7 +188,7 @@ namespace GameLogic.Gameplay.Expedition
                 case ExpeditionTable.EnumExpeditionRoutePolicy.BySelectedOption:
                     if (node.OptionRoutes == null || node.OptionRoutes.Count == 0)
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} uses BySelectedOption but has no option routes.");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 使用了 BySelectedOption 但没有选项路由。");
                         return false;
                     }
 
@@ -196,13 +196,13 @@ namespace GameLogic.Gameplay.Expedition
                 case ExpeditionTable.EnumExpeditionRoutePolicy.ByConditions:
                     if (node.Transitions == null || node.Transitions.Count == 0)
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} uses ByConditions but has no transitions.");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 使用了 ByConditions 但没有转换条件。");
                         return false;
                     }
 
                     return true;
                 default:
-                    Log.Warning($"[Expedition] Unsupported route policy:{node.RoutePolicy} nodeId:{node.NodeId}");
+                    Log.Warning($"[远征] 不支持的路由策略:{node.RoutePolicy} nodeId:{node.NodeId}");
                     return false;
             }
         }
@@ -216,7 +216,7 @@ namespace GameLogic.Gameplay.Expedition
                 {
                     if (transition == null || string.IsNullOrWhiteSpace(transition.TransitionId))
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} has an invalid transition entry.");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 包含无效的转换条目。");
                         return false;
                     }
 
@@ -230,7 +230,7 @@ namespace GameLogic.Gameplay.Expedition
                     var targetNodeExists = expedition.Route.Any(routeNode => routeNode != null && routeNode.NodeId == transition.TargetNodeId);
                     if (!targetNodeExists)
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} transition:{transition.TransitionId} targets missing node:{transition.TargetNodeId}");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 的转换:{transition.TransitionId} 指向不存在的节点:{transition.TargetNodeId}");
                         return false;
                     }
                 }
@@ -243,20 +243,20 @@ namespace GameLogic.Gameplay.Expedition
                 {
                     if (optionRoute == null || string.IsNullOrWhiteSpace(optionRoute.OptionId))
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} contains an invalid option route.");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 包含无效的选项路由。");
                         return false;
                     }
 
                     var optionExists = eventConfig?.Options?.Any(option => option != null && option.OptionId == optionRoute.OptionId) ?? false;
                     if (!optionExists)
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} option route references missing option:{optionRoute.OptionId}");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 选项路由引用了不存在的选项:{optionRoute.OptionId}");
                         return false;
                     }
 
                     if (!string.IsNullOrWhiteSpace(optionRoute.TransitionId) && !transitionIds.Contains(optionRoute.TransitionId))
                     {
-                        Log.Warning($"[Expedition] Node:{node.NodeId} option route references missing transition:{optionRoute.TransitionId}");
+                        Log.Warning($"[远征] 节点:{node.NodeId} 选项路由引用了不存在的转换:{optionRoute.TransitionId}");
                         return false;
                     }
                 }

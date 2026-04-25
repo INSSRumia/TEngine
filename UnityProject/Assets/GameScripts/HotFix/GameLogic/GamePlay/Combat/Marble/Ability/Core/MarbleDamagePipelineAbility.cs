@@ -156,7 +156,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 // 当前实现为“护盾先完整吸收当次伤害，不溢出到生命”。
                 shield = Mathf.Max(shield - damage, 0);
                 Owner.RuntimeData.State.Shield = shield;
-                Log.Info($"[MarbleDamagePipelineAbility] 护盾吸收了 {damage} 点伤害，剩余护盾: {shield}");
+                Log.Info($"[弹珠伤害管线能力] 护盾吸收了 {damage} 点伤害，剩余护盾: {shield}");
                 return;
             }
 
@@ -164,7 +164,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             if(hp > 0)
             {
                 hp = Mathf.Max(hp - damage, 0);
-                Log.Info($"[MarbleDamagePipelineAbility] 剩余血量: {hp}");
+                Log.Info($"[弹珠伤害管线能力] 剩余血量: {hp}");
                 Owner.RuntimeData.State.Hp = hp;
                 return;
             }

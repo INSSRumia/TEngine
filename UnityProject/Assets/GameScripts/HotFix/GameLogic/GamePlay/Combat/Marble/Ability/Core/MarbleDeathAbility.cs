@@ -18,7 +18,7 @@ namespace GameLogic.Gameplay.Combat.Marble
         {
             if (!Owner.RuntimeData.State.IsAlive || Owner.RuntimeData.State.Hp > 0)
                 return;
-            Log.Info($"[MarbleDeathAbility]  marble {Owner.RuntimeData.ConfigId} 死亡");
+            Log.Info($"[弹珠死亡能力] 弹珠 {Owner.RuntimeData.ConfigId} 死亡");
 
             var lstBeforeDeathAbilities = ListPool<IBeforeDeath>.Get();
             Owner.GetAbilities<IBeforeDeath>(ref lstBeforeDeathAbilities);

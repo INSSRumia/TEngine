@@ -42,7 +42,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             EquipmentOwner.RuntimeData.IsEquipped = true;
 
             EquipmentOwner.OwnerMarble.RegisterEquipment(EquipmentOwner, Slot);
-            Log.Info($"[EquipmentMountAbility] 装备 {EquipmentOwner.RuntimeData.ConfigId} 挂载到角色 {EquipmentOwner.OwnerMarble.RuntimeData.ConfigId}");
+            Log.Info($"[装备挂载能力] 装备 {EquipmentOwner.RuntimeData.ConfigId} 挂载到角色 {EquipmentOwner.OwnerMarble.RuntimeData.ConfigId}");
         }
 
         private void BindJoint()

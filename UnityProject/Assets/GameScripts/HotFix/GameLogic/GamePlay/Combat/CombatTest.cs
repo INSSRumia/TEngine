@@ -33,7 +33,7 @@ namespace GameLogic.Gameplay.Combat
         private void Awake()
         {
             _combatManager = new CombatManager();
-            Log.Warning($"[CombatTest] CombatManager 已初始化");
+            Log.Warning($"[战斗测试] CombatManager 已初始化");
         }
 
         private void OnDestroy()
@@ -46,7 +46,7 @@ namespace GameLogic.Gameplay.Combat
         {
             SpawnCampSoldiers(_camp1ConfigId, _camp1Camp, _camp1Count);
             SpawnCampSoldiers(_camp2ConfigId, _camp2Camp, _camp2Count);
-            Log.Warning($"[CombatTest] 共生成 {_testSoldiers.Count} 个士兵");
+            Log.Warning($"[战斗测试] 共生成 {_testSoldiers.Count} 个士兵");
         }
 
         [Button("生成阵营1士兵")]
@@ -73,7 +73,7 @@ namespace GameLogic.Gameplay.Combat
                 }
             }
             _testSoldiers.Clear();
-            Log.Warning("[CombatTest] 已清理所有士兵");
+            Log.Warning("[战斗测试] 已清理所有士兵");
         }
 
         [Button("打印战斗状态")]
@@ -82,32 +82,32 @@ namespace GameLogic.Gameplay.Combat
             var active = _combatManager?.GetAllActiveMarbles();
             if (active == null)
             {
-                Log.Warning("[CombatTest] CombatManager 未初始化");
+                Log.Warning("[战斗测试] CombatManager 未初始化");
                 return;
             }
 
-            Log.Warning($"[CombatTest] === 战斗状态 ===");
-            Log.Warning($"[CombatTest] 活跃单位数: {active.Count}");
+            Log.Warning($"[战斗测试] === 战斗状态 ===");
+            Log.Warning($"[战斗测试] 活跃单位数: {active.Count}");
 
             int camp1Alive = 0, camp2Alive = 0;
             foreach (var marble in active)
             {
                 if (marble?.RuntimeData == null) continue;
                 var status = marble.RuntimeData.State.IsAlive ? "存活" : "死亡";
-                Log.Warning($"[CombatTest] [{marble.RuntimeData.InstId}] 阵营:{marble.RuntimeData.Camp} HP:{marble.RuntimeData.State.Hp}/{marble.RuntimeData.State.MaxHp} {status}");
+                Log.Warning($"[战斗测试] [{marble.RuntimeData.InstId}] 阵营:{marble.RuntimeData.Camp} HP:{marble.RuntimeData.State.Hp}/{marble.RuntimeData.State.MaxHp} {status}");
 
                 if (marble.RuntimeData.Camp == _camp1Camp) camp1Alive++;
                 else if (marble.RuntimeData.Camp == _camp2Camp) camp2Alive++;
             }
 
-            Log.Warning($"[CombatTest] 阵营1存活: {camp1Alive}, 阵营2存活: {camp2Alive}");
+            Log.Warning($"[战斗测试] 阵营1存活: {camp1Alive}, 阵营2存活: {camp2Alive}");
         }
 
         private void SpawnCampSoldiers(string configId, int camp, int count)
         {
             if (count <= 0)
             {
-                Log.Warning($"[CombatTest] 阵营 {camp} 数量为0，跳过生成");
+                Log.Warning($"[战斗测试] 阵营 {camp} 数量为0，跳过生成");
                 return;
             }
 
@@ -122,7 +122,7 @@ namespace GameLogic.Gameplay.Combat
                     _combatManager.Register(soldier);
                     _testSoldiers.Add(soldier);
 
-                    Log.Warning($"[CombatTest] 生成士兵 阵营:{camp} 位置:{spawnPos} InstId:{soldier.RuntimeData.InstId}");
+                    Log.Warning($"[战斗测试] 生成士兵 阵营:{camp} 位置:{spawnPos} InstId:{soldier.RuntimeData.InstId}");
                 }
             }
         }

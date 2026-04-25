@@ -86,7 +86,7 @@ namespace GameLogic.Gameplay.Expedition
             var node = GetCurrentNode();
             if (node == null)
             {
-                DebugLogs.Add($"[MissingNode] queueEntry={CurrentNodeEntry.QueueEntryId} nodeId={CurrentNodeEntry.NodeId}");
+                DebugLogs.Add($"[缺失节点] queueEntry={CurrentNodeEntry.QueueEntryId} nodeId={CurrentNodeEntry.NodeId}");
                 CurrentNodeEntry = null;
                 EndReason = EnumExpeditionEndReason.Defeat;
                 return null;
@@ -109,7 +109,7 @@ namespace GameLogic.Gameplay.Expedition
                 BlackboardBefore = Blackboard?.ToDebugString() ?? string.Empty,
             };
             NodeRecords.Add(record);
-            DebugLogs.Add($"[EnterNode] {record.NodeId} queue={record.QueueAfterEnter}");
+            DebugLogs.Add($"[进入节点] {record.NodeId} queue={record.QueueAfterEnter}");
             return record;
         }
 
@@ -217,17 +217,17 @@ namespace GameLogic.Gameplay.Expedition
         {
             if (PendingNodeQueue == null || PendingNodeQueue.Count == 0)
             {
-                return "<empty>";
+                return "<空>";
             }
 
             return string.Join(" -> ", PendingNodeQueue.Select(entry =>
             {
                 if (entry == null)
                 {
-                    return "<null>";
+                    return "<空节点>";
                 }
 
-                var suffix = entry.IsDynamic ? "[dynamic]" : string.Empty;
+                var suffix = entry.IsDynamic ? "[动态]" : string.Empty;
                 return $"{entry.NodeId}{suffix}";
             }));
         }

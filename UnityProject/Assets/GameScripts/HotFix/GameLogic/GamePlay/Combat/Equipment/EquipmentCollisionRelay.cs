@@ -16,7 +16,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             _owner = GetComponentInParent<Equipment>();
             if (_owner == null)
             {
-                Log.Error($"[EquipmentCollisionRelay] 未在父节点找到 Equipment: {name}");
+                Log.Error($"[装备碰撞转发器] 未在父节点找到装备: {name}");
             }
         }
 

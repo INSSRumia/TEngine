@@ -64,7 +64,7 @@ namespace GameLogic.Gameplay.Combat.Marble
             var levelData = data.LstLevelConfig.Find(x => x.Level == level);
             if (levelData == null)
             {
-                Log.Error($"Marble level data not found: {id} {level}");
+                Log.Error($"未找到 Marble 等级数据: {id} {level}");
                 return null;
             }
             return levelData;
@@ -129,7 +129,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                     return ability;
                 }
             }
-            Log.Error($"Marble ability creator for config not found: {config.GetType().Name}");
+            Log.Error($"未找到 Marble ability 创建器: {config.GetType().Name}");
             return null;
         }
 

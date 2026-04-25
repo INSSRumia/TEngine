@@ -44,7 +44,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var levelConfig = config.LstLevelConfig.Find(x => x.Level == level);
             if (levelConfig == null)
             {
-                Log.Error($"Equipment level config not found: {config.ConfigId} {level}");
+                Log.Error($"未找到装备等级配置: {config.ConfigId} {level}");
                 return null;
             }
 
@@ -53,7 +53,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var equipment = gameObject.GetComponent<Equipment>();
             if (equipment == null)
             {
-                Log.Error($"Equipment 组件缺失: {config.ConfigId}");
+                Log.Error($"装备组件缺失: {config.ConfigId}");
                 return null;
             }
 
@@ -78,7 +78,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             if (equipment == null)
                 return;
 
-            Log.Info($"[EquipmentFactory] 销毁装备: {equipment.RuntimeData?.ConfigId}");
+            Log.Info($"[装备工厂] 销毁装备: {equipment.RuntimeData?.ConfigId}");
 
             if (equipment.gameObject != null)
             {
@@ -120,7 +120,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                 }
             }
 
-            Log.Error($"Equipment ability creator for config not found: {config.GetType().Name}");
+            Log.Error($"装备 ability 创建器未找到: {config.GetType().Name}");
             return null;
         }
     }
@@ -202,7 +202,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
                     break;
                 default:
                 {
-                    Log.Error($"Equipment 类型错误: {equipment.GetType().Name}");
+                    Log.Error($"装备类型错误: {equipment.GetType().Name}");
                     break;
                 }
             }

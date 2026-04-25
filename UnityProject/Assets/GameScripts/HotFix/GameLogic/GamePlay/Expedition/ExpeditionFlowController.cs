@@ -50,7 +50,7 @@ namespace GameLogic.Gameplay.Expedition
             CurrentRun = ExpeditionConfigBridge.CreateConfiguredRun(_persistentData.Marbles, ExpeditionConstants.MinimalExpeditionId);
             if (CurrentRun == null)
             {
-                Log.Warning("[ExpeditionFlowController] StartMinimalExpedition aborted because expedition config could not be resolved.");
+                Log.Warning("[远征流程控制器] StartMinimalExpedition 已中止，因为无法解析远征配置。");
                 return false;
             }
 
@@ -247,7 +247,7 @@ namespace GameLogic.Gameplay.Expedition
             var encounter = ExpeditionConfigBridge.ResolveDebugCombatEncounter(ExpeditionConstants.MinimalExpeditionId);
             if (encounter == null)
             {
-                Log.Warning("[ExpeditionFlowController] StartCombatDebug aborted because no combat encounter config was found.");
+                Log.Warning("[远征流程控制器] StartCombatDebug 已中止，因为未找到战斗遭遇配置。");
                 return false;
             }
 
@@ -503,7 +503,7 @@ namespace GameLogic.Gameplay.Expedition
 
         private void OnDebugCombatCompleted(CombatSessionResult result)
         {
-            Log.Info($"[ExpeditionFlowController] Combat debug complete. Victory:{result?.IsVictory}");
+            Log.Info($"[远征流程控制器] 战斗调试完成。胜利:{result?.IsVictory}");
             OpenEntryUi();
         }
 

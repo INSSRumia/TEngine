@@ -14,7 +14,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
         public void Execute()
         {
             EquipmentOwner.RuntimeData.IsBroken = true;
-            Log.Info($"[EquipmentBrokenAbility] 装备 {EquipmentOwner.RuntimeData.ConfigId} 损坏");
+            Log.Info($"[装备损坏能力] 装备 {EquipmentOwner.RuntimeData.ConfigId} 损坏");
 
             HandleBroken();
         }

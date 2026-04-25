@@ -41,7 +41,7 @@ namespace GameLogic.Gameplay.Expedition
             _sessionRoot = new GameObject("ExpeditionCombatSessionRoot");
             SpawnAlliedMarbles(request.AlliedMarbles);
             SpawnEnemyMarbles(request.EnemyMarbles);
-            Log.Info($"[ExpeditionCombatSessionController] StartSession {request.SessionId} Allies:{_playerMarbles.Count} Enemies:{_enemyMarbles.Count}");
+            Log.Info($"[远征战斗会话控制器] 开始会话 {request.SessionId} 友方:{_playerMarbles.Count} 敌方:{_enemyMarbles.Count}");
             return true;
         }
 

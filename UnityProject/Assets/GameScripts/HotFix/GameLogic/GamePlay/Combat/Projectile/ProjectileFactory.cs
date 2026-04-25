@@ -36,21 +36,21 @@ namespace GameLogic.Gameplay.Combat
         {
             if (sourceMarble?.RuntimeData == null)
             {
-                Log.Error("[ProjectileFactory] Source marble is null");
+                Log.Error("[发射物工厂] 源弹珠为空");
                 return null;
             }
 
             var projectileConfig = ConfigSystem.Instance.Tables.TbProjectile.Get(configId);
             if (projectileConfig == null)
             {
-                Log.Error($"[ProjectileFactory] Projectile config not found: {configId}");
+                Log.Error($"[发射物工厂] 未找到发射物配置: {configId}");
                 return null;
             }
 
             var levelConfig = projectileConfig.LstLevelConfig.Find(x => x.Level == level);
             if (levelConfig == null)
             {
-                Log.Error($"[ProjectileFactory] Projectile level config not found: {configId} level {level}");
+                Log.Error($"[发射物工厂] 未找到发射物等级配置: {configId} 等级 {level}");
                 return null;
             }
 
@@ -58,7 +58,7 @@ namespace GameLogic.Gameplay.Combat
 
             if (projectile == null)
             {
-                Log.Error($"[ProjectileFactory] Projectile component not found on prefab: {configId}");
+                Log.Error($"[发射物工厂] 在预制体上未找到发射物组件: {configId}");
                 return null;
             }
 
@@ -96,7 +96,7 @@ namespace GameLogic.Gameplay.Combat
             var obj = GameModule.Resource.LoadGameObject(path);
             if (obj == null)
             {
-                Log.Error($"[ProjectileFactory] Projectile prefab not found: {path}");
+                Log.Error($"[发射物工厂] 未找到发射物预制体: {path}");
                 return null;
             }
             return obj.GetComponent<Projectile>();
@@ -170,7 +170,7 @@ namespace GameLogic.Gameplay.Combat
                     return ability;
                 }
             }
-            Log.Error($"Projectile ability creator for config not found: {config.GetType().Name}");
+            Log.Error($"未找到发射物 ability 创建器: {config.GetType().Name}");
             return null;
         }
     }

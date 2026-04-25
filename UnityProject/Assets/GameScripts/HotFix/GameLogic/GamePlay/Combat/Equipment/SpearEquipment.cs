@@ -18,7 +18,7 @@ namespace GameLogic.Gameplay.Combat.Equipment
             SliderJoint = GetComponentInChildren<SliderJoint2D>(true);
             if (SliderJoint == null)
             {
-                Log.Error($"[SpearEquipment] 未找到子节点 SliderJoint2D: {name}");
+                Log.Error($"[长枪装备] 未找到子节点 SliderJoint2D: {name}");
             }
         }
 
