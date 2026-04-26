@@ -10,6 +10,7 @@ namespace GameLogic.Gameplay.Expedition
     {
         public string QueueEntryInstId;
         public string NodeConfigId;
+        public string DisplayNodeLabel;
         public EnumExpeditionNodeType NodeType;
         public EnumExpeditionNodeProcessStatus Status;
         public int EntryOrder;
@@ -17,9 +18,11 @@ namespace GameLogic.Gameplay.Expedition
         public string SourceTransitionId;
         public string EnqueueReason;
         public bool WasDynamicallyInserted;
+        public bool IsTemporaryRuntimeNode;
         public string RoutePolicy;
         public string ChosenOptionId;
         public string ActualEventConfigId;
+        public string ActualCombatEncounterConfigId;
         public string RandomEventPoolConfigId;
         public bool WasRandomEventSkipped;
         public int GainedMoney;
@@ -86,7 +89,7 @@ namespace GameLogic.Gameplay.Expedition
 
             var parts = new List<string>
             {
-                $"#{record.EntryOrder} 节点 {record.NodeConfigId}"
+                $"#{record.EntryOrder} 节点 {(!string.IsNullOrWhiteSpace(record.DisplayNodeLabel) ? record.DisplayNodeLabel : record.NodeConfigId)}"
             };
             if (!string.IsNullOrWhiteSpace(record.Summary))
             {
@@ -155,7 +158,7 @@ namespace GameLogic.Gameplay.Expedition
                 IsVictory = runState.EndReason == EnumExpeditionEndReason.Victory,
                 EndReason = runState.EndReason,
                 MoneyDelta = runState.TotalMoneyGained,
-                LstMarbleSummarie = runState.MarbleSnapshots.Where(snapshot => snapshot.HasValue).Select(snapshot => new ExpeditionMarbleSummary
+                LstMarbleSummarie = runState.LstMarbleSnapshot.Where(snapshot => snapshot.HasValue).Select(snapshot => new ExpeditionMarbleSummary
                 {
                     MarbleInstId = snapshot.Value.MarbleInstId,
                     DisplayName = snapshot.Value.DisplayName,
@@ -164,7 +167,7 @@ namespace GameLogic.Gameplay.Expedition
                     Exp = snapshot.Value.Exp,
                     IsDead = snapshot.Value.IsDead,
                 }).ToList(),
-                LstNodeSummarie = runState.NodeRecords.Select(ExpeditionNodeRecord.BuildNodeSummary).Where(summary => !string.IsNullOrWhiteSpace(summary)).ToList(),
+                LstNodeSummarie = runState.LstNodeRecord.Select(ExpeditionNodeRecord.BuildNodeSummary).Where(summary => !string.IsNullOrWhiteSpace(summary)).ToList(),
             };
         }
     }

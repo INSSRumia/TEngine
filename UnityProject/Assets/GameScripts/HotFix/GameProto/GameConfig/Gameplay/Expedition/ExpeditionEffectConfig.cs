@@ -29,6 +29,7 @@ public abstract partial class ExpeditionEffectConfig : Luban.BeanBase
             case "AddPlayerMarbleHpEffectConfig": return new Gameplay.Expedition.AddPlayerMarbleHpEffectConfig(_buf);
             case "AddPlayerMarbleEffectConfig": return new Gameplay.Expedition.AddPlayerMarbleEffectConfig(_buf);
             case "ChangeEnvironmentEffectConfig": return new Gameplay.Expedition.ChangeEnvironmentEffectConfig(_buf);
+            case "DelayInsertNodeEffectConfig": return new Gameplay.Expedition.DelayInsertNodeEffectConfig(_buf);
             default: throw new SerializationException();
         }
     }

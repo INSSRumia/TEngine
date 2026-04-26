@@ -24,7 +24,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public void Execute(ExpeditionEffectExecutionContext context)
         {
-            if (context?.RunState?.MarbleSnapshots == null || _config == null)
+            if (context?.RunState?.LstMarbleSnapshot == null || _config == null)
                 return;
 
             var targetCount = ExpeditionRewardResolver.ResolveMarbleCount(context, _config.MarbleCountTier, _config.MarbleCountValue);
@@ -46,7 +46,7 @@ namespace GameLogic.Gameplay.Expedition
                     continue;
 
                 var marbleInstId = CreateMarbleInstId(marbleSpawnConfig.MarbleConfigId);
-                context.RunState.MarbleSnapshots.Add(MarblePersistentData.CreateDefault(marbleInstId, marbleSpawnConfig));
+                context.RunState.LstMarbleSnapshot.Add(MarblePersistentData.CreateDefault(marbleInstId, marbleSpawnConfig));
                 lstAddedDisplayName.Add(GetDisplayName(marbleSpawnConfig));
                 addedCount++;
             }

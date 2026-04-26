@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Expedition
             return CurrentRun?.PendingCombatResult != null;
         }
 
-        public ExpeditionRouteNodeConfig GetCurrentNode()
+        public ExpeditionRuntimeNode GetCurrentNode()
         {
             return CurrentRun?.GetCurrentNode();
         }
@@ -112,7 +112,7 @@ namespace GameLogic.Gameplay.Expedition
                 || !CurrentRun.HasPendingNodes();
         }
 
-        private void ApplyEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyEventNodeResult(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
         {
             var eventConfig = ResolveNodeEventConfig(node, record);
             var option = eventConfig?.Options?.FirstOrDefault(item => item != null && item.OptionId == CurrentRun.PendingEventOptionId);
@@ -131,7 +131,7 @@ namespace GameLogic.Gameplay.Expedition
             CurrentRun.Blackboard?.AddCompletedEvent(eventConfig.EventConfigId);
         }
 
-        private void ApplyRandomEventNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyRandomEventNodeResult(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
         {
             if (record.WasRandomEventSkipped)
             {
@@ -143,18 +143,18 @@ namespace GameLogic.Gameplay.Expedition
             ApplyEventNodeResult(node, record);
         }
 
-        private void ApplyCombatNodeResult(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyCombatNodeResult(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
         {
             var result = CurrentRun.PendingCombatResult;
             if (result == null)
             {
-                record.AddRouteDecisionLog($"节点 {node.NodeConfigId} 没有收到 Combat 结果。");
+                record.AddRouteDecisionLog($"节点 {node?.NodeConfigId} 没有收到 Combat 结果。");
                 return;
             }
 
-            for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
+            for (int i = 0; i < CurrentRun.LstMarbleSnapshot.Count; i++)
             {
-                var snapshot = CurrentRun.MarbleSnapshots[i];
+                var snapshot = CurrentRun.LstMarbleSnapshot[i];
                 if (!snapshot.HasValue)
                     continue;
 
@@ -162,10 +162,11 @@ namespace GameLogic.Gameplay.Expedition
                 if (!marbleResult.HasValue)
                     continue;
 
-                CurrentRun.MarbleSnapshots[i] = marbleResult;
+                CurrentRun.LstMarbleSnapshot[i] = marbleResult;
             }
 
-            var combatConfig = ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterConfigId);
+            var combatEncounterConfigId = GetCurrentCombatEncounterConfigId(node, record);
+            var combatConfig = ExpeditionConfigBridge.ResolveCombatEncounter(combatEncounterConfigId);
             var lstEffectConfig = result.IsVictory ? combatConfig?.LstVictoryEffect : combatConfig?.LstDefeatEffect;
             var context = new ExpeditionEffectExecutionContext(CurrentRun, _persistentData, record);
             ExpeditionEffectFactory.ExecuteEffects(lstEffectConfig, context);
@@ -178,22 +179,33 @@ namespace GameLogic.Gameplay.Expedition
         private void ApplyDynamicInsertions(ExpeditionNodeRecord record)
         {
             if (CurrentRun == null || record == null)
+            {
                 return;
+            }
 
             var lstInsertedEntry = CurrentRun.TriggerScheduledInsertions(record.NodeConfigId);
+            var lstDelayedInsertedEntry = CurrentRun.ResolvePendingInsertNodesAfterSettlement(record.NodeConfigId);
+
+            if (lstDelayedInsertedEntry.Count > 0)
+            {
+                lstInsertedEntry.AddRange(lstDelayedInsertedEntry);
+            }
+
             if (lstInsertedEntry.Count == 0)
             {
                 record.AddRouteDecisionLog("当前节点没有触发动态插入。");
                 return;
             }
 
-            record.RecordInsertedNodeIds(lstInsertedEntry.Select(entry => entry.NodeConfigId));
+            record.RecordInsertedNodeIds(lstInsertedEntry.Select(BuildPendingNodeDisplayLabel));
         }
 
-        private void ApplyRouteDecision(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private void ApplyRouteDecision(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
         {
             if (CurrentRun == null || node == null || record == null)
+            {
                 return;
+            }
 
             if (CurrentRun.EndReason != EnumExpeditionEndReason.None)
             {
@@ -201,12 +213,23 @@ namespace GameLogic.Gameplay.Expedition
                 return;
             }
 
-            var decision = ExpeditionRouteResolver.Resolve(CurrentRun, node, record);
+            if (node.IsTemporaryRuntimeNode)
+            {
+                record.AddRouteDecisionLog($"临时节点 {node.DisplayNodeLabel} 按隐式 fixed_next 返回原有队列。");
+                record.NextNodeConfigId = CurrentRun.LstPendingNodeQueue.FirstOrDefault()?.NodeConfigId;
+                return;
+            }
+
+            var decision = ExpeditionRouteResolver.Resolve(CurrentRun, node.StaticNodeConfig, record);
             if (!string.IsNullOrWhiteSpace(decision?.Summary))
+            {
                 record.AddRouteDecisionLog(decision.Summary);
+            }
 
             if (decision == null || string.IsNullOrWhiteSpace(decision.TargetNodeConfigId))
+            {
                 return;
+            }
 
             var enqueuedNode = CurrentRun.EnqueueNode(
                 decision.TargetNodeConfigId,
@@ -218,12 +241,37 @@ namespace GameLogic.Gameplay.Expedition
             record.NextNodeConfigId = enqueuedNode?.NodeConfigId;
         }
 
-        private ExpeditionEventConfig ResolveNodeEventConfig(ExpeditionRouteNodeConfig node, ExpeditionNodeRecord record)
+        private ExpeditionEventConfig ResolveNodeEventConfig(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
         {
             var eventConfigId = !string.IsNullOrWhiteSpace(record?.ActualEventConfigId)
                 ? record.ActualEventConfigId
                 : node?.EventConfigId;
             return ExpeditionConfigBridge.ResolveEvent(eventConfigId);
+        }
+
+        private string GetCurrentCombatEncounterConfigId(ExpeditionRuntimeNode node, ExpeditionNodeRecord record)
+        {
+            if (!string.IsNullOrWhiteSpace(record?.ActualCombatEncounterConfigId))
+            {
+                return record.ActualCombatEncounterConfigId;
+            }
+
+            return node?.CombatEncounterConfigId ?? string.Empty;
+        }
+
+        private static string BuildPendingNodeDisplayLabel(ExpeditionPendingNodeEntry entry)
+        {
+            if (entry == null)
+            {
+                return string.Empty;
+            }
+
+            if (entry.IsTemporaryRuntimeNode && !string.IsNullOrWhiteSpace(entry.DebugLabel))
+            {
+                return entry.DebugLabel;
+            }
+
+            return entry.NodeConfigId;
         }
     }
 }

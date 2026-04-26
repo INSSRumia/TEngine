@@ -9,12 +9,12 @@ namespace GameLogic.Gameplay.Expedition
             if (CurrentRun == null)
                 return;
 
-            for (int i = 0; i < CurrentRun.MarbleSnapshots.Count; i++)
+            for (int i = 0; i < CurrentRun.LstMarbleSnapshot.Count; i++)
             {
-                if (!CurrentRun.MarbleSnapshots[i].HasValue)
+                if (!CurrentRun.LstMarbleSnapshot[i].HasValue)
                     continue;
 
-                var snapshot = CurrentRun.MarbleSnapshots[i].Value;
+                var snapshot = CurrentRun.LstMarbleSnapshot[i].Value;
                 _persistentData.SetMarble(snapshot);
             }
 

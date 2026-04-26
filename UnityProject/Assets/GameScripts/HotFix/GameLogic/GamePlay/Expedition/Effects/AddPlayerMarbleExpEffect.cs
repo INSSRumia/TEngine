@@ -20,19 +20,19 @@ namespace GameLogic.Gameplay.Expedition
 
         public void Execute(ExpeditionEffectExecutionContext context)
         {
-            if (context.RunState.MarbleSnapshots == null)
+            if (context.RunState.LstMarbleSnapshot == null)
                 return;
 
             var expDelta = ExpeditionRewardResolver.ResolveExp(context, _config.Tier, _config.Value);
 
-            for (int i = 0; i < context.RunState.MarbleSnapshots.Count; i++)
+            for (int i = 0; i < context.RunState.LstMarbleSnapshot.Count; i++)
             {
-                if (!context.RunState.MarbleSnapshots[i].HasValue)
+                if (!context.RunState.LstMarbleSnapshot[i].HasValue)
                     continue;
 
-                var snapshot = context.RunState.MarbleSnapshots[i].Value;
+                var snapshot = context.RunState.LstMarbleSnapshot[i].Value;
                 snapshot.Exp += expDelta;
-                context.RunState.MarbleSnapshots[i] = snapshot;
+                context.RunState.LstMarbleSnapshot[i] = snapshot;
             }
 
             _dictTokenValue[TOKEN_EXP] = expDelta.ToString();

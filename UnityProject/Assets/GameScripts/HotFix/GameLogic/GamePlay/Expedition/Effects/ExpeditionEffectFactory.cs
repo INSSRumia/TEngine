@@ -31,6 +31,7 @@ namespace GameLogic.Gameplay.Expedition
                 ExpeditionTable.AddPlayerMarbleHpEffectConfig hpConfig => new AddPlayerMarbleHpEffect(hpConfig),
                 ExpeditionTable.AddPlayerMarbleEffectConfig marbleConfig => new AddPlayerMarbleEffect(marbleConfig),
                 ExpeditionTable.ChangeEnvironmentEffectConfig environmentConfig => new ChangeEnvironmentEffect(environmentConfig),
+                ExpeditionTable.DelayInsertNodeEffectConfig delayInsertNodeConfig => new DelayInsertNodeEffect(delayInsertNodeConfig),
                 _ => null,
             };
         }

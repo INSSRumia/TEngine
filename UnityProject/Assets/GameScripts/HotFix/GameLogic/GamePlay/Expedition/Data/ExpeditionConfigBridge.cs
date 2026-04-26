@@ -82,7 +82,7 @@ namespace GameLogic.Gameplay.Expedition
                 ExpeditionConfigId = expedition.ExpeditionConfigId,
                 Phase = EnumExpeditionFlowPhase.None,
                 EndReason = EnumExpeditionEndReason.None,
-                MarbleSnapshots = marbles?
+                LstMarbleSnapshot = marbles?
                     .Where(marble => marble.HasValue && !marble.Value.IsDead)
                     .ToList() ?? new List<MarblePersistentData?>(),
                 Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),

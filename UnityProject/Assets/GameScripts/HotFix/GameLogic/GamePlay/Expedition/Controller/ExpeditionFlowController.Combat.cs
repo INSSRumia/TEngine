@@ -114,7 +114,7 @@ namespace GameLogic.Gameplay.Expedition
                 CombatEncounterConfigId = combatConfig.CombatEncounterConfigId,
                 BattlefieldConfigId = battlefieldConfigId,
                 Title = combatConfig.Title,
-                LstAlliedMarble = CurrentRun.MarbleSnapshots
+                LstAlliedMarble = CurrentRun.LstMarbleSnapshot
                     .Where(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0)
                     .ToList(),
                 // 敌方 roster 在进入 Combat 前已经完全展开：

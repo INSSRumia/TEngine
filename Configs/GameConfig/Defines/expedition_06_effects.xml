@@ -37,4 +37,13 @@
     <bean name="ChangeEnvironmentEffectConfig" alias="change_environment" parent="ExpeditionEffectConfig" valueType="false" sep=",">
         <var name="target_environment_config_id" type="string" />
     </bean>
+
+    <!-- 在当前节点结算后，延迟若干个节点再插入一个临时 event/combat 节点。passed_node_count 使用 1 表示“下一个节点就是插入节点”。 -->
+    <bean name="DelayInsertNodeEffectConfig" alias="delay_insert_node" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <!-- 使用 1 基语义：1 = 下一个节点插入，2 = 下下个节点插入。 -->
+        <var name="passed_node_count" type="int" />
+        <!-- 只允许使用 event / combat；event 时 id 表示 event_config_id，combat 时 id 表示 combat_encounter_config_id。 -->
+        <var name="node_type" type="EnumExpeditionNodeType" />
+        <var name="id" type="string" />
+    </bean>
 </module>

@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Expedition
 
         public void Execute(ExpeditionEffectExecutionContext context)
         {
-            if (context.RunState.MarbleSnapshots == null)
+            if (context.RunState.LstMarbleSnapshot == null)
                 return;
 
             var hpValue = ExpeditionRewardResolver.ResolveHp(context, _config.Tier, _config.Value);
@@ -29,15 +29,15 @@ namespace GameLogic.Gameplay.Expedition
                 ? -hpValue
                 : hpValue;
 
-            for (int i = 0; i < context.RunState.MarbleSnapshots.Count; i++)
+            for (int i = 0; i < context.RunState.LstMarbleSnapshot.Count; i++)
             {
-                if (!context.RunState.MarbleSnapshots[i].HasValue)
+                if (!context.RunState.LstMarbleSnapshot[i].HasValue)
                     continue;
 
-                var snapshot = context.RunState.MarbleSnapshots[i].Value;
+                var snapshot = context.RunState.LstMarbleSnapshot[i].Value;
                 snapshot.CurrentHp = UnityEngine.Mathf.Clamp(snapshot.CurrentHp + hpDelta, 0, snapshot.MaxHp);
                 snapshot.IsDead = snapshot.CurrentHp <= 0;
-                context.RunState.MarbleSnapshots[i] = snapshot;
+                context.RunState.LstMarbleSnapshot[i] = snapshot;
             }
 
             _dictTokenValue[TOKEN_HP] = System.Math.Abs(hpDelta).ToString();
