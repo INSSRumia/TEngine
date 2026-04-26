@@ -8,18 +8,17 @@
         "$type": "AddMoneyEffectConfig",
         "summary": "获得{money}晶体",
         "operation": 0,
-        "money": {
-          "reward_tier": 3
-        }
+        "tier": 3,
+        "value": 0
       }
     ],
     "lst_defeat_effect": [
       {
-        "$type": "AddPlayerMarbleExpEffectConfig",
-        "summary": "全队获得 {exp} 经验",
-        "exp": {
-          "reward_tier": 0
-        }
+        "$type": "AddMoneyEffectConfig",
+        "summary": "获得{money}晶体",
+        "operation": 0,
+        "tier": 0,
+        "value": 0
       }
     ],
     "enemy_marbles": [

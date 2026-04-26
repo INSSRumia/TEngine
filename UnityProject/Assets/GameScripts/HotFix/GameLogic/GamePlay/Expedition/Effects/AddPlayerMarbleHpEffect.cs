@@ -1,11 +1,18 @@
 using System.Collections.Generic;
+using GameConfig.Gameplay;
 using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Expedition
 {
     public class AddPlayerMarbleHpEffect : IExpeditionEffect
     {
         private readonly ExpeditionTable.AddPlayerMarbleHpEffectConfig _config;
+        private const string TOKEN_HP = "hp";
+        private static readonly Dictionary<string, string> _dictTokenValue = new Dictionary<string, string>()
+        {
+            {TOKEN_HP, "0"},
+        };
 
         public AddPlayerMarbleHpEffect(ExpeditionTable.AddPlayerMarbleHpEffectConfig config)
         {
@@ -17,8 +24,8 @@ namespace GameLogic.Gameplay.Expedition
             if (context.RunState.MarbleSnapshots == null)
                 return;
 
-            var hpValue = ExpeditionRewardResolver.ResolveHp(context, _config.Hp);
-            var hpDelta = _config.Operation == ExpeditionTable.EnumExpeditionRewardOperation.Subtract
+            var hpValue = ExpeditionRewardResolver.ResolveHp(context, _config.Tier, _config.Value);
+            var hpDelta = _config.Operation == EnumOperation.Sub
                 ? -hpValue
                 : hpValue;
 
@@ -33,14 +40,11 @@ namespace GameLogic.Gameplay.Expedition
                 context.RunState.MarbleSnapshots[i] = snapshot;
             }
 
-            var dictTokenValue = new Dictionary<string, string>
-            {
-                ["hp"] = System.Math.Abs(hpDelta).ToString(),
-            };
+            _dictTokenValue[TOKEN_HP] = System.Math.Abs(hpDelta).ToString();
             var fallbackSummary = hpDelta >= 0
                 ? $"全队恢复 {hpDelta} 点生命。"
                 : $"全队失去 {System.Math.Abs(hpDelta)} 点生命。";
-            context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
+            context.AddSummaryTemplate(_config.Summary, _dictTokenValue, fallbackSummary);
         }
     }
 }

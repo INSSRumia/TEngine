@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ExpeditionTable = GameConfig.Gameplay.Expedition;
+using UnityEngine.Pool;
 
 namespace GameLogic.Gameplay.Expedition
 {
@@ -17,7 +18,7 @@ namespace GameLogic.Gameplay.Expedition
             if (context.RunState.MarbleSnapshots == null)
                 return;
 
-            var expDelta = ExpeditionRewardResolver.ResolveExp(context, _config.Exp);
+            var expDelta = ExpeditionRewardResolver.ResolveExp(context, _config.Tier, _config.Value);
 
             for (int i = 0; i < context.RunState.MarbleSnapshots.Count; i++)
             {
@@ -29,14 +30,13 @@ namespace GameLogic.Gameplay.Expedition
                 context.RunState.MarbleSnapshots[i] = snapshot;
             }
 
-            var dictTokenValue = new Dictionary<string, string>
-            {
-                ["exp"] = expDelta.ToString(),
-            };
+            var dictTokenValue = DictionaryPool<string, string>.Get();
+            dictTokenValue.Add("exp", expDelta.ToString());
             var fallbackSummary = expDelta >= 0
                 ? $"全队获得 {expDelta} 点经验。"
                 : $"全队失去 {System.Math.Abs(expDelta)} 点经验。";
             context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
+            DictionaryPool<string, string>.Release(dictTokenValue);
         }
     }
 }

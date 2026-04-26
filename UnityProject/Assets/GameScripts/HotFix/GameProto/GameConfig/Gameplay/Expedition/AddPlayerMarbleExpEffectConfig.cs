@@ -17,7 +17,8 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
 {
     public AddPlayerMarbleExpEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["exp"].IsObject) { throw new SerializationException(); }  Exp = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["exp"]);  }
+        { if(!_buf["tier"].IsNumber) { throw new SerializationException(); }  Tier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["tier"].AsInt; }
+        { if(!_buf["value"].IsNumber) { throw new SerializationException(); }  Value = _buf["value"]; }
     }
 
     public static AddPlayerMarbleExpEffectConfig DeserializeAddPlayerMarbleExpEffectConfig(JSONNode _buf)
@@ -25,7 +26,8 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
         return new Gameplay.Expedition.AddPlayerMarbleExpEffectConfig(_buf);
     }
 
-    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Exp;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier Tier;
+    public readonly int Value;
    
     public const int __ID__ = -798641898;
     public override int GetTypeId() => __ID__;
@@ -33,14 +35,14 @@ public sealed partial class AddPlayerMarbleExpEffectConfig : ExpeditionEffectCon
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
-        Exp?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "exp:" + Exp + ","
+        + "tier:" + Tier + ","
+        + "value:" + Value + ","
         + "}";
     }
 }

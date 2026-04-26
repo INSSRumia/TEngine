@@ -17,7 +17,10 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
 {
     public AddPlayerMarbleEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["marble_count"].IsObject) { throw new SerializationException(); }  MarbleCount = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["marble_count"]);  }
+        { if(!_buf["marble_count_tier"].IsNumber) { throw new SerializationException(); }  MarbleCountTier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["marble_count_tier"].AsInt; }
+        { if(!_buf["marble_count_value"].IsNumber) { throw new SerializationException(); }  MarbleCountValue = _buf["marble_count_value"]; }
+        { if(!_buf["marble_type_tier"].IsNumber) { throw new SerializationException(); }  MarbleTypeTier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["marble_type_tier"].AsInt; }
+        { if(!_buf["marble_type_value"].IsObject) { throw new SerializationException(); }  MarbleTypeValue = global::GameConfig.Gameplay.Combat.MarbleSpawnConfig.DeserializeMarbleSpawnConfig(_buf["marble_type_value"]);  }
     }
 
     public static AddPlayerMarbleEffectConfig DeserializeAddPlayerMarbleEffectConfig(JSONNode _buf)
@@ -25,7 +28,10 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
         return new Gameplay.Expedition.AddPlayerMarbleEffectConfig(_buf);
     }
 
-    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig MarbleCount;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier MarbleCountTier;
+    public readonly int MarbleCountValue;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier MarbleTypeTier;
+    public readonly Gameplay.Combat.MarbleSpawnConfig MarbleTypeValue;
    
     public const int __ID__ = 831192013;
     public override int GetTypeId() => __ID__;
@@ -33,14 +39,17 @@ public sealed partial class AddPlayerMarbleEffectConfig : ExpeditionEffectConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
-        MarbleCount?.ResolveRef(tables);
+        MarbleTypeValue?.ResolveRef(tables);
     }
 
     public override string ToString()
     {
         return "{ "
         + "summary:" + Summary + ","
-        + "marbleCount:" + MarbleCount + ","
+        + "marbleCountTier:" + MarbleCountTier + ","
+        + "marbleCountValue:" + MarbleCountValue + ","
+        + "marbleTypeTier:" + MarbleTypeTier + ","
+        + "marbleTypeValue:" + MarbleTypeValue + ","
         + "}";
     }
 }

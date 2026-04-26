@@ -1,0 +1,6 @@
+<module name="Gameplay">
+    <enum name="EnumOperation">
+        <var name="Add" alias="add" value="0" />
+        <var name="Sub" alias="sub" value="1" />
+    </enum>
+</module>

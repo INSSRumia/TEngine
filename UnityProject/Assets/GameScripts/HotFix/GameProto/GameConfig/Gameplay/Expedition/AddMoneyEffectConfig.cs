@@ -17,8 +17,9 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
 {
     public AddMoneyEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.Expedition.EnumExpeditionRewardOperation)_buf["operation"].AsInt; }
-        { if(!_buf["money"].IsObject) { throw new SerializationException(); }  Money = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["money"]);  }
+        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.EnumOperation)_buf["operation"].AsInt; }
+        { if(!_buf["tier"].IsNumber) { throw new SerializationException(); }  Tier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["tier"].AsInt; }
+        { if(!_buf["value"].IsNumber) { throw new SerializationException(); }  Value = _buf["value"]; }
     }
 
     public static AddMoneyEffectConfig DeserializeAddMoneyEffectConfig(JSONNode _buf)
@@ -26,8 +27,9 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
         return new Gameplay.Expedition.AddMoneyEffectConfig(_buf);
     }
 
-    public readonly Gameplay.Expedition.EnumExpeditionRewardOperation Operation;
-    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Money;
+    public readonly Gameplay.EnumOperation Operation;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier Tier;
+    public readonly int Value;
    
     public const int __ID__ = -625639017;
     public override int GetTypeId() => __ID__;
@@ -35,7 +37,6 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
-        Money?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -43,7 +44,8 @@ public sealed partial class AddMoneyEffectConfig : ExpeditionEffectConfig
         return "{ "
         + "summary:" + Summary + ","
         + "operation:" + Operation + ","
-        + "money:" + Money + ","
+        + "tier:" + Tier + ","
+        + "value:" + Value + ","
         + "}";
     }
 }

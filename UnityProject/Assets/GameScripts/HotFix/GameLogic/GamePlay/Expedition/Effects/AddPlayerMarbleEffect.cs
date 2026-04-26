@@ -9,6 +9,13 @@ namespace GameLogic.Gameplay.Expedition
     public class AddPlayerMarbleEffect : IExpeditionEffect
     {
         private readonly ExpeditionTable.AddPlayerMarbleEffectConfig _config;
+        private const string TOKEN_COUNT = "count";
+        private const string TOKEN_MARBLE_NAME = "marble_name";
+        private static readonly Dictionary<string, string> _dictTokenValue = new Dictionary<string, string>()
+        {
+            {TOKEN_COUNT, "0"},
+            {TOKEN_MARBLE_NAME, "Marble"},
+        };
 
         public AddPlayerMarbleEffect(ExpeditionTable.AddPlayerMarbleEffectConfig config)
         {
@@ -17,19 +24,15 @@ namespace GameLogic.Gameplay.Expedition
 
         public void Execute(ExpeditionEffectExecutionContext context)
         {
-            if (context?.RunState?.MarbleSnapshots == null || _config?.MarbleCount == null)
+            if (context?.RunState?.MarbleSnapshots == null || _config == null)
                 return;
 
-            var targetCount = ExpeditionRewardResolver.ResolveMarbleCount(context, _config.MarbleCount);
+            var targetCount = ExpeditionRewardResolver.ResolveMarbleCount(context, _config.MarbleCountTier, _config.MarbleCountValue);
             if (targetCount <= 0)
             {
                 context.AddSummaryTemplate(
                     _config.Summary,
-                    new Dictionary<string, string>
-                    {
-                        ["count"] = "0",
-                        ["marble_name"] = "Marble",
-                    },
+                    _dictTokenValue,
                     "没有新的 Marble 加入队伍。");
                 return;
             }
@@ -38,7 +41,7 @@ namespace GameLogic.Gameplay.Expedition
             var addedCount = 0;
             for (int i = 0; i < targetCount; i++)
             {
-                var marbleSpawnConfig = ExpeditionRewardResolver.ResolveRecruitCandidate(context, _config.MarbleCount);
+                var marbleSpawnConfig = ExpeditionRewardResolver.ResolveRecruitCandidate(context, _config.MarbleTypeTier, _config.MarbleTypeValue);
                 if (marbleSpawnConfig == null)
                     continue;
 
@@ -49,15 +52,12 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             var marbleName = ResolveSummaryMarbleName(lstAddedDisplayName);
-            var dictTokenValue = new Dictionary<string, string>
-            {
-                ["count"] = addedCount.ToString(),
-                ["marble_name"] = marbleName,
-            };
+            _dictTokenValue[TOKEN_COUNT] = addedCount.ToString();
+            _dictTokenValue[TOKEN_MARBLE_NAME] = marbleName;
             var fallbackSummary = addedCount > 0
                 ? $"队伍加入 {addedCount} 名 {marbleName}。"
                 : "未能招募到任何 Marble。";
-            context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
+            context.AddSummaryTemplate(_config.Summary, _dictTokenValue, fallbackSummary);
         }
 
         private static string CreateMarbleInstId(string marbleConfigId)

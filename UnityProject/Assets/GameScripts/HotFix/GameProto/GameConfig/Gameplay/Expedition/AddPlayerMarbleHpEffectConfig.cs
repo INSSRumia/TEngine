@@ -17,8 +17,9 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
 {
     public AddPlayerMarbleHpEffectConfig(JSONNode _buf)  : base(_buf) 
     {
-        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.Expedition.EnumExpeditionRewardOperation)_buf["operation"].AsInt; }
-        { if(!_buf["hp"].IsObject) { throw new SerializationException(); }  Hp = global::GameConfig.Gameplay.Expedition.ExpeditionScaledValueConfig.DeserializeExpeditionScaledValueConfig(_buf["hp"]);  }
+        { if(!_buf["operation"].IsNumber) { throw new SerializationException(); }  Operation = (Gameplay.EnumOperation)_buf["operation"].AsInt; }
+        { if(!_buf["tier"].IsNumber) { throw new SerializationException(); }  Tier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["tier"].AsInt; }
+        { if(!_buf["value"].IsNumber) { throw new SerializationException(); }  Value = _buf["value"]; }
     }
 
     public static AddPlayerMarbleHpEffectConfig DeserializeAddPlayerMarbleHpEffectConfig(JSONNode _buf)
@@ -26,8 +27,9 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
         return new Gameplay.Expedition.AddPlayerMarbleHpEffectConfig(_buf);
     }
 
-    public readonly Gameplay.Expedition.EnumExpeditionRewardOperation Operation;
-    public readonly Gameplay.Expedition.ExpeditionScaledValueConfig Hp;
+    public readonly Gameplay.EnumOperation Operation;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier Tier;
+    public readonly int Value;
    
     public const int __ID__ = 1896911477;
     public override int GetTypeId() => __ID__;
@@ -35,7 +37,6 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
     public override void ResolveRef(Tables tables)
     {
         base.ResolveRef(tables);
-        Hp?.ResolveRef(tables);
     }
 
     public override string ToString()
@@ -43,7 +44,8 @@ public sealed partial class AddPlayerMarbleHpEffectConfig : ExpeditionEffectConf
         return "{ "
         + "summary:" + Summary + ","
         + "operation:" + Operation + ","
-        + "hp:" + Hp + ","
+        + "tier:" + Tier + ","
+        + "value:" + Value + ","
         + "}";
     }
 }

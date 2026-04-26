@@ -64,47 +64,65 @@ namespace GameLogic.Gameplay.Expedition
     {
         private static readonly Random _random = new Random();
 
-        public static int ResolveMoney(ExpeditionEffectExecutionContext context, ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig)
+        public static int ResolveMoney(ExpeditionEffectExecutionContext context, ExpeditionTable.EnumExpeditionRewardTier tier, int fixedValue)
         {
+            if (ShouldUseFixedIntValue(fixedValue))
+                return fixedValue;
+
             return ResolveStageValue(
                 context,
-                scaledValueConfig,
+                tier,
                 context?.RewardContext?.RewardProfileConfig?.LstMoney,
                 "money");
         }
 
-        public static int ResolveExp(ExpeditionEffectExecutionContext context, ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig)
+        public static int ResolveExp(ExpeditionEffectExecutionContext context, ExpeditionTable.EnumExpeditionRewardTier tier, int fixedValue)
         {
+            if (ShouldUseFixedIntValue(fixedValue))
+                return fixedValue;
+
             return ResolveStageValue(
                 context,
-                scaledValueConfig,
+                tier,
                 context?.RewardContext?.RewardProfileConfig?.LstExp,
                 "exp");
         }
 
-        public static int ResolveHp(ExpeditionEffectExecutionContext context, ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig)
+        public static int ResolveHp(ExpeditionEffectExecutionContext context, ExpeditionTable.EnumExpeditionRewardTier tier, int fixedValue)
         {
+            if (ShouldUseFixedIntValue(fixedValue))
+                return fixedValue;
+
             return ResolveStageValue(
                 context,
-                scaledValueConfig,
+                tier,
                 context?.RewardContext?.RewardProfileConfig?.LstHp,
                 "hp");
         }
 
-        public static int ResolveMarbleCount(ExpeditionEffectExecutionContext context, ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig)
+        public static int ResolveMarbleCount(ExpeditionEffectExecutionContext context, ExpeditionTable.EnumExpeditionRewardTier tier, int fixedValue)
         {
+            if (ShouldUseFixedIntValue(fixedValue))
+                return fixedValue;
+
             return ResolveStageValue(
                 context,
-                scaledValueConfig,
+                tier,
                 context?.RewardContext?.RewardProfileConfig?.LstMarbleCount,
                 "marble_count");
         }
 
-        public static MarbleSpawnConfig ResolveRecruitCandidate(ExpeditionEffectExecutionContext context, ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig)
+        public static MarbleSpawnConfig ResolveRecruitCandidate(
+            ExpeditionEffectExecutionContext context,
+            ExpeditionTable.EnumExpeditionRewardTier tier,
+            MarbleSpawnConfig fixedValue)
         {
-            if (context?.RewardContext?.RewardProfileConfig == null || scaledValueConfig == null)
+            if (HasFixedMarbleSpawnValue(fixedValue))
+                return fixedValue;
+
+            if (context?.RewardContext?.RewardProfileConfig == null)
             {
-                LogMissingConfig(context, "recruit_candidate", scaledValueConfig?.RewardTier.ToString() ?? "<null>");
+                LogMissingConfig(context, "recruit_candidate", tier.ToString());
                 return null;
             }
 
@@ -112,18 +130,18 @@ namespace GameLogic.Gameplay.Expedition
                 .Where(candidate => candidate != null
                     && candidate.MarbleSpawnConfig != null
                     && candidate.Weight > 0
-                    && candidate.RewardTier == scaledValueConfig.RewardTier)
+                    && candidate.RewardTier == tier)
                 .ToList() ?? new List<ExpeditionTable.ExpeditionRecruitRewardCandidateConfig>();
             if (lstCandidate.Count == 0)
             {
-                LogMissingConfig(context, "recruit_candidate", scaledValueConfig.RewardTier.ToString());
+                LogMissingConfig(context, "recruit_candidate", tier.ToString());
                 return null;
             }
 
             var totalWeight = lstCandidate.Sum(candidate => candidate.Weight);
             if (totalWeight <= 0)
             {
-                LogMissingConfig(context, "recruit_candidate_weight", scaledValueConfig.RewardTier.ToString());
+                LogMissingConfig(context, "recruit_candidate_weight", tier.ToString());
                 return null;
             }
 
@@ -141,19 +159,19 @@ namespace GameLogic.Gameplay.Expedition
                 return candidate.MarbleSpawnConfig;
             }
 
-            LogMissingConfig(context, "recruit_candidate_draw", scaledValueConfig.RewardTier.ToString());
+            LogMissingConfig(context, "recruit_candidate_draw", tier.ToString());
             return null;
         }
 
         private static int ResolveStageValue(
             ExpeditionEffectExecutionContext context,
-            ExpeditionTable.ExpeditionScaledValueConfig scaledValueConfig,
+            ExpeditionTable.EnumExpeditionRewardTier tier,
             IEnumerable<ExpeditionTable.ExpeditionRewardStageValueConfig> lstStageConfig,
             string rewardType)
         {
-            if (context?.RewardContext?.RewardProfileConfig == null || scaledValueConfig == null)
+            if (context?.RewardContext?.RewardProfileConfig == null)
             {
-                LogMissingConfig(context, rewardType, scaledValueConfig?.RewardTier.ToString() ?? "<null>");
+                LogMissingConfig(context, rewardType, tier.ToString());
                 return 0;
             }
 
@@ -166,14 +184,24 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             var tierValue = stageConfig.LstValue?
-                .FirstOrDefault(config => config != null && config.RewardTier == scaledValueConfig.RewardTier);
+                .FirstOrDefault(config => config != null && config.RewardTier == tier);
             if (tierValue == null)
             {
-                LogMissingConfig(context, rewardType, $"{context.RewardContext.ProgressStage}:{scaledValueConfig.RewardTier}");
+                LogMissingConfig(context, rewardType, $"{context.RewardContext.ProgressStage}:{tier}");
                 return 0;
             }
 
             return tierValue.Value;
+        }
+
+        private static bool ShouldUseFixedIntValue(int fixedValue)
+        {
+            return fixedValue != 0;
+        }
+
+        private static bool HasFixedMarbleSpawnValue(MarbleSpawnConfig fixedValue)
+        {
+            return fixedValue != null && !string.IsNullOrWhiteSpace(fixedValue.MarbleConfigId);
         }
 
         private static void LogMissingConfig(ExpeditionEffectExecutionContext context, string rewardType, string detail)

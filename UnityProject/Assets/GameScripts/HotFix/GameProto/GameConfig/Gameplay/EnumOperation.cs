@@ -9,9 +9,9 @@
 
 
 
-namespace GameConfig.Gameplay.Expedition
+namespace GameConfig.Gameplay
 { 
-    public enum EnumExpeditionRewardOperation
+    public enum EnumOperation
     {
         /// <summary>
         /// add
@@ -20,7 +20,7 @@ namespace GameConfig.Gameplay.Expedition
         /// <summary>
         /// sub
         /// </summary>
-        Subtract = 1,
+        Sub = 1,
     }
 
 } 

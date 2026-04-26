@@ -13,17 +13,15 @@
             "$type": "AddMoneyEffectConfig",
             "summary": "获得 {money} 晶体。",
             "operation": 0,
-            "money": {
-              "reward_tier": 2
-            }
+            "tier": 2,
+            "value": 0
           },
           {
             "$type": "AddPlayerMarbleHpEffectConfig",
             "summary": "全队失去 {hp} 点生命",
             "operation": 1,
-            "hp": {
-              "reward_tier": 0
-            }
+            "tier": 0,
+            "value": 0
           }
         ]
       },
@@ -35,9 +33,8 @@
           {
             "$type": "AddPlayerMarbleExpEffectConfig",
             "summary": "全队获得 {exp} 点经验。",
-            "exp": {
-              "reward_tier": 2
-            }
+            "tier": 2,
+            "value": 0
           }
         ]
       }
@@ -57,9 +54,8 @@
             "$type": "AddPlayerMarbleHpEffectConfig",
             "summary": "全队回复 {hp} 点生命",
             "operation": 0,
-            "hp": {
-              "reward_tier": 2
-            }
+            "tier": 2,
+            "value": 0
           }
         ]
       },
@@ -72,9 +68,8 @@
             "$type": "AddMoneyEffectConfig",
             "summary": "获得 {money} 晶体",
             "operation": 0,
-            "money": {
-              "reward_tier": 3
-            }
+            "tier": 3,
+            "value": 0
           }
         ]
       }

@@ -30,12 +30,6 @@
         <var name="Late" alias="late" value="2" />
     </enum>
 
-    <!-- 奖励方向。tier 只表达强度，direction 单独决定是增加还是扣除。 -->
-    <enum name="EnumExpeditionRewardOperation">
-        <var name="Add" alias="add" value="0" />
-        <var name="Subtract" alias="sub" value="1" />
-    </enum>
-
     <!-- 远征路线条件基类。summary 只用于策划/调试说明，不参与运行时判断。 -->
     <bean name="ExpeditionConditionConfig" valueType="false" sep=",">
         <var name="summary" type="string" />
@@ -142,10 +136,6 @@
         <var name="lst_battlefield" type="list, ExpeditionEnvironmentBattlefieldConfig" />
     </bean>
 
-    <!-- 奖励型 Effect 复用的缩放值配置。只声明请求的 reward tier，不直接写死真实数值。 -->
-    <bean name="ExpeditionScaledValueConfig" valueType="false" sep=",">
-        <var name="reward_tier" type="EnumExpeditionRewardTier" />
-    </bean>
 
     <!-- 某个进度阶段内，一个 reward tier 对应的真实强度值。money/hp 的增减方向由具体 Effect 的 operation 决定。 -->
     <bean name="ExpeditionRewardTierValueConfig" valueType="false" sep=",">
@@ -200,24 +190,30 @@
 
     <!-- 修改远征 money。真实强度由 money.reward_tier + 当前远征 reward profile 解析，增减方向由 operation 决定。 -->
     <bean name="AddMoneyEffectConfig" alias="add_money" parent="ExpeditionEffectConfig" valueType="false" sep=",">
-        <var name="operation" type="EnumExpeditionRewardOperation" />
-        <var name="money" type="ExpeditionScaledValueConfig" />
+        <var name="operation" type="Gameplay.EnumOperation" />
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
     </bean>
 
     <!-- 增减玩家当前远征队伍中所有 Marble 的经验。真实数值由 exp.reward_tier 解析。 -->
     <bean name="AddPlayerMarbleExpEffectConfig" alias="add_player_marble_exp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
-        <var name="exp" type="ExpeditionScaledValueConfig" />
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
     </bean>
 
     <!-- 修改玩家当前远征队伍中所有存活 Marble 的 HP。真实强度由 hp.reward_tier 解析，增减方向由 operation 决定。 -->
     <bean name="AddPlayerMarbleHpEffectConfig" alias="add_player_marble_hp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
-        <var name="operation" type="EnumExpeditionRewardOperation" />
-        <var name="hp" type="ExpeditionScaledValueConfig" />
+        <var name="operation" type="Gameplay.EnumOperation" />
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
     </bean>
 
     <!-- 往玩家当前远征队伍中添加指定数量的 Marble。数量与 Marble 候选都由 marble_count.reward_tier 解析。 -->
     <bean name="AddPlayerMarbleEffectConfig" alias="add_player_marble" parent="ExpeditionEffectConfig" valueType="false" sep=",">
-        <var name="marble_count" type="ExpeditionScaledValueConfig" />
+        <var name="marble_count_tier" type="EnumExpeditionRewardTier" />
+        <var name="marble_count_value" type="int" />
+        <var name="marble_type_tier" type="EnumExpeditionRewardTier" />
+        <var name="marble_type_value" type="Gameplay.Combat.MarbleSpawnConfig" />
     </bean>
 
     <!-- 改变当前远征环境，并按环境切换规则更新环境来源随机事件池。 -->
