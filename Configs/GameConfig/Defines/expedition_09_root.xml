@@ -1,0 +1,25 @@
+<module name="Gameplay.Expedition">
+    <!-- 远征主配置。一次 ExpeditionConfig 对应一条可进入的远征路线。 -->
+    <bean name="ExpeditionConfig" valueType="false" sep=",">
+        <var name="expedition_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <!-- 当前远征引用的奖励 profile；奖励型 Effect 会通过它解析真实数值。 -->
+        <var name="reward_profile_config_id" type="string" />
+        <!-- 当前远征引用的敌人强度 profile；动态敌人组会通过它解析真实数量与等级。 -->
+        <var name="enemy_profile_config_id" type="string" />
+        <!-- 开始远征时进入的环境，会激活该环境的随机事件池。 -->
+        <var name="initial_environment_config_id" type="string" />
+        <!-- 远征基础随机事件池，会在本次远征期间持续存在，不随环境切换移除。 -->
+        <var name="lst_random_event_pool_config_id" type="list, string" />
+        <var name="route" type="list, ExpeditionRouteNodeConfig" />
+    </bean>
+
+    <table name="TbExpedition" value="ExpeditionConfig" input="expedition.xlsx" index="expedition_config_id" />
+    <table name="TbExpeditionEvent" value="ExpeditionEventConfig" input="expedition_event.xlsx" index="event_config_id" />
+    <table name="TbExpeditionCombatEncounter" value="ExpeditionCombatEncounterConfig" input="expedition_combat_encounter.xlsx" index="combat_encounter_config_id" />
+    <table name="TbExpeditionRandomEventPool" value="ExpeditionRandomEventPoolConfig" input="expedition_random_event_pool.xlsx" index="random_event_pool_config_id" />
+    <table name="TbExpeditionEnvironment" value="ExpeditionEnvironmentConfig" input="expedition_environment.xlsx" index="environment_config_id" />
+    <table name="TbExpeditionRewardProfile" value="ExpeditionRewardProfileConfig" input="expedition_reward_profile.xlsx" index="reward_profile_config_id" />
+    <table name="TbExpeditionEnemyProfile" value="ExpeditionEnemyProfileConfig" input="expedition_enemy_profile.xlsx" index="enemy_profile_config_id" />
+</module>

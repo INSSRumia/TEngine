@@ -1,0 +1,24 @@
+<module name="Gameplay.Expedition">
+    <!-- Combat 遭遇中的动态敌人组。敌人类型来自当前环境候选池，数量和等级来自 enemy profile。不会按环境候选里自带的 level 做筛选。 -->
+    <bean name="ExpeditionDynamicEnemyGroupConfig" valueType="false" sep=",">
+        <var name="count_tier" type="EnumExpeditionRewardTier" />
+        <var name="level_tier" type="EnumExpeditionRewardTier" />
+    </bean>
+
+    <!-- 远征中的 Combat 遭遇配置。敌方 Marble 使用 Combat.MarbleSpawnConfig。 -->
+    <bean name="ExpeditionCombatEncounterConfig" valueType="false" sep=",">
+        <var name="combat_encounter_config_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <!-- Combat 胜利后执行的远征 Effect 列表。 -->
+        <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
+        <!-- Combat 失败后执行的远征 Effect 列表。 -->
+        <var name="lst_defeat_effect" type="list, ExpeditionEffectConfig" />
+        <!-- 固定敌人。适合剧情指定敌人、Boss 或必须出现的编组；固定敌人直接使用各自 MarbleSpawnConfig 中配置的 level。 -->
+        <var name="enemy_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
+        <!-- 动态敌人组。敌人类型从当前环境 lst_enemy_candidate 中抽取，最终等级由 enemy profile 覆盖候选配置等级。 -->
+        <var name="lst_dynamic_enemy_group" type="list, ExpeditionDynamicEnemyGroupConfig" />
+        <!-- 可选显式场地。为空时从当前环境 lst_battlefield 中按权重选择。 -->
+        <var name="battlefield_config_id" type="string" />
+    </bean>
+</module>

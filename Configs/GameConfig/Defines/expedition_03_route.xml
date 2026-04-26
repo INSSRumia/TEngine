@@ -1,0 +1,32 @@
+<module name="Gameplay.Expedition">
+    <!-- Node 的一个出口。FixedNext/ByConditions 会在候选出口中选优先级最高者。 -->
+    <bean name="ExpeditionNodeTransitionConfig" valueType="false" sep=",">
+        <!-- 出口业务 Id，只在当前 Node 内用于 option_routes 引用和调试显示。 -->
+        <var name="transition_id" type="string" />
+        <!-- 目标 Node 的配置 Id。为空表示该 Node 可作为叶子节点结束推进。 -->
+        <var name="target_node_config_id" type="string" />
+        <!-- 出口优先级。数值越大优先级越高。 -->
+        <var name="priority" type="int" />
+        <!-- ByConditions 策略下使用的条件列表；所有条件满足时该出口命中。 -->
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <!-- BySelectedOption 策略使用的 option_id 到 transition_id 映射。 -->
+    <bean name="ExpeditionOptionRouteConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+        <var name="transition_id" type="string" />
+    </bean>
+
+    <!-- 远征路线节点配置。Event 只提供内容，出口由当前 Node 的 route_policy 决定。 -->
+    <bean name="ExpeditionRouteNodeConfig" valueType="false" sep=",">
+        <var name="node_config_id" type="string" />
+        <var name="node_type" type="EnumExpeditionNodeType" />
+        <!-- Event 节点使用的固定事件；RandomEvent 节点通常不填此字段。 -->
+        <var name="event_config_id" type="string" />
+        <!-- Combat 节点使用的遭遇配置。 -->
+        <var name="combat_encounter_config_id" type="string" />
+        <var name="route_policy" type="EnumExpeditionRoutePolicy" />
+        <var name="transitions" type="list, ExpeditionNodeTransitionConfig" />
+        <var name="option_routes" type="list, ExpeditionOptionRouteConfig" />
+    </bean>
+</module>

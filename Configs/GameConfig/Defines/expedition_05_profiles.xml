@@ -1,0 +1,29 @@
+<module name="Gameplay.Expedition">
+    <!-- 招募奖励候选条目。运行时会先按 reward tier 过滤，再按 weight 抽取 Marble。 -->
+    <bean name="ExpeditionRecruitRewardCandidateConfig" valueType="false" sep=",">
+        <var name="reward_tier" type="EnumExpeditionRewardTier" />
+        <var name="marble_spawn_config" type="Gameplay.Combat.MarbleSpawnConfig" />
+        <var name="weight" type="int" />
+    </bean>
+
+    <!-- 一条远征使用的奖励 profile，定义 early / mid / late 的奖励强度与招募候选池。 -->
+    <bean name="ExpeditionRewardProfileConfig" valueType="false" sep=",">
+        <var name="reward_profile_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_money" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_exp" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_hp" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_marble_count" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_recruit_candidate" type="list, ExpeditionRecruitRewardCandidateConfig" />
+    </bean>
+
+    <!-- 一条远征使用的敌人强度 profile，定义 early / mid / late 的敌人数量与等级强度。动态敌人最终等级以这里解析出的值为准。 -->
+    <bean name="ExpeditionEnemyProfileConfig" valueType="false" sep=",">
+        <var name="enemy_profile_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_enemy_count" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_enemy_level" type="list, ExpeditionStageTierIntValueConfig" />
+    </bean>
+</module>

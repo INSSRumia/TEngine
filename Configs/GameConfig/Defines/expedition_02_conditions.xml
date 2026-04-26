@@ -1,0 +1,42 @@
+<module name="Gameplay.Expedition">
+    <!-- 远征路线条件基类。summary 只用于策划/调试说明，不参与运行时判断。 -->
+    <bean name="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="summary" type="string" />
+    </bean>
+
+    <!-- 判断远征黑板中是否拥有指定 flag。 -->
+    <bean name="HasFlagConditionConfig" alias="has_flag" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="flag_id" type="string" />
+    </bean>
+
+    <!-- 判断远征黑板中是否拥有指定 item。当前 item 只作为远征黑板标记使用。 -->
+    <bean name="HasItemConditionConfig" alias="has_item" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="item_id" type="string" />
+    </bean>
+
+    <!-- 判断本次远征中是否曾经选择过指定 option_id。 -->
+    <bean name="HasChosenOptionConditionConfig" alias="has_chosen_option" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+    </bean>
+
+    <!-- 判断远征黑板计数器是否大于等于 min_value。 -->
+    <bean name="CounterAtLeastConditionConfig" alias="counter_at_least" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="counter_id" type="string" />
+        <var name="min_value" type="int" />
+    </bean>
+
+    <!-- 与条件。conditions 中所有子条件都满足时才满足。空列表按不满足处理。 -->
+    <bean name="AndConditionConfig" alias="and" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <!-- 或条件。conditions 中任意子条件满足时即满足。空列表按不满足处理。 -->
+    <bean name="OrConditionConfig" alias="or" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="conditions" type="list, ExpeditionConditionConfig" />
+    </bean>
+
+    <!-- 非条件。对单个 condition 的结果取反。 -->
+    <bean name="NotConditionConfig" alias="not" parent="ExpeditionConditionConfig" valueType="false" sep=",">
+        <var name="condition" type="ExpeditionConditionConfig" />
+    </bean>
+</module>

@@ -1,0 +1,44 @@
+<module name="Gameplay.Expedition">
+    <!-- 远征节点类型。Event 使用固定事件；RandomEvent 从当前激活随机事件池抽事件；Combat 进入战斗遭遇。 -->
+    <enum name="EnumExpeditionNodeType">
+        <var name="None" alias="none" value="0" />
+        <var name="Event" alias="event" value="1" />
+        <var name="Combat" alias="combat" value="2" />
+        <var name="RandomEvent" alias="random_event" value="3" />
+    </enum>
+
+    <!-- 节点出口策略。出口逻辑属于 Node，不属于可复用 Event。 -->
+    <enum name="EnumExpeditionRoutePolicy">
+        <var name="FixedNext" alias="fixed_next" value="0" />
+        <var name="BySelectedOption" alias="by_selected_option" value="1" />
+        <var name="ByConditions" alias="by_conditions" value="2" />
+    </enum>
+
+    <!-- 远征奖励档位。奖励型 Effect 只声明档位，真实数值由 reward profile + progress stage 决定。 -->
+    <enum name="EnumExpeditionRewardTier">
+        <var name="Tiny" alias="tiny" value="0" />
+        <var name="Small" alias="small" value="1" />
+        <var name="Medium" alias="medium" value="2" />
+        <var name="Large" alias="large" value="3" />
+        <var name="Huge" alias="huge" value="4" />
+    </enum>
+
+    <!-- 远征内的奖励进度阶段。首版按 early / mid / late 三段拆分。 -->
+    <enum name="EnumExpeditionRewardProgressStage">
+        <var name="Early" alias="early" value="0" />
+        <var name="Mid" alias="mid" value="1" />
+        <var name="Late" alias="late" value="2" />
+    </enum>
+
+    <!-- 远征内部通用的档位数值条目。由外层字段决定它表达奖励还是敌人强度。 -->
+    <bean name="ExpeditionTierIntValueConfig" valueType="false" sep=",">
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
+    </bean>
+
+    <!-- 远征内部通用的阶段档位数值映射。reward profile 和 enemy profile 都复用该结构。 -->
+    <bean name="ExpeditionStageTierIntValueConfig" valueType="false" sep=",">
+        <var name="progress_stage" type="EnumExpeditionRewardProgressStage" />
+        <var name="lst_value" type="list, ExpeditionTierIntValueConfig" />
+    </bean>
+</module>

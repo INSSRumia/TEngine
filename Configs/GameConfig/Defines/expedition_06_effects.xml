@@ -1,0 +1,40 @@
+<module name="Gameplay.Expedition">
+    <!-- 远征 Effect 基类。summary 用于结算摘要/调试展示。 -->
+    <bean name="ExpeditionEffectConfig" valueType="false" sep=",">
+        <!-- 支持命名 token，例如 {money}、{count}、{marble_name}。 -->
+        <var name="summary" type="string" />
+    </bean>
+
+    <!-- 修改远征 money。真实强度由 money.reward_tier + 当前远征 reward profile 解析，增减方向由 operation 决定。 -->
+    <bean name="AddMoneyEffectConfig" alias="add_money" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="operation" type="Gameplay.EnumOperation" />
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
+    </bean>
+
+    <!-- 增减玩家当前远征队伍中所有 Marble 的经验。真实数值由 exp.reward_tier 解析。 -->
+    <bean name="AddPlayerMarbleExpEffectConfig" alias="add_player_marble_exp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
+    </bean>
+
+    <!-- 修改玩家当前远征队伍中所有存活 Marble 的 HP。真实强度由 hp.reward_tier 解析，增减方向由 operation 决定。 -->
+    <bean name="AddPlayerMarbleHpEffectConfig" alias="add_player_marble_hp" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="operation" type="Gameplay.EnumOperation" />
+        <var name="tier" type="EnumExpeditionRewardTier" />
+        <var name="value" type="int" />
+    </bean>
+
+    <!-- 往玩家当前远征队伍中添加指定数量的 Marble。数量与 Marble 候选都由 marble_count.reward_tier 解析。 -->
+    <bean name="AddPlayerMarbleEffectConfig" alias="add_player_marble" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="marble_count_tier" type="EnumExpeditionRewardTier" />
+        <var name="marble_count_value" type="int" />
+        <var name="marble_type_tier" type="EnumExpeditionRewardTier" />
+        <var name="marble_type_value" type="Gameplay.Combat.MarbleSpawnConfig" />
+    </bean>
+
+    <!-- 改变当前远征环境，并按环境切换规则更新环境来源随机事件池。 -->
+    <bean name="ChangeEnvironmentEffectConfig" alias="change_environment" parent="ExpeditionEffectConfig" valueType="false" sep=",">
+        <var name="target_environment_config_id" type="string" />
+    </bean>
+</module>

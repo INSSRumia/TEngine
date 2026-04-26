@@ -1,0 +1,17 @@
+<module name="Gameplay.Expedition">
+    <!-- 事件选项。选项执行 lst_effect，路线出口由所在 Node 决定。 -->
+    <bean name="ExpeditionEventOptionConfig" valueType="false" sep=",">
+        <var name="option_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_effect" type="list, ExpeditionEffectConfig" />
+    </bean>
+
+    <!-- 可复用事件内容。Event 不应该直接配置前往哪个 Node。 -->
+    <bean name="ExpeditionEventConfig" valueType="false" sep=",">
+        <var name="event_config_id" type="string" />
+        <var name="title" type="string" />
+        <var name="description" type="string" />
+        <var name="options" type="list, ExpeditionEventOptionConfig" />
+    </bean>
+</module>
