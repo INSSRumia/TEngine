@@ -1,75 +1,80 @@
 ## MODIFIED Requirements
 
 ### Requirement: 事件配置 SHALL 使用 Effect 列表
-系统 MUST 让远征事件选项的效果通过配置化的 `LstEffect` 表达，而不是继续依赖固定的 `crystal_delta`、`exp_delta`、`hp_delta` 这类字段。首版至少能够通过 Effect 列表表达添加金钱、为玩家全队添加经验和为玩家全队修改血量这 3 类结果。
+系统 MUST 让远征事件选项的结果继续通过 `LstEffect` 表达，但奖励型 Effect 的配置内容 MUST 使用档位化奖励结构，而不是继续使用写死的 `money_delta`、`exp_delta`、`hp_delta` 或固定招募数量字段。事件配置负责声明奖励类型和奖励档位，不直接承担真实数值强度定义。
 
-#### Scenario: 事件选项配置多个 Effect
+#### Scenario: 事件选项配置档位化奖励 Effect
 - **WHEN** 运行时读取某个事件选项的配置
 - **THEN** 该选项通过 `LstEffect` 提供一个或多个 Expedition Effect 配置
-- **AND** 不要求通过固定数值字段才能表达首版远征事件结果
-
-### Requirement: Combat 遭遇配置 SHALL 提供敌方编队与胜负效果列表
-系统 MUST 让远征 Combat 遭遇配置显式提供敌方 Marble 列表、标题描述以及两组结算效果列表：战斗胜利时触发的 `LstVictoryEffect` 与战斗失败时触发的 `LstDefeatEffect`。首版固定胜利奖励字段不再作为唯一表达方式。
-
-#### Scenario: 从遭遇配置构建 Combat 输入与胜负结果
-- **WHEN** 远征流程进入一个 Combat 节点
-- **THEN** 系统根据节点引用读取对应的 Combat 遭遇配置
-- **AND** 该配置能够提供敌方 Marble 列表
-- **AND** 该配置能够根据 Combat 结算结果提供对应的胜利或失败 Effect 列表
+- **AND** 奖励型 Effect 在配置中声明奖励档位或缩放值结构
+- **AND** 不要求在事件配置里直接写死真实奖励数值
 
 ## ADDED Requirements
 
-### Requirement: Luban 配置 SHALL 定义随机事件池
-系统 MUST 在 Luban schema 中提供随机事件池配置结构，用于声明随机事件池 Id、说明信息和带权重的事件条目列表。
+### Requirement: Luban 配置 SHALL 定义远征奖励档位结构
+系统 MUST 在远征 schema 中提供奖励档位相关配置结构，用于描述奖励类型、奖励档位、进度阶段和真实值映射关系。
 
-#### Scenario: 配置随机事件池条目
-- **WHEN** 配置者定义一个随机事件池
-- **THEN** 该池能够配置多个事件条目
-- **AND** 每个事件条目能够引用一个 Event 配置并声明权重
+#### Scenario: 配置远征奖励档位
+- **WHEN** 配置者定义一条远征的 reward profile
+- **THEN** 该配置能够为至少 `money`、`exp`、`hp`、`marble_count` 这几类奖励定义档位强度
+- **AND** 该配置能够区分 `early`、`mid`、`late` 三段进度
 
-### Requirement: Luban 配置 SHALL 定义环境
-系统 MUST 在 Luban schema 中提供环境配置结构，用于声明环境 Id、说明信息、环境随机事件池列表和环境场地候选列表。
+### Requirement: Luban 配置 SHALL 定义可复用的缩放值配置
+系统 MUST 在远征 schema 中提供可复用的缩放值配置结构，供奖励型 Effect 声明其请求的奖励档位，而不是各自重复发明字段。
 
-#### Scenario: 配置环境内容
+#### Scenario: 多种奖励型 Effect 复用同一缩放值结构
+- **WHEN** 配置者定义 money、exp、hp 或招募类 Effect
+- **THEN** 这些 Effect 都能够复用统一的缩放值配置结构
+- **AND** 不要求每种 Effect 分别定义一套完全独立的档位字段命名
+
+### Requirement: Luban 配置 SHALL 定义招募奖励候选池
+系统 MUST 在远征 schema 中提供招募奖励候选池结构。每个候选条目 MUST 至少包含一个 `MarbleSpawnConfig`、一个 `weight` 和一个 `reward_tier`。
+
+#### Scenario: 配置招募奖励候选条目
+- **WHEN** 配置者定义 reward profile 中的招募奖励候选池
+- **THEN** 每个候选条目能够声明一条具体的 `MarbleSpawnConfig`
+- **AND** 每个候选条目能够声明其权重和所属奖励档位
+
+### Requirement: 远征主配置 SHALL 能引用 reward profile
+系统 MUST 允许远征主配置显式引用一个 reward profile，用于控制该远征中的事件奖励强度。
+
+#### Scenario: 远征配置 reward profile
+- **WHEN** 配置者定义一条远征
+- **THEN** 该远征能够引用一个 reward profile 配置 Id
+- **AND** 运行时可通过该引用解析事件奖励的真实强度
+
+### Requirement: Luban 配置 SHALL 定义敌人强度档位结构
+系统 MUST 在远征 schema 中提供敌人强度档位相关配置结构，用于描述敌人数量档位、敌人等级档位、远征阶段和真实值映射关系。
+
+#### Scenario: 配置敌人强度档位
+- **WHEN** 配置者定义一条远征的 enemy profile
+- **THEN** 该配置能够为至少“敌人数量”和“敌人等级”两类强度定义档位映射
+- **AND** 该配置能够区分 `early`、`mid`、`late` 三段远征阶段
+
+### Requirement: Luban 配置 SHALL 定义环境敌人候选池结构
+系统 MUST 在远征 schema 中提供环境敌人候选池结构。每个候选条目 MUST 至少包含一个 `MarbleSpawnConfig` 和一个 `weight`。
+
+#### Scenario: 配置环境敌人候选条目
 - **WHEN** 配置者定义一个环境
-- **THEN** 该环境能够引用多个随机事件池
-- **AND** 该环境能够配置多个带权重的场地候选
+- **THEN** 该环境能够声明任意数量的敌人候选条目
+- **AND** 每个候选条目能够声明具体候选敌人与抽取权重
 
-### Requirement: Luban 配置 SHALL 定义 Combat 场地
-系统 MUST 在 Luban schema 的 `Gameplay.Combat` 命名空间中提供 Combat 场地配置结构，用于声明场地 Id、名称和描述。Combat 场地 prefab 路径不在表格中配置，而是由 Combat 层按 `battlefield_config_id` 在 `Assets/AssetRaw/Actor/Prefabs/Battlefield` 目录下查找同名 prefab。远征 schema 只引用场地配置 Id。
+### Requirement: Luban 配置 SHALL 定义动态敌人组结构
+系统 MUST 在 Combat 遭遇相关 schema 中提供动态敌人组结构。每个动态敌人组 MUST 至少声明一个数量档位和一个等级档位。
 
-#### Scenario: 配置 Combat 场地资源
-- **WHEN** 配置者定义一个 Combat 场地
-- **THEN** 该场地能够提供 `battlefield_config_id`
-- **AND** 不要求配置 prefab 地址字段
+#### Scenario: 配置动态敌人组
+- **WHEN** 配置者定义一条 Combat 遭遇
+- **THEN** 该遭遇能够继续声明固定敌人
+- **AND** 该遭遇也能够额外声明任意数量的动态敌人组
+- **AND** 每个动态敌人组能够声明数量档位和等级档位
 
-### Requirement: 远征主配置 SHALL 支持初始环境和基础随机事件池
-系统 MUST 允许远征主配置声明初始环境，并声明不依赖当前环境的基础随机事件池列表。
+### Requirement: 远征主配置 SHALL 能引用 enemy profile
+系统 MUST 允许远征主配置显式引用一个 enemy profile，用于控制该远征中的动态敌人强度。
 
-#### Scenario: 配置远征初始环境
+#### Scenario: 远征配置 enemy profile
 - **WHEN** 配置者定义一条远征
-- **THEN** 该远征能够指定初始环境配置 Id
-
-#### Scenario: 配置远征基础随机事件池
-- **WHEN** 配置者定义一条远征
-- **THEN** 该远征能够指定多个基础随机事件池
-- **AND** 这些池不因环境切换而被移除
-
-### Requirement: 远征节点配置 SHALL 支持 RandomEvent 节点类型
-系统 MUST 允许远征节点配置声明 `RandomEvent` 节点类型。该节点类型 MUST 能复用现有节点级路由配置。
-
-#### Scenario: 配置随机事件节点
-- **WHEN** 配置者定义一个 `RandomEvent` 节点
-- **THEN** 该节点能够声明节点级路由策略
-- **AND** 不要求在节点上固定写死一个 Event 配置 Id
-
-### Requirement: Combat 遭遇配置 SHALL 支持可选场地引用
-系统 MUST 允许远征 Combat 遭遇配置声明可选场地配置 Id。未配置或配置为空时，运行时从当前环境选择场地。
-
-#### Scenario: 配置遭遇场地
-- **WHEN** 配置者定义一个 Combat 遭遇
-- **THEN** 该遭遇能够选择性引用一个 Combat 场地配置
-- **AND** 该字段为空时不阻止配置生成
+- **THEN** 该远征能够引用一个敌人强度档位配置 Id
+- **AND** 运行时可通过该引用解析动态敌人的真实数量与等级
 
 ### Requirement: Agent SHALL NOT 修改 xlsx 表格
 实现该变更的 agent MUST NOT 创建、编辑、填充或修改任何 xlsx 表格。若 schema 变更需要表格新增 sheet、列或数据，agent MUST 暂停并通知用户手工修改。

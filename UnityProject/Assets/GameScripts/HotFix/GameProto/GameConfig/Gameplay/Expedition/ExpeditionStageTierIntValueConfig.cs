@@ -13,23 +13,23 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Expedition
 {
-public sealed partial class ExpeditionRewardStageValueConfig : Luban.BeanBase
+public sealed partial class ExpeditionStageTierIntValueConfig : Luban.BeanBase
 {
-    public ExpeditionRewardStageValueConfig(JSONNode _buf) 
+    public ExpeditionStageTierIntValueConfig(JSONNode _buf) 
     {
         { if(!_buf["progress_stage"].IsNumber) { throw new SerializationException(); }  ProgressStage = (Gameplay.Expedition.EnumExpeditionRewardProgressStage)_buf["progress_stage"].AsInt; }
-        { var __json0 = _buf["lst_value"]; if(!__json0.IsArray) { throw new SerializationException(); } LstValue = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionRewardTierValueConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionRewardTierValueConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionRewardTierValueConfig.DeserializeExpeditionRewardTierValueConfig(__e0);  }  LstValue.Add(__v0); }   }
+        { var __json0 = _buf["lst_value"]; if(!__json0.IsArray) { throw new SerializationException(); } LstValue = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionTierIntValueConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionTierIntValueConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionTierIntValueConfig.DeserializeExpeditionTierIntValueConfig(__e0);  }  LstValue.Add(__v0); }   }
     }
 
-    public static ExpeditionRewardStageValueConfig DeserializeExpeditionRewardStageValueConfig(JSONNode _buf)
+    public static ExpeditionStageTierIntValueConfig DeserializeExpeditionStageTierIntValueConfig(JSONNode _buf)
     {
-        return new Gameplay.Expedition.ExpeditionRewardStageValueConfig(_buf);
+        return new Gameplay.Expedition.ExpeditionStageTierIntValueConfig(_buf);
     }
 
     public readonly Gameplay.Expedition.EnumExpeditionRewardProgressStage ProgressStage;
-    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionRewardTierValueConfig> LstValue;
+    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionTierIntValueConfig> LstValue;
    
-    public const int __ID__ = -587733622;
+    public const int __ID__ = 708507006;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)

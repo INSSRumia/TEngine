@@ -11,6 +11,56 @@
         "battlefield_config_id": "普通森林_1",
         "weight": 10
       }
+    ],
+    "lst_enemy_candidate": [
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "lancer",
+          "level": 0,
+          "camp_config_id": "hollow"
+        },
+        "weight": 10
+      },
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "soldier",
+          "level": 0,
+          "camp_config_id": "hollow"
+        },
+        "weight": 10
+      },
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "archer",
+          "level": 0,
+          "camp_config_id": "hollow"
+        },
+        "weight": 10
+      },
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "lancer",
+          "level": 1,
+          "camp_config_id": "hollow"
+        },
+        "weight": 3
+      },
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "soldier",
+          "level": 1,
+          "camp_config_id": "hollow"
+        },
+        "weight": 3
+      },
+      {
+        "marble_spawn_config": {
+          "marble_config_id": "archer",
+          "level": 1,
+          "camp_config_id": "hollow"
+        },
+        "weight": 3
+      }
     ]
   }
 ]

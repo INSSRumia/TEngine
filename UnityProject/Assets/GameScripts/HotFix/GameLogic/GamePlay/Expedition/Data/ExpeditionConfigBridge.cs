@@ -182,8 +182,29 @@ namespace GameLogic.Gameplay.Expedition
             return ConfigSystem.Instance.Tables?.TbExpeditionRewardProfile?.GetOrDefault(rewardProfileConfigId);
         }
 
+        public static ExpeditionEnemyProfileConfig ResolveEnemyProfile(string enemyProfileConfigId)
+        {
+            if (string.IsNullOrWhiteSpace(enemyProfileConfigId))
+                return null;
+
+            // enemy profile 只定义动态敌人的“强度映射”，不负责指定敌人类型。
+            // 敌人类型来自环境的 lst_enemy_candidate。
+            return ConfigSystem.Instance.Tables?.TbExpeditionEnemyProfile?.GetOrDefault(enemyProfileConfigId);
+        }
+
         public static ExpeditionCombatEncounterConfig ResolveDebugCombatEncounter(string preferredExpeditionConfigId)
         {
+            TryResolveDebugCombatEncounter(preferredExpeditionConfigId, out _, out var encounter);
+            return encounter;
+        }
+
+        public static bool TryResolveDebugCombatEncounter(
+            string preferredExpeditionConfigId,
+            out ExpeditionConfig expeditionConfig,
+            out ExpeditionCombatEncounterConfig encounterConfig)
+        {
+            expeditionConfig = null;
+            encounterConfig = null;
             var lstPreferredExpedition = ResolveAvailableExpeditionConfigIds();
             if (!string.IsNullOrWhiteSpace(preferredExpeditionConfigId) && !lstPreferredExpedition.Contains(preferredExpeditionConfigId))
                 lstPreferredExpedition.Insert(0, preferredExpeditionConfigId);
@@ -201,12 +222,16 @@ namespace GameLogic.Gameplay.Expedition
 
                     var encounter = ResolveCombatEncounter(node.CombatEncounterConfigId);
                     if (encounter != null)
-                        return encounter;
+                    {
+                        expeditionConfig = expedition;
+                        encounterConfig = encounter;
+                        return true;
+                    }
                 }
             }
 
             Log.Warning("[远征] 当前可用远征中未找到可调试的战斗遭遇。");
-            return null;
+            return false;
         }
 
         public static string ResolveMarbleDisplayName(string marbleConfigId)
@@ -247,6 +272,8 @@ namespace GameLogic.Gameplay.Expedition
                 return false;
             }
 
+            var requiresEnemyProfile = false;
+
             var nodeIdSet = new HashSet<string>();
             foreach (var node in expedition.Route)
             {
@@ -275,6 +302,9 @@ namespace GameLogic.Gameplay.Expedition
                             return false;
                         }
 
+                        if (EncounterHasDynamicEnemyGroup(encounter))
+                            requiresEnemyProfile = true;
+
                         break;
                     default:
                         Log.Warning($"[远征] 不支持的节点类型:{node.NodeType} nodeConfigId:{node.NodeConfigId}");
@@ -292,7 +322,19 @@ namespace GameLogic.Gameplay.Expedition
                 }
             }
 
+            if (requiresEnemyProfile && ResolveEnemyProfile(expedition.EnemyProfileConfigId) == null)
+            {
+                Log.Warning($"[远征] 远征缺少有效敌人强度档位配置。expeditionConfigId:{expedition.ExpeditionConfigId} enemyProfileConfigId:{expedition.EnemyProfileConfigId}");
+                return false;
+            }
+
             return true;
+        }
+
+        private static bool EncounterHasDynamicEnemyGroup(ExpeditionCombatEncounterConfig encounter)
+        {
+            return encounter?.LstDynamicEnemyGroup != null
+                && encounter.LstDynamicEnemyGroup.Any(group => group != null);
         }
 
         private static bool ValidateRoutePolicy(ExpeditionRouteNodeConfig node)

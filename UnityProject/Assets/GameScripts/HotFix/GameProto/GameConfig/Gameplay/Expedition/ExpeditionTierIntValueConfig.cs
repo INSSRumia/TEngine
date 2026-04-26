@@ -13,23 +13,23 @@ using Luban.SimpleJSON;
 
 namespace GameConfig.Gameplay.Expedition
 {
-public sealed partial class ExpeditionRewardTierValueConfig : Luban.BeanBase
+public sealed partial class ExpeditionTierIntValueConfig : Luban.BeanBase
 {
-    public ExpeditionRewardTierValueConfig(JSONNode _buf) 
+    public ExpeditionTierIntValueConfig(JSONNode _buf) 
     {
-        { if(!_buf["reward_tier"].IsNumber) { throw new SerializationException(); }  RewardTier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["reward_tier"].AsInt; }
+        { if(!_buf["tier"].IsNumber) { throw new SerializationException(); }  Tier = (Gameplay.Expedition.EnumExpeditionRewardTier)_buf["tier"].AsInt; }
         { if(!_buf["value"].IsNumber) { throw new SerializationException(); }  Value = _buf["value"]; }
     }
 
-    public static ExpeditionRewardTierValueConfig DeserializeExpeditionRewardTierValueConfig(JSONNode _buf)
+    public static ExpeditionTierIntValueConfig DeserializeExpeditionTierIntValueConfig(JSONNode _buf)
     {
-        return new Gameplay.Expedition.ExpeditionRewardTierValueConfig(_buf);
+        return new Gameplay.Expedition.ExpeditionTierIntValueConfig(_buf);
     }
 
-    public readonly Gameplay.Expedition.EnumExpeditionRewardTier RewardTier;
+    public readonly Gameplay.Expedition.EnumExpeditionRewardTier Tier;
     public readonly int Value;
    
-    public const int __ID__ = 1398217436;
+    public const int __ID__ = 239011884;
     public override int GetTypeId() => __ID__;
 
     public  void ResolveRef(Tables tables)
@@ -39,7 +39,7 @@ public sealed partial class ExpeditionRewardTierValueConfig : Luban.BeanBase
     public override string ToString()
     {
         return "{ "
-        + "rewardTier:" + RewardTier + ","
+        + "tier:" + Tier + ","
         + "value:" + Value + ","
         + "}";
     }

@@ -1,0 +1,161 @@
+[
+  {
+    "enemy_profile_config_id": "敌人配置1",
+    "name": "敌人配置1",
+    "description": "敌人配置1",
+    "lst_enemy_count": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 1
+          },
+          {
+            "tier": 1,
+            "value": 2
+          },
+          {
+            "tier": 2,
+            "value": 3
+          },
+          {
+            "tier": 3,
+            "value": 4
+          },
+          {
+            "tier": 4,
+            "value": 5
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 2
+          },
+          {
+            "tier": 1,
+            "value": 3
+          },
+          {
+            "tier": 2,
+            "value": 4
+          },
+          {
+            "tier": 3,
+            "value": 5
+          },
+          {
+            "tier": 4,
+            "value": 6
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 5
+          },
+          {
+            "tier": 1,
+            "value": 6
+          },
+          {
+            "tier": 2,
+            "value": 7
+          },
+          {
+            "tier": 3,
+            "value": 8
+          },
+          {
+            "tier": 4,
+            "value": 10
+          }
+        ]
+      }
+    ],
+    "lst_enemy_level": [
+      {
+        "progress_stage": 0,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 0
+          },
+          {
+            "tier": 1,
+            "value": 0
+          },
+          {
+            "tier": 2,
+            "value": 0
+          },
+          {
+            "tier": 3,
+            "value": 0
+          },
+          {
+            "tier": 4,
+            "value": 0
+          }
+        ]
+      },
+      {
+        "progress_stage": 1,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 1
+          },
+          {
+            "tier": 1,
+            "value": 1
+          },
+          {
+            "tier": 2,
+            "value": 1
+          },
+          {
+            "tier": 3,
+            "value": 1
+          },
+          {
+            "tier": 4,
+            "value": 1
+          }
+        ]
+      },
+      {
+        "progress_stage": 2,
+        "lst_value": [
+          {
+            "tier": 0,
+            "value": 1
+          },
+          {
+            "tier": 1,
+            "value": 1
+          },
+          {
+            "tier": 2,
+            "value": 1
+          },
+          {
+            "tier": 3,
+            "value": 1
+          },
+          {
+            "tier": 4,
+            "value": 1
+          }
+        ]
+      }
+    ]
+  }
+]

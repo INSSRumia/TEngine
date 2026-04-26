@@ -33,6 +33,12 @@
         "camp_config_id": "hollow"
       }
     ],
+    "lst_dynamic_enemy_group": [
+      {
+        "count_tier": 3,
+        "level_tier": 3
+      }
+    ],
     "battlefield_config_id": ""
   }
 ]

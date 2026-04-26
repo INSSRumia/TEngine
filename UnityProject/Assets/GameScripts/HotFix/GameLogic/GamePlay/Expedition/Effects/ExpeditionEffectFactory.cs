@@ -166,7 +166,7 @@ namespace GameLogic.Gameplay.Expedition
         private static int ResolveStageValue(
             ExpeditionEffectExecutionContext context,
             ExpeditionTable.EnumExpeditionRewardTier tier,
-            IEnumerable<ExpeditionTable.ExpeditionRewardStageValueConfig> lstStageConfig,
+            IEnumerable<ExpeditionTable.ExpeditionStageTierIntValueConfig> lstStageConfig,
             string rewardType)
         {
             if (context?.RewardContext?.RewardProfileConfig == null)
@@ -184,7 +184,7 @@ namespace GameLogic.Gameplay.Expedition
             }
 
             var tierValue = stageConfig.LstValue?
-                .FirstOrDefault(config => config != null && config.RewardTier == tier);
+                .FirstOrDefault(config => config != null && config.Tier == tier);
             if (tierValue == null)
             {
                 LogMissingConfig(context, rewardType, $"{context.RewardContext.ProgressStage}:{tier}");

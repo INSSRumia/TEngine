@@ -23,6 +23,7 @@ public partial class Tables
     public Gameplay.Expedition.TbExpeditionRandomEventPool TbExpeditionRandomEventPool {get; }
     public Gameplay.Expedition.TbExpeditionEnvironment TbExpeditionEnvironment {get; }
     public Gameplay.Expedition.TbExpeditionRewardProfile TbExpeditionRewardProfile {get; }
+    public Gameplay.Expedition.TbExpeditionEnemyProfile TbExpeditionEnemyProfile {get; }
     public Gameplay.Initial.TbInitial TbInitial {get; }
     public Gameplay.Combat.TbMarble TbMarble {get; }
     public Gameplay.Combat.TbProjectile TbProjectile {get; }
@@ -38,6 +39,7 @@ public partial class Tables
         TbExpeditionRandomEventPool = new Gameplay.Expedition.TbExpeditionRandomEventPool(loader("gameplay_expedition_tbexpeditionrandomeventpool"));
         TbExpeditionEnvironment = new Gameplay.Expedition.TbExpeditionEnvironment(loader("gameplay_expedition_tbexpeditionenvironment"));
         TbExpeditionRewardProfile = new Gameplay.Expedition.TbExpeditionRewardProfile(loader("gameplay_expedition_tbexpeditionrewardprofile"));
+        TbExpeditionEnemyProfile = new Gameplay.Expedition.TbExpeditionEnemyProfile(loader("gameplay_expedition_tbexpeditionenemyprofile"));
         TbInitial = new Gameplay.Initial.TbInitial(loader("gameplay_initial_tbinitial"));
         TbMarble = new Gameplay.Combat.TbMarble(loader("gameplay_combat_tbmarble"));
         TbProjectile = new Gameplay.Combat.TbProjectile(loader("gameplay_combat_tbprojectile"));
@@ -55,6 +57,7 @@ public partial class Tables
         TbExpeditionRandomEventPool.ResolveRef(this);
         TbExpeditionEnvironment.ResolveRef(this);
         TbExpeditionRewardProfile.ResolveRef(this);
+        TbExpeditionEnemyProfile.ResolveRef(this);
         TbInitial.ResolveRef(this);
         TbMarble.ResolveRef(this);
         TbProjectile.ResolveRef(this);

@@ -22,6 +22,7 @@ public sealed partial class ExpeditionEnvironmentConfig : Luban.BeanBase
         { if(!_buf["description"].IsString) { throw new SerializationException(); }  Description = _buf["description"]; }
         { var __json0 = _buf["lst_random_event_pool_config_id"]; if(!__json0.IsArray) { throw new SerializationException(); } LstRandomEventPoolConfigId = new System.Collections.Generic.List<string>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { string __v0;  { if(!__e0.IsString) { throw new SerializationException(); }  __v0 = __e0; }  LstRandomEventPoolConfigId.Add(__v0); }   }
         { var __json0 = _buf["lst_battlefield"]; if(!__json0.IsArray) { throw new SerializationException(); } LstBattlefield = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnvironmentBattlefieldConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEnvironmentBattlefieldConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEnvironmentBattlefieldConfig.DeserializeExpeditionEnvironmentBattlefieldConfig(__e0);  }  LstBattlefield.Add(__v0); }   }
+        { var __json0 = _buf["lst_enemy_candidate"]; if(!__json0.IsArray) { throw new SerializationException(); } LstEnemyCandidate = new System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnvironmentEnemyCandidateConfig>(__json0.Count); foreach(JSONNode __e0 in __json0.Children) { Gameplay.Expedition.ExpeditionEnvironmentEnemyCandidateConfig __v0;  { if(!__e0.IsObject) { throw new SerializationException(); }  __v0 = global::GameConfig.Gameplay.Expedition.ExpeditionEnvironmentEnemyCandidateConfig.DeserializeExpeditionEnvironmentEnemyCandidateConfig(__e0);  }  LstEnemyCandidate.Add(__v0); }   }
     }
 
     public static ExpeditionEnvironmentConfig DeserializeExpeditionEnvironmentConfig(JSONNode _buf)
@@ -34,6 +35,7 @@ public sealed partial class ExpeditionEnvironmentConfig : Luban.BeanBase
     public readonly string Description;
     public readonly System.Collections.Generic.List<string> LstRandomEventPoolConfigId;
     public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnvironmentBattlefieldConfig> LstBattlefield;
+    public readonly System.Collections.Generic.List<Gameplay.Expedition.ExpeditionEnvironmentEnemyCandidateConfig> LstEnemyCandidate;
    
     public const int __ID__ = 2088299887;
     public override int GetTypeId() => __ID__;
@@ -41,6 +43,7 @@ public sealed partial class ExpeditionEnvironmentConfig : Luban.BeanBase
     public  void ResolveRef(Tables tables)
     {
         foreach (var _e in LstBattlefield) { _e?.ResolveRef(tables); }
+        foreach (var _e in LstEnemyCandidate) { _e?.ResolveRef(tables); }
     }
 
     public override string ToString()
@@ -51,6 +54,7 @@ public sealed partial class ExpeditionEnvironmentConfig : Luban.BeanBase
         + "description:" + Description + ","
         + "lstRandomEventPoolConfigId:" + Luban.StringUtil.CollectionToString(LstRandomEventPoolConfigId) + ","
         + "lstBattlefield:" + Luban.StringUtil.CollectionToString(LstBattlefield) + ","
+        + "lstEnemyCandidate:" + Luban.StringUtil.CollectionToString(LstEnemyCandidate) + ","
         + "}";
     }
 }

@@ -16,10 +16,31 @@ namespace GameLogic.Gameplay.Expedition
             if (IsFlowRunning || ExpeditionCombatSessionController.Instance.IsRunning)
                 return false;
 
-            var encounter = ExpeditionConfigBridge.ResolveDebugCombatEncounter(string.Empty);
-            if (encounter == null)
+            var hasEncounter = ExpeditionConfigBridge.TryResolveDebugCombatEncounter(string.Empty, out var expeditionConfig, out var encounter);
+            if (!hasEncounter || encounter == null)
             {
                 Log.Warning("[远征流程控制器] StartCombatDebug 已中止，因为未找到战斗遭遇配置。");
+                return false;
+            }
+
+            var debugRunState = expeditionConfig == null
+                ? null
+                : new ExpeditionRunState
+                {
+                    ExpeditionInstId = "combat_debug_run",
+                    ExpeditionConfigId = expeditionConfig.ExpeditionConfigId,
+                    CurrentEnvironmentConfigId = expeditionConfig.InitialEnvironmentConfigId,
+                    Route = expeditionConfig.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
+                };
+            var debugNodeRecord = new ExpeditionNodeRecord
+            {
+                NodeConfigId = "combat_debug_node",
+                EntryOrder = 1,
+            };
+            var enemyBuildResult = ExpeditionCombatEnemyResolver.BuildEnemyRoster(debugRunState, debugNodeRecord, encounter);
+            if (!enemyBuildResult.IsSuccess)
+            {
+                Log.Warning($"[远征流程控制器] StartCombatDebug 已中止，因为敌方阵容解析失败。{enemyBuildResult.ErrorMessage}");
                 return false;
             }
 
@@ -32,9 +53,9 @@ namespace GameLogic.Gameplay.Expedition
                 LstAlliedMarble = _persistentData.LstMarbles
                     .Where(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0)
                     .ToList(),
-                LstEnemyMarble = new List<MarbleSpawnConfig>(encounter.EnemyMarbles),
+                LstEnemyMarble = enemyBuildResult.LstEnemyMarble,
             };
-            var battlefieldConfigId = ResolveBattlefieldConfigId(encounter, string.Empty);
+            var battlefieldConfigId = ResolveBattlefieldConfigId(encounter, debugRunState?.CurrentEnvironmentConfigId ?? string.Empty);
             if (string.IsNullOrWhiteSpace(battlefieldConfigId))
             {
                 Log.Warning($"[远征流程控制器] StartCombatDebug 已中止，因为无法解析场地。combatEncounterConfigId:{encounter.CombatEncounterConfigId}");
@@ -50,6 +71,7 @@ namespace GameLogic.Gameplay.Expedition
         public CombatSessionRequest BuildCombatSessionRequest()
         {
             var node = GetCurrentNode();
+            var record = CurrentRun?.GetCurrentRecord();
             var combatConfig = node == null ? null : ExpeditionConfigBridge.ResolveCombatEncounter(node.CombatEncounterConfigId);
             if (combatConfig == null || CurrentRun == null)
                 return null;
@@ -59,6 +81,29 @@ namespace GameLogic.Gameplay.Expedition
             {
                 CurrentRun.DebugLogs.Add($"[Combat] 节点 {node.NodeConfigId} 无法解析场地。");
                 Log.Warning($"[远征流程控制器] Combat 节点无法解析场地。nodeConfigId:{node.NodeConfigId} combatEncounterConfigId:{combatConfig.CombatEncounterConfigId}");
+                return null;
+            }
+
+            var enemyBuildResult = ExpeditionCombatEnemyResolver.BuildEnemyRoster(CurrentRun, record, combatConfig);
+            if (enemyBuildResult.LstBuildLog != null)
+            {
+                foreach (var log in enemyBuildResult.LstBuildLog)
+                {
+                    if (string.IsNullOrWhiteSpace(log))
+                        continue;
+
+                    CurrentRun.DebugLogs.Add($"[CombatEnemy] {log}");
+                    record?.AddRouteDecisionLog(log);
+                }
+            }
+
+            if (!enemyBuildResult.IsSuccess)
+            {
+                var errorMessage = string.IsNullOrWhiteSpace(enemyBuildResult.ErrorMessage)
+                    ? $"[远征流程控制器] Combat 节点敌方阵容解析失败。nodeConfigId:{node.NodeConfigId}"
+                    : $"[远征流程控制器] Combat 节点敌方阵容解析失败。nodeConfigId:{node.NodeConfigId} error:{enemyBuildResult.ErrorMessage}";
+                CurrentRun.DebugLogs.Add(errorMessage);
+                Log.Warning(errorMessage);
                 return null;
             }
 
@@ -72,7 +117,10 @@ namespace GameLogic.Gameplay.Expedition
                 LstAlliedMarble = CurrentRun.MarbleSnapshots
                     .Where(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0)
                     .ToList(),
-                LstEnemyMarble = new List<MarbleSpawnConfig>(combatConfig.EnemyMarbles),
+                // 敌方 roster 在进入 Combat 前已经完全展开：
+                // 固定敌人直接保留；
+                // 动态敌人先抽类型，再用 enemy profile 覆盖等级。
+                LstEnemyMarble = enemyBuildResult.LstEnemyMarble,
             };
         }
 

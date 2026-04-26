@@ -125,6 +125,14 @@
         <var name="weight" type="int" />
     </bean>
 
+    <!-- 环境提供的动态敌人候选。环境只负责敌人类型候选与 camp 配置来源，不负责本场数量和最终等级。 -->
+    <bean name="ExpeditionEnvironmentEnemyCandidateConfig" valueType="false" sep=",">
+        <!-- 运行时会使用其中的 marble_config_id 与 camp_config_id 作为类型基础；若该候选被动态敌人组选中，其 level 会被 enemy profile 解析结果覆盖。 -->
+        <var name="marble_spawn_config" type="Gameplay.Combat.MarbleSpawnConfig" />
+        <!-- 环境随机选择动态敌人类型时的权重。敌人类型抽取是放回的。 -->
+        <var name="weight" type="int" />
+    </bean>
+
     <!-- 远征环境。当前只影响随机事件池和场地候选，不实现环境 Buff。 -->
     <bean name="ExpeditionEnvironmentConfig" valueType="false" sep=",">
         <var name="environment_config_id" type="string" />
@@ -134,19 +142,20 @@
         <var name="lst_random_event_pool_config_id" type="list, string" />
         <!-- Combat 未显式配置场地时，从当前环境的该列表中按权重抽取。 -->
         <var name="lst_battlefield" type="list, ExpeditionEnvironmentBattlefieldConfig" />
+        <!-- Combat 遭遇存在动态敌人组时，从当前环境的该列表中按权重抽取敌人类型。 -->
+        <var name="lst_enemy_candidate" type="list, ExpeditionEnvironmentEnemyCandidateConfig" />
     </bean>
 
-
-    <!-- 某个进度阶段内，一个 reward tier 对应的真实强度值。money/hp 的增减方向由具体 Effect 的 operation 决定。 -->
-    <bean name="ExpeditionRewardTierValueConfig" valueType="false" sep=",">
-        <var name="reward_tier" type="EnumExpeditionRewardTier" />
+    <!-- 远征内部通用的档位数值条目。由外层字段决定它表达奖励还是敌人强度。 -->
+    <bean name="ExpeditionTierIntValueConfig" valueType="false" sep=",">
+        <var name="tier" type="EnumExpeditionRewardTier" />
         <var name="value" type="int" />
     </bean>
 
-    <!-- 某种奖励类型在一个 progress stage 下的数值映射。 -->
-    <bean name="ExpeditionRewardStageValueConfig" valueType="false" sep=",">
+    <!-- 远征内部通用的阶段档位数值映射。reward profile 和 enemy profile 都复用该结构。 -->
+    <bean name="ExpeditionStageTierIntValueConfig" valueType="false" sep=",">
         <var name="progress_stage" type="EnumExpeditionRewardProgressStage" />
-        <var name="lst_value" type="list, ExpeditionRewardTierValueConfig" />
+        <var name="lst_value" type="list, ExpeditionTierIntValueConfig" />
     </bean>
 
     <!-- 招募奖励候选条目。运行时会先按 reward tier 过滤，再按 weight 抽取 Marble。 -->
@@ -161,11 +170,20 @@
         <var name="reward_profile_config_id" type="string" />
         <var name="name" type="string" />
         <var name="description" type="string" />
-        <var name="lst_money" type="list, ExpeditionRewardStageValueConfig" />
-        <var name="lst_exp" type="list, ExpeditionRewardStageValueConfig" />
-        <var name="lst_hp" type="list, ExpeditionRewardStageValueConfig" />
-        <var name="lst_marble_count" type="list, ExpeditionRewardStageValueConfig" />
+        <var name="lst_money" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_exp" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_hp" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_marble_count" type="list, ExpeditionStageTierIntValueConfig" />
         <var name="lst_recruit_candidate" type="list, ExpeditionRecruitRewardCandidateConfig" />
+    </bean>
+
+    <!-- 一条远征使用的敌人强度 profile，定义 early / mid / late 的敌人数量与等级强度。动态敌人最终等级以这里解析出的值为准。 -->
+    <bean name="ExpeditionEnemyProfileConfig" valueType="false" sep=",">
+        <var name="enemy_profile_config_id" type="string" />
+        <var name="name" type="string" />
+        <var name="description" type="string" />
+        <var name="lst_enemy_count" type="list, ExpeditionStageTierIntValueConfig" />
+        <var name="lst_enemy_level" type="list, ExpeditionStageTierIntValueConfig" />
     </bean>
 
     <!-- 远征主配置。一次 ExpeditionConfig 对应一条可进入的远征路线。 -->
@@ -175,6 +193,8 @@
         <var name="description" type="string" />
         <!-- 当前远征引用的奖励 profile；奖励型 Effect 会通过它解析真实数值。 -->
         <var name="reward_profile_config_id" type="string" />
+        <!-- 当前远征引用的敌人强度 profile；动态敌人组会通过它解析真实数量与等级。 -->
+        <var name="enemy_profile_config_id" type="string" />
         <!-- 开始远征时进入的环境，会激活该环境的随机事件池。 -->
         <var name="initial_environment_config_id" type="string" />
         <!-- 远征基础随机事件池，会在本次远征期间持续存在，不随环境切换移除。 -->
@@ -237,6 +257,12 @@
         <var name="options" type="list, ExpeditionEventOptionConfig" />
     </bean>
 
+    <!-- Combat 遭遇中的动态敌人组。敌人类型来自当前环境候选池，数量和等级来自 enemy profile。不会按环境候选里自带的 level 做筛选。 -->
+    <bean name="ExpeditionDynamicEnemyGroupConfig" valueType="false" sep=",">
+        <var name="count_tier" type="EnumExpeditionRewardTier" />
+        <var name="level_tier" type="EnumExpeditionRewardTier" />
+    </bean>
+
     <!-- 远征中的 Combat 遭遇配置。敌方 Marble 使用 Combat.MarbleSpawnConfig。 -->
     <bean name="ExpeditionCombatEncounterConfig" valueType="false" sep=",">
         <var name="combat_encounter_config_id" type="string" />
@@ -246,7 +272,10 @@
         <var name="lst_victory_effect" type="list, ExpeditionEffectConfig" />
         <!-- Combat 失败后执行的远征 Effect 列表。 -->
         <var name="lst_defeat_effect" type="list, ExpeditionEffectConfig" />
+        <!-- 固定敌人。适合剧情指定敌人、Boss 或必须出现的编组；固定敌人直接使用各自 MarbleSpawnConfig 中配置的 level。 -->
         <var name="enemy_marbles" type="list, Gameplay.Combat.MarbleSpawnConfig" />
+        <!-- 动态敌人组。敌人类型从当前环境 lst_enemy_candidate 中抽取，最终等级由 enemy profile 覆盖候选配置等级。 -->
+        <var name="lst_dynamic_enemy_group" type="list, ExpeditionDynamicEnemyGroupConfig" />
         <!-- 可选显式场地。为空时从当前环境 lst_battlefield 中按权重选择。 -->
         <var name="battlefield_config_id" type="string" />
     </bean>
@@ -257,4 +286,5 @@
     <table name="TbExpeditionRandomEventPool" value="ExpeditionRandomEventPoolConfig" input="expedition_random_event_pool.xlsx" index="random_event_pool_config_id" />
     <table name="TbExpeditionEnvironment" value="ExpeditionEnvironmentConfig" input="expedition_environment.xlsx" index="environment_config_id" />
     <table name="TbExpeditionRewardProfile" value="ExpeditionRewardProfileConfig" input="expedition_reward_profile.xlsx" index="reward_profile_config_id" />
+    <table name="TbExpeditionEnemyProfile" value="ExpeditionEnemyProfileConfig" input="expedition_enemy_profile.xlsx" index="enemy_profile_config_id" />
 </module>

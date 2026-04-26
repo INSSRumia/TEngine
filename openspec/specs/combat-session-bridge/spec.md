@@ -6,7 +6,8 @@
 #### Scenario: 发起 Combat 会话
 - **WHEN** 远征流程进入一个 `CombatNode`
 - **THEN** 系统构造一份 `CombatSessionRequest`
-- **AND** 请求中包含本次参战 Marble 快照、当前远征 Buff 和目标 Combat 节点配置
+- **AND** 请求中包含玩家参战 Marble 快照、已解析完成的敌方 Marble roster、当前远征 Buff 和选定场地信息
+- **AND** Combat 层不要求自行解析远征动态敌人配置或当前环境敌人池
 
 #### Scenario: 接收 Combat 会话结果
 - **WHEN** 一场 Combat 结束
