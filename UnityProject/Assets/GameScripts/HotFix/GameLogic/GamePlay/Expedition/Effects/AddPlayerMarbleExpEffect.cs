@@ -7,6 +7,11 @@ namespace GameLogic.Gameplay.Expedition
     public class AddPlayerMarbleExpEffect : IExpeditionEffect
     {
         private readonly ExpeditionTable.AddPlayerMarbleExpEffectConfig _config;
+        private const string TOKEN_EXP = "exp";
+        private static readonly Dictionary<string, string> _dictTokenValue = new Dictionary<string, string>()
+        {
+            {TOKEN_EXP, "0"},
+        };
 
         public AddPlayerMarbleExpEffect(ExpeditionTable.AddPlayerMarbleExpEffectConfig config)
         {
@@ -30,13 +35,11 @@ namespace GameLogic.Gameplay.Expedition
                 context.RunState.MarbleSnapshots[i] = snapshot;
             }
 
-            var dictTokenValue = DictionaryPool<string, string>.Get();
-            dictTokenValue.Add("exp", expDelta.ToString());
+            _dictTokenValue[TOKEN_EXP] = expDelta.ToString();
             var fallbackSummary = expDelta >= 0
                 ? $"全队获得 {expDelta} 点经验。"
                 : $"全队失去 {System.Math.Abs(expDelta)} 点经验。";
-            context.AddSummaryTemplate(_config.Summary, dictTokenValue, fallbackSummary);
-            DictionaryPool<string, string>.Release(dictTokenValue);
+            context.AddSummaryTemplate(_config.Summary, _dictTokenValue, fallbackSummary);
         }
     }
 }
