@@ -85,11 +85,11 @@ namespace GameLogic.Gameplay.Expedition
                 LstMarbleSnapshot = marbles?
                     .Where(marble => marble.HasValue && !marble.Value.IsDead)
                     .ToList() ?? new List<MarblePersistentData?>(),
-                Route = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
+                LstRouteConfig = expedition.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
             };
             runState.InitializeRandomEventPools(expedition);
 
-            var firstNode = runState.Route.FirstOrDefault(node => node != null);
+            var firstNode = runState.LstRouteConfig.FirstOrDefault(node => node != null);
             if (firstNode != null)
             {
                 runState.EnqueueNode(firstNode.NodeConfigId, false, string.Empty, string.Empty, "initial_entry");
@@ -440,7 +440,7 @@ namespace GameLogic.Gameplay.Expedition
             var expeditionConfig = ExpeditionConfigBridge.ResolveExpedition(runState?.ExpeditionConfigId);
             var rewardProfileConfig = ExpeditionConfigBridge.ResolveRewardProfile(expeditionConfig?.RewardProfileConfigId);
             var currentNodeOrder = nodeRecord?.EntryOrder ?? runState?.EnteredNodeCount ?? 0;
-            var totalConfiguredNodeCount = runState?.Route?.Count ?? 0;
+            var totalConfiguredNodeCount = runState?.LstRouteConfig?.Count ?? 0;
 
             return new ExpeditionRewardContext
             {

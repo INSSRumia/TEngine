@@ -1,120 +1,65 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExpeditionTable = GameConfig.Gameplay.Expedition;
 using TEngine;
+using ExpeditionTable = GameConfig.Gameplay.Expedition;
 
 namespace GameLogic.Gameplay.Expedition
 {
     [Serializable]
-    public sealed class ExpeditionPendingNodeEntry
+    public sealed partial class ExpeditionRunState
     {
-        public string QueueEntryInstId;
-        public string NodeConfigId;
-        public bool IsDynamic;
-        public bool IsTemporaryRuntimeNode;
-        public ExpeditionTable.EnumExpeditionNodeType NodeType;
-        public string EventConfigId;
-        public string CombatEncounterConfigId;
-        public string SourceNodeConfigId;
-        public string SourceTransitionId;
-        public string SourcePendingInsertInstId;
-        public string Reason;
-        public string DebugLabel;
-    }
-
-    [Serializable]
-    public sealed class ExpeditionScheduledNodeInsertion
-    {
-        public string InsertionRequestInstId;
-        public string TriggerNodeConfigId;
-        public string NodeConfigId;
-        public int Priority;
-        public string Reason;
-        public bool IsConsumed;
-    }
-
-    [Serializable]
-    public class ExpeditionRuntimeNode
-    {
-        public string NodeConfigId;
-        public string DisplayNodeLabel;
-        public ExpeditionTable.EnumExpeditionNodeType NodeType;
-        public bool IsTemporaryRuntimeNode;
-        public string EventConfigId;
-        public string CombatEncounterConfigId;
-        public string RoutePolicy;
-        public ExpeditionTable.ExpeditionRouteNodeConfig StaticNodeConfig;
-    }
-
-    [Serializable]
-    public class ExpeditionPendingInsertNodeEntry
-    {
-        public string PendingInsertInstId;
-        public int RemainingPassedNodeCount;
-        public int CreateOrder;
-        public ExpeditionTable.EnumExpeditionNodeType NodeType;
-        public string EventConfigId;
-        public string CombatEncounterConfigId;
-        public string SourceNodeConfigId;
-        public string SourceQueueEntryInstId;
-        public string Reason;
-        public string DebugLabel;
-        public bool IsConsumed;
-    }
-
-    [Serializable]
-    public sealed class ExpeditionRunState
-    {
+        // 远征随机事件抽取统一使用的运行时随机源。
         private static readonly Random _random = new Random();
+        // 标记“远征自身配置”激活的随机池来源。
         private const string BaseRandomEventPoolSourceType = "expedition";
+        // 标记“环境切换”激活的随机池来源。
         private const string EnvironmentRandomEventPoolSourceType = "environment";
 
+        // 本次远征运行实例 Id。
         public string ExpeditionInstId;
+        // 本次远征对应的 expedition_config_id。
         public string ExpeditionConfigId;
+        // 当前远征所在环境，用来解析环境事件池和默认战场。
         public string CurrentEnvironmentConfigId;
+        // 当前流程阶段，驱动 FSM 与 UI 展示。
         public EnumExpeditionFlowPhase Phase;
+        // 当前远征为什么结束。None 表示仍在进行中。
         public EnumExpeditionEndReason EndReason;
+        // 本次远征累计获得的 money。
         public int TotalMoneyGained;
+        // 远征黑板：选项、flag、item、counter 等都记录在这里。
         public ExpeditionBlackboard Blackboard = new ExpeditionBlackboard();
+        // 当前远征队伍的运行时快照。战斗、事件效果都直接改这份数据。
         public List<MarblePersistentData?> LstMarbleSnapshot = new ();
-        public List<ExpeditionTable.ExpeditionRouteNodeConfig> Route = new ();
+        // 当前远征的静态路线配置原文。
+        public List<ExpeditionTable.ExpeditionRouteNodeConfig> LstRouteConfig = new ();
+        // 待执行节点队列。主线推进和动态插队最终都会落到这里。
         public List<ExpeditionPendingNodeEntry> LstPendingNodeQueue = new ();
+        // 当前正在执行的节点条目。
         public ExpeditionPendingNodeEntry CurrentNodeEntry;
+        // 已经进入过的节点记录，用于结算摘要和调试。
         public List<ExpeditionNodeRecord> LstNodeRecord = new ();
-        public List<ExpeditionScheduledNodeInsertion> LstScheduledInsertion = new ();
+        // “若干节点后插入临时节点”的延迟插入请求列表。
         public List<ExpeditionPendingInsertNodeEntry> LstPendingInsertNode = new ();
+        // 当前激活中的随机事件池运行时状态。
         public List<ExpeditionActiveRandomEventPoolState> LstActiveRandomEventPool = new ();
-        public List<string> DebugLogs = new ();
+        // 本次远征会话级调试追踪；只记录开发期 trace，不承担节点业务记录职责。
+        public ExpeditionDebugTrace DebugTrace = new ();
+        // 当前事件节点等待玩家提交的 option_id。
         public string PendingEventOptionId;
+        // 当前战斗节点等待回写的战斗结果。
         public CombatSessionResult PendingCombatResult;
+        // 结算界面是否已经被玩家确认关闭。
         public bool IsSettlementAcknowledged;
+        // 本次远征最终生成的结算摘要。
         public ExpeditionResultSummary ResultSummary;
+        // 已进入节点的总次数。用于阶段计算、日志排序和结算展示。
         public int EnteredNodeCount;
+        // 延迟插入请求的自增登记序号。
         public int PendingInsertOrderSeed;
 
-        public ExpeditionRuntimeNode GetCurrentNode()
-        {
-            return CurrentNodeEntry == null ? null : BuildRuntimeNode(CurrentNodeEntry);
-        }
-
-        public ExpeditionTable.ExpeditionRouteNodeConfig GetNode(string nodeConfigId)
-        {
-            return string.IsNullOrWhiteSpace(nodeConfigId)
-                ? null
-                : Route?.FirstOrDefault(node => node != null && node.NodeConfigId == nodeConfigId);
-        }
-
-        public ExpeditionNodeRecord GetCurrentRecord()
-        {
-            if (CurrentNodeEntry == null)
-            {
-                return null;
-            }
-
-            return LstNodeRecord.LastOrDefault(record => record != null && record.QueueEntryInstId == CurrentNodeEntry.QueueEntryInstId);
-        }
-
+        // 初始化远征可用的随机池：先挂基础池，再根据初始环境挂环境池。
         public void InitializeRandomEventPools(ExpeditionTable.ExpeditionConfig expedition)
         {
             LstActiveRandomEventPool.Clear();
@@ -126,6 +71,7 @@ namespace GameLogic.Gameplay.Expedition
             ChangeEnvironment(expedition?.InitialEnvironmentConfigId);
         }
 
+        // 切换当前环境，并按规则移除旧环境池、激活新环境池。
         public bool ChangeEnvironment(string environmentConfigId)
         {
             RemoveRandomEventPoolsBySource(EnvironmentRandomEventPoolSourceType);
@@ -133,14 +79,17 @@ namespace GameLogic.Gameplay.Expedition
 
             if (string.IsNullOrWhiteSpace(CurrentEnvironmentConfigId))
             {
-                DebugLogs.Add("[环境] 当前环境为空，仅保留远征基础随机事件池。");
+                DebugTrace.RecordEnvironment("当前环境为空，仅保留远征基础随机事件池。", Phase);
                 return true;
             }
 
             var environment = ExpeditionConfigBridge.ResolveEnvironment(CurrentEnvironmentConfigId);
             if (environment == null)
             {
-                DebugLogs.Add($"[环境] 未找到环境配置 environmentConfigId={CurrentEnvironmentConfigId}");
+                DebugTrace.RecordEnvironment(
+                    $"未找到环境配置 environmentConfigId={CurrentEnvironmentConfigId}",
+                    Phase,
+                    severity: EnumExpeditionDebugTraceSeverity.Warning);
                 Log.Warning($"[远征] 未找到环境配置。environmentConfigId:{CurrentEnvironmentConfigId}");
                 return false;
             }
@@ -150,10 +99,11 @@ namespace GameLogic.Gameplay.Expedition
                 EnvironmentRandomEventPoolSourceType,
                 CurrentEnvironmentConfigId,
                 true);
-            DebugLogs.Add($"[环境] 当前环境切换为 {CurrentEnvironmentConfigId}");
+            DebugTrace.RecordEnvironment($"当前环境切换为 {CurrentEnvironmentConfigId}", Phase);
             return true;
         }
 
+        // 从所有当前激活的随机池里抽一个事件。池内抽取是无放回的。
         public ExpeditionRandomEventDrawResult DrawRandomEvent()
         {
             var lstValidPool = LstActiveRandomEventPool?
@@ -190,438 +140,7 @@ namespace GameLogic.Gameplay.Expedition
             };
         }
 
-        public ExpeditionNodeRecord EnterNextPendingNode()
-        {
-            if (LstPendingNodeQueue == null || LstPendingNodeQueue.Count == 0)
-            {
-                CurrentNodeEntry = null;
-                return null;
-            }
-
-            var queueBeforeEnter = DescribeQueue();
-            CurrentNodeEntry = LstPendingNodeQueue[0];
-            LstPendingNodeQueue.RemoveAt(0);
-
-            var node = GetCurrentNode();
-            if (node == null)
-            {
-                DebugLogs.Add($"[缺失节点] queueEntry={CurrentNodeEntry.QueueEntryInstId} nodeConfigId={CurrentNodeEntry.NodeConfigId}");
-                CurrentNodeEntry = null;
-                EndReason = EnumExpeditionEndReason.Defeat;
-                return null;
-            }
-
-            var record = new ExpeditionNodeRecord
-            {
-                QueueEntryInstId = CurrentNodeEntry.QueueEntryInstId,
-                NodeConfigId = node.NodeConfigId,
-                DisplayNodeLabel = node.DisplayNodeLabel,
-                NodeType = node.NodeType,
-                Status = EnumExpeditionNodeProcessStatus.Entered,
-                EntryOrder = ++EnteredNodeCount,
-                RoutePolicy = node.RoutePolicy.ToString(),
-                SourceNodeConfigId = CurrentNodeEntry.SourceNodeConfigId,
-                SourceTransitionId = CurrentNodeEntry.SourceTransitionId,
-                EnqueueReason = CurrentNodeEntry.Reason,
-                WasDynamicallyInserted = CurrentNodeEntry.IsDynamic,
-                IsTemporaryRuntimeNode = CurrentNodeEntry.IsTemporaryRuntimeNode,
-                QueueBeforeEnter = queueBeforeEnter,
-                QueueAfterEnter = DescribeQueue(),
-                BlackboardBefore = Blackboard?.ToDebugString() ?? string.Empty,
-            };
-            if (CurrentNodeEntry.IsTemporaryRuntimeNode)
-            {
-                record.ActualEventConfigId = CurrentNodeEntry.EventConfigId;
-                record.ActualCombatEncounterConfigId = CurrentNodeEntry.CombatEncounterConfigId;
-                record.AddRouteDecisionLog($"临时节点入队来源: {CurrentNodeEntry.DebugLabel}");
-            }
-
-            LstNodeRecord.Add(record);
-            DebugLogs.Add($"[进入节点] {record.NodeConfigId} queue={record.QueueAfterEnter}");
-            return record;
-        }
-
-        public void ClearCurrentNode()
-        {
-            CurrentNodeEntry = null;
-        }
-
-        public bool HasPendingNodes()
-        {
-            return LstPendingNodeQueue != null && LstPendingNodeQueue.Count > 0;
-        }
-
-        public ExpeditionPendingNodeEntry EnqueueNode(
-            string nodeConfigId,
-            bool isDynamic,
-            string sourceNodeConfigId,
-            string sourceTransitionId,
-            string reason)
-        {
-            if (string.IsNullOrWhiteSpace(nodeConfigId))
-            {
-                return null;
-            }
-
-            var entry = CreatePendingNodeEntry(nodeConfigId, isDynamic, sourceNodeConfigId, sourceTransitionId, reason);
-            LstPendingNodeQueue.Add(entry);
-            return entry;
-        }
-
-        public ExpeditionPendingNodeEntry InsertNodeAtFront(
-            string nodeConfigId,
-            bool isDynamic,
-            string sourceNodeConfigId,
-            string sourceTransitionId,
-            string reason)
-        {
-            if (string.IsNullOrWhiteSpace(nodeConfigId))
-            {
-                return null;
-            }
-
-            var entry = CreatePendingNodeEntry(nodeConfigId, isDynamic, sourceNodeConfigId, sourceTransitionId, reason);
-            LstPendingNodeQueue.Insert(0, entry);
-            return entry;
-        }
-
-        public ExpeditionPendingNodeEntry InsertTemporaryNodeAtFront(
-            ExpeditionTable.EnumExpeditionNodeType nodeType,
-            string referencedConfigId,
-            string sourceNodeConfigId,
-            string reason,
-            string sourcePendingInsertInstId)
-        {
-            if (string.IsNullOrWhiteSpace(referencedConfigId))
-            {
-                return null;
-            }
-
-            if (nodeType != ExpeditionTable.EnumExpeditionNodeType.Event
-                && nodeType != ExpeditionTable.EnumExpeditionNodeType.Combat)
-            {
-                return null;
-            }
-
-            var entry = CreateTemporaryPendingNodeEntry(
-                nodeType,
-                referencedConfigId,
-                sourceNodeConfigId,
-                reason,
-                sourcePendingInsertInstId);
-            LstPendingNodeQueue.Insert(0, entry);
-            return entry;
-        }
-
-        public void ScheduleInsertionAfterNode(string triggerNodeConfigId, string nodeConfigId, string reason, int priority = 0)
-        {
-            if (string.IsNullOrWhiteSpace(triggerNodeConfigId) || string.IsNullOrWhiteSpace(nodeConfigId))
-            {
-                return;
-            }
-
-            LstScheduledInsertion.Add(new ExpeditionScheduledNodeInsertion
-            {
-                InsertionRequestInstId = Guid.NewGuid().ToString("N"),
-                TriggerNodeConfigId = triggerNodeConfigId,
-                NodeConfigId = nodeConfigId,
-                Priority = priority,
-                Reason = reason,
-                IsConsumed = false,
-            });
-        }
-
-        public List<ExpeditionPendingNodeEntry> TriggerScheduledInsertions(string triggerNodeConfigId)
-        {
-            if (string.IsNullOrWhiteSpace(triggerNodeConfigId) || LstScheduledInsertion == null || LstScheduledInsertion.Count == 0)
-            {
-                return new List<ExpeditionPendingNodeEntry>();
-            }
-
-            var insertions = LstScheduledInsertion
-                .Where(item => item != null && !item.IsConsumed && item.TriggerNodeConfigId == triggerNodeConfigId)
-                .OrderByDescending(item => item.Priority)
-                .ToList();
-            var insertedEntries = new List<ExpeditionPendingNodeEntry>(insertions.Count);
-            for (int i = insertions.Count - 1; i >= 0; i--)
-            {
-                var insertion = insertions[i];
-                insertion.IsConsumed = true;
-                var entry = InsertNodeAtFront(
-                    insertion.NodeConfigId,
-                    true,
-                    triggerNodeConfigId,
-                    string.Empty,
-                    insertion.Reason);
-                if (entry != null)
-                {
-                    insertedEntries.Add(entry);
-                }
-            }
-
-            insertedEntries.Reverse();
-            return insertedEntries;
-        }
-
-        public ExpeditionPendingInsertNodeEntry RegisterPendingInsertNode(
-            int passedNodeCount,
-            ExpeditionTable.EnumExpeditionNodeType nodeType,
-            string referencedConfigId,
-            string sourceNodeConfigId,
-            string sourceQueueEntryInstId,
-            string reason)
-        {
-            if (passedNodeCount <= 0)
-            {
-                DebugLogs.Add($"[延迟插入] 无效 passedNodeCount={passedNodeCount}");
-                return null;
-            }
-
-            if (string.IsNullOrWhiteSpace(referencedConfigId))
-            {
-                DebugLogs.Add("[延迟插入] 引用配置为空，忽略本次登记。");
-                return null;
-            }
-
-            if (nodeType != ExpeditionTable.EnumExpeditionNodeType.Event
-                && nodeType != ExpeditionTable.EnumExpeditionNodeType.Combat)
-            {
-                DebugLogs.Add($"[延迟插入] 不支持的临时节点类型 {nodeType}");
-                return null;
-            }
-
-            var entry = new ExpeditionPendingInsertNodeEntry
-            {
-                PendingInsertInstId = Guid.NewGuid().ToString("N"),
-                RemainingPassedNodeCount = passedNodeCount,
-                CreateOrder = ++PendingInsertOrderSeed,
-                NodeType = nodeType,
-                EventConfigId = nodeType == ExpeditionTable.EnumExpeditionNodeType.Event ? referencedConfigId : string.Empty,
-                CombatEncounterConfigId = nodeType == ExpeditionTable.EnumExpeditionNodeType.Combat ? referencedConfigId : string.Empty,
-                SourceNodeConfigId = sourceNodeConfigId,
-                SourceQueueEntryInstId = sourceQueueEntryInstId,
-                Reason = reason,
-                DebugLabel = BuildTemporaryNodeLabel(nodeType, referencedConfigId),
-                IsConsumed = false,
-            };
-            LstPendingInsertNode.Add(entry);
-            DebugLogs.Add($"[延迟插入] 登记 {entry.DebugLabel} remaining={entry.RemainingPassedNodeCount} source={entry.SourceNodeConfigId}");
-            return entry;
-        }
-
-        public List<ExpeditionPendingNodeEntry> ResolvePendingInsertNodesAfterSettlement(string sourceNodeConfigId)
-        {
-            var lstInsertedEntry = new List<ExpeditionPendingNodeEntry>();
-            if (LstPendingInsertNode == null || LstPendingInsertNode.Count == 0)
-            {
-                return lstInsertedEntry;
-            }
-
-            var lstExpiredEntry = new List<ExpeditionPendingInsertNodeEntry>();
-            foreach (var pendingInsertNode in LstPendingInsertNode)
-            {
-                if (pendingInsertNode == null || pendingInsertNode.IsConsumed)
-                {
-                    continue;
-                }
-
-                pendingInsertNode.RemainingPassedNodeCount -= 1;
-                DebugLogs.Add($"[延迟插入] 递减 {pendingInsertNode.DebugLabel} remaining={pendingInsertNode.RemainingPassedNodeCount}");
-                if (pendingInsertNode.RemainingPassedNodeCount <= 0)
-                {
-                    pendingInsertNode.IsConsumed = true;
-                    lstExpiredEntry.Add(pendingInsertNode);
-                }
-            }
-
-            foreach (var expiredEntry in lstExpiredEntry)
-            {
-                var referencedConfigId = GetPendingInsertReferencedConfigId(expiredEntry);
-                var insertedEntry = InsertTemporaryNodeAtFront(
-                    expiredEntry.NodeType,
-                    referencedConfigId,
-                    sourceNodeConfigId,
-                    expiredEntry.Reason,
-                    expiredEntry.PendingInsertInstId);
-                if (insertedEntry == null)
-                {
-                    DebugLogs.Add($"[延迟插入] 到期插入失败 {expiredEntry.DebugLabel}");
-                    continue;
-                }
-
-                lstInsertedEntry.Add(insertedEntry);
-                DebugLogs.Add($"[延迟插入] 到期插入 {expiredEntry.DebugLabel}");
-            }
-
-            LstPendingInsertNode.RemoveAll(item => item == null || item.IsConsumed);
-            return lstInsertedEntry;
-        }
-
-        public bool AreAllPlayerMarblesDead()
-        {
-            var aliveCount = LstMarbleSnapshot.Count(snapshot => snapshot.HasValue && !snapshot.Value.IsDead && snapshot.Value.CurrentHp > 0);
-            return aliveCount <= 0;
-        }
-
-        public string DescribeQueue()
-        {
-            if (LstPendingNodeQueue == null || LstPendingNodeQueue.Count == 0)
-            {
-                return "<空>";
-            }
-
-            return string.Join(" -> ", LstPendingNodeQueue.Select(entry =>
-            {
-                if (entry == null)
-                {
-                    return "<空节点>";
-                }
-
-                var suffix = entry.IsDynamic ? "[动态]" : string.Empty;
-                var label = entry.IsTemporaryRuntimeNode && !string.IsNullOrWhiteSpace(entry.DebugLabel)
-                    ? entry.DebugLabel
-                    : entry.NodeConfigId;
-                return $"{label}{suffix}";
-            }));
-        }
-
-        private static ExpeditionPendingNodeEntry CreatePendingNodeEntry(
-            string nodeConfigId,
-            bool isDynamic,
-            string sourceNodeConfigId,
-            string sourceTransitionId,
-            string reason)
-        {
-            return new ExpeditionPendingNodeEntry
-            {
-                QueueEntryInstId = Guid.NewGuid().ToString("N"),
-                NodeConfigId = nodeConfigId,
-                IsDynamic = isDynamic,
-                IsTemporaryRuntimeNode = false,
-                NodeType = ExpeditionTable.EnumExpeditionNodeType.None,
-                EventConfigId = string.Empty,
-                CombatEncounterConfigId = string.Empty,
-                SourceNodeConfigId = sourceNodeConfigId,
-                SourceTransitionId = sourceTransitionId,
-                SourcePendingInsertInstId = string.Empty,
-                Reason = reason,
-                DebugLabel = nodeConfigId,
-            };
-        }
-
-        private ExpeditionRuntimeNode BuildRuntimeNode(ExpeditionPendingNodeEntry entry)
-        {
-            if (entry == null)
-            {
-                return null;
-            }
-
-            if (entry.IsTemporaryRuntimeNode)
-            {
-                return BuildTemporaryRuntimeNode(entry);
-            }
-
-            var staticNode = GetNode(entry.NodeConfigId);
-            if (staticNode == null)
-            {
-                return null;
-            }
-
-            return new ExpeditionRuntimeNode
-            {
-                NodeConfigId = staticNode.NodeConfigId,
-                DisplayNodeLabel = staticNode.NodeConfigId,
-                NodeType = staticNode.NodeType,
-                IsTemporaryRuntimeNode = false,
-                EventConfigId = staticNode.EventConfigId,
-                CombatEncounterConfigId = staticNode.CombatEncounterConfigId,
-                RoutePolicy = staticNode.RoutePolicy.ToString(),
-                StaticNodeConfig = staticNode,
-            };
-        }
-
-        private ExpeditionRuntimeNode BuildTemporaryRuntimeNode(ExpeditionPendingNodeEntry entry)
-        {
-            if (entry == null)
-            {
-                return null;
-            }
-
-            if (entry.NodeType == ExpeditionTable.EnumExpeditionNodeType.Event)
-            {
-                if (ExpeditionConfigBridge.ResolveEvent(entry.EventConfigId) == null)
-                {
-                    return null;
-                }
-            }
-
-            if (entry.NodeType == ExpeditionTable.EnumExpeditionNodeType.Combat)
-            {
-                if (ExpeditionConfigBridge.ResolveCombatEncounter(entry.CombatEncounterConfigId) == null)
-                {
-                    return null;
-                }
-            }
-
-            return new ExpeditionRuntimeNode
-            {
-                NodeConfigId = entry.NodeConfigId,
-                DisplayNodeLabel = entry.DebugLabel,
-                NodeType = entry.NodeType,
-                IsTemporaryRuntimeNode = true,
-                EventConfigId = entry.EventConfigId,
-                CombatEncounterConfigId = entry.CombatEncounterConfigId,
-                RoutePolicy = ExpeditionTable.EnumExpeditionRoutePolicy.FixedNext.ToString(),
-                StaticNodeConfig = null,
-            };
-        }
-
-        private static ExpeditionPendingNodeEntry CreateTemporaryPendingNodeEntry(
-            ExpeditionTable.EnumExpeditionNodeType nodeType,
-            string referencedConfigId,
-            string sourceNodeConfigId,
-            string reason,
-            string sourcePendingInsertInstId)
-        {
-            var queueEntryInstId = Guid.NewGuid().ToString("N");
-            var shortQueueId = queueEntryInstId.Length > 8 ? queueEntryInstId.Substring(0, 8) : queueEntryInstId;
-            var debugLabel = BuildTemporaryNodeLabel(nodeType, referencedConfigId);
-            return new ExpeditionPendingNodeEntry
-            {
-                QueueEntryInstId = queueEntryInstId,
-                NodeConfigId = $"{debugLabel}:{shortQueueId}",
-                IsDynamic = true,
-                IsTemporaryRuntimeNode = true,
-                NodeType = nodeType,
-                EventConfigId = nodeType == ExpeditionTable.EnumExpeditionNodeType.Event ? referencedConfigId : string.Empty,
-                CombatEncounterConfigId = nodeType == ExpeditionTable.EnumExpeditionNodeType.Combat ? referencedConfigId : string.Empty,
-                SourceNodeConfigId = sourceNodeConfigId,
-                SourceTransitionId = string.Empty,
-                SourcePendingInsertInstId = sourcePendingInsertInstId,
-                Reason = reason,
-                DebugLabel = debugLabel,
-            };
-        }
-
-        private static string BuildTemporaryNodeLabel(ExpeditionTable.EnumExpeditionNodeType nodeType, string referencedConfigId)
-        {
-            return nodeType == ExpeditionTable.EnumExpeditionNodeType.Event
-                ? $"temp_event:{referencedConfigId}"
-                : $"temp_combat:{referencedConfigId}";
-        }
-
-        private static string GetPendingInsertReferencedConfigId(ExpeditionPendingInsertNodeEntry entry)
-        {
-            if (entry == null)
-            {
-                return string.Empty;
-            }
-
-            return entry.NodeType == ExpeditionTable.EnumExpeditionNodeType.Event
-                ? entry.EventConfigId
-                : entry.CombatEncounterConfigId;
-        }
-
+        // 激活一组随机池；同来源重复激活时可选择保留旧状态，避免把已抽取进度重置掉。
         private void ActivateRandomEventPools(IEnumerable<string> lstPoolConfigId, string sourceType, string sourceConfigId, bool preserveExistingState)
         {
             if (lstPoolConfigId == null)
@@ -638,7 +157,10 @@ namespace GameLogic.Gameplay.Expedition
                 var poolConfig = ExpeditionConfigBridge.ResolveRandomEventPool(poolConfigId);
                 if (poolConfig == null)
                 {
-                    DebugLogs.Add($"[随机事件池] 未找到池配置 poolConfigId={poolConfigId}");
+                    DebugTrace.RecordRandomEventPool(
+                        $"未找到池配置 poolConfigId={poolConfigId}",
+                        Phase,
+                        severity: EnumExpeditionDebugTraceSeverity.Warning);
                     Log.Warning($"[远征] 未找到随机事件池配置。poolConfigId:{poolConfigId}");
                     continue;
                 }
@@ -655,10 +177,13 @@ namespace GameLogic.Gameplay.Expedition
                         .ToList() ?? new List<ExpeditionRandomEventPoolEntryState>(),
                 };
                 LstActiveRandomEventPool.Add(poolState);
-                DebugLogs.Add($"[随机事件池] 激活 {poolState.RandomEventPoolConfigId} source={poolState.SourceType}:{poolState.SourceConfigId} entries={poolState.LstRemainingEntry.Count}");
+                DebugTrace.RecordRandomEventPool(
+                    $"激活 {poolState.RandomEventPoolConfigId} source={poolState.SourceType}:{poolState.SourceConfigId} entries={poolState.LstRemainingEntry.Count}",
+                    Phase);
             }
         }
 
+        // 移除某个来源类型激活出来的所有随机池。环境切换时主要用这个。
         private void RemoveRandomEventPoolsBySource(string sourceType)
         {
             if (LstActiveRandomEventPool == null || LstActiveRandomEventPool.Count == 0)
@@ -666,9 +191,10 @@ namespace GameLogic.Gameplay.Expedition
 
             var removedCount = LstActiveRandomEventPool.RemoveAll(pool => pool != null && pool.SourceType == sourceType);
             if (removedCount > 0)
-                DebugLogs.Add($"[随机事件池] 移除来源 {sourceType} 的池数量:{removedCount}");
+                DebugTrace.RecordRandomEventPool($"移除来源 {sourceType} 的池数量:{removedCount}", Phase);
         }
 
+        // 检查某个来源的某个池是否已经处于激活状态。
         private bool HasActiveRandomEventPool(string poolConfigId, string sourceType, string sourceConfigId)
         {
             return LstActiveRandomEventPool.Any(pool =>
@@ -678,6 +204,7 @@ namespace GameLogic.Gameplay.Expedition
                 && pool.SourceConfigId == (sourceConfigId ?? string.Empty));
         }
 
+        // 在单个随机池内部按权重抽一个条目，并把命中的条目从剩余列表中移除。
         private static ExpeditionRandomEventDrawResult DrawRandomEventFromPool(ExpeditionActiveRandomEventPoolState pool, int localWeight)
         {
             var cursor = 0;
@@ -709,47 +236,5 @@ namespace GameLogic.Gameplay.Expedition
                 Summary = $"随机事件池 {pool.RandomEventPoolConfigId} 没有命中有效条目。",
             };
         }
-    }
-
-    [Serializable]
-    public class ExpeditionRandomEventPoolEntryState
-    {
-        public string EventConfigId;
-        public int Weight;
-
-        public ExpeditionRandomEventPoolEntryState()
-        {
-        }
-
-        public ExpeditionRandomEventPoolEntryState(ExpeditionTable.ExpeditionRandomEventPoolEntryConfig config)
-        {
-            EventConfigId = config?.EventConfigId ?? string.Empty;
-            Weight = config?.Weight ?? 0;
-        }
-    }
-
-    [Serializable]
-    public class ExpeditionActiveRandomEventPoolState
-    {
-        public string PoolRuntimeInstId;
-        public string RandomEventPoolConfigId;
-        public string SourceType;
-        public string SourceConfigId;
-        public List<ExpeditionRandomEventPoolEntryState> LstRemainingEntry = new List<ExpeditionRandomEventPoolEntryState>();
-
-        public int GetTotalWeight()
-        {
-            return LstRemainingEntry?
-                .Where(entry => entry != null && !string.IsNullOrWhiteSpace(entry.EventConfigId) && entry.Weight > 0)
-                .Sum(entry => entry.Weight) ?? 0;
-        }
-    }
-
-    public class ExpeditionRandomEventDrawResult
-    {
-        public bool IsSuccess;
-        public string EventConfigId;
-        public string RandomEventPoolConfigId;
-        public string Summary;
     }
 }

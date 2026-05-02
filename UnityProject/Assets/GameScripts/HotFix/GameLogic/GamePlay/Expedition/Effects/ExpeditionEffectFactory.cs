@@ -211,8 +211,12 @@ namespace GameLogic.Gameplay.Expedition
             var rewardProfileConfigId = context?.RewardContext?.RewardProfileConfig?.RewardProfileConfigId ?? "<none>";
             var message = $"[远征奖励] 缺少配置 rewardType={rewardType} detail={detail} expeditionConfigId={expeditionConfigId} rewardProfileConfigId={rewardProfileConfigId}";
             Log.Warning(message);
-            context?.RunState?.DebugLogs?.Add(message);
-            context?.NodeRecord?.AddRouteDecisionLog($"奖励解析缺少配置: {rewardType} ({detail})");
+            context?.RunState?.DebugTrace?.RecordEffect(
+                message,
+                context?.RunState?.Phase ?? EnumExpeditionFlowPhase.None,
+                context?.NodeRecord?.NodeConfigId,
+                context?.NodeRecord?.QueueEntryInstId,
+                EnumExpeditionDebugTraceSeverity.Warning);
         }
     }
 }

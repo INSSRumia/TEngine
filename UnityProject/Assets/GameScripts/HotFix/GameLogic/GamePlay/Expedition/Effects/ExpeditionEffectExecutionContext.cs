@@ -66,9 +66,13 @@ namespace GameLogic.Gameplay.Expedition
                 if (dictTokenValue != null && dictTokenValue.TryGetValue(token, out var value))
                     return value ?? string.Empty;
 
-                var diagnostic = $"[远征Effect] Summary token 缺失 token={token} template={template}";
-                RunState?.DebugLogs?.Add(diagnostic);
-                NodeRecord?.AddRouteDecisionLog($"Summary token 缺失: {token}");
+                var diagnostic = $"Summary token 缺失 token={token} template={template}";
+                RunState?.DebugTrace?.RecordEffect(
+                    diagnostic,
+                    RunState?.Phase ?? EnumExpeditionFlowPhase.None,
+                    NodeRecord?.NodeConfigId,
+                    NodeRecord?.QueueEntryInstId,
+                    EnumExpeditionDebugTraceSeverity.Warning);
                 return match.Value;
             });
         }

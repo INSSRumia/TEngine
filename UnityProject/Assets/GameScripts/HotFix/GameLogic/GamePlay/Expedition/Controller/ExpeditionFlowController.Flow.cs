@@ -47,7 +47,11 @@ namespace GameLogic.Gameplay.Expedition
             {
                 record.WasRandomEventSkipped = true;
                 record.Summary = drawResult?.Summary ?? "随机事件抽取失败，节点跳过。";
-                CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 未抽到事件。");
+                CurrentRun.DebugTrace.RecordRandomEvent(
+                    "节点未抽到事件。",
+                    CurrentRun.Phase,
+                    node.NodeConfigId,
+                    record.QueueEntryInstId);
                 return false;
             }
 
@@ -58,11 +62,20 @@ namespace GameLogic.Gameplay.Expedition
                 record.WasRandomEventSkipped = true;
                 record.Summary = $"随机事件 {record.ActualEventConfigId} 不存在，节点跳过。";
                 record.AddRouteDecisionLog(record.Summary);
-                CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 抽到不存在的事件 {record.ActualEventConfigId}。");
+                CurrentRun.DebugTrace.RecordRandomEvent(
+                    $"抽到不存在的事件 {record.ActualEventConfigId}。",
+                    CurrentRun.Phase,
+                    node.NodeConfigId,
+                    record.QueueEntryInstId,
+                    EnumExpeditionDebugTraceSeverity.Warning);
                 return false;
             }
 
-            CurrentRun.DebugLogs.Add($"[随机事件节点] {node.NodeConfigId} 抽到事件 {record.ActualEventConfigId} pool={record.RandomEventPoolConfigId}");
+            CurrentRun.DebugTrace.RecordRandomEvent(
+                $"抽到事件 {record.ActualEventConfigId} pool={record.RandomEventPoolConfigId}",
+                CurrentRun.Phase,
+                node.NodeConfigId,
+                record.QueueEntryInstId);
             return true;
         }
 
@@ -183,13 +196,7 @@ namespace GameLogic.Gameplay.Expedition
                 return;
             }
 
-            var lstInsertedEntry = CurrentRun.TriggerScheduledInsertions(record.NodeConfigId);
-            var lstDelayedInsertedEntry = CurrentRun.ResolvePendingInsertNodesAfterSettlement(record.NodeConfigId);
-
-            if (lstDelayedInsertedEntry.Count > 0)
-            {
-                lstInsertedEntry.AddRange(lstDelayedInsertedEntry);
-            }
+            var lstInsertedEntry = CurrentRun.ResolvePendingInsertNodesAfterSettlement(record.NodeConfigId);
 
             if (lstInsertedEntry.Count == 0)
             {

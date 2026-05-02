@@ -30,7 +30,7 @@ namespace GameLogic.Gameplay.Expedition
                     ExpeditionInstId = "combat_debug_run",
                     ExpeditionConfigId = expeditionConfig.ExpeditionConfigId,
                     CurrentEnvironmentConfigId = expeditionConfig.InitialEnvironmentConfigId,
-                    Route = expeditionConfig.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
+                    LstRouteConfig = expeditionConfig.Route?.Where(node => node != null).ToList() ?? new List<ExpeditionRouteNodeConfig>(),
                 };
             var debugNodeRecord = new ExpeditionNodeRecord
             {
@@ -79,7 +79,12 @@ namespace GameLogic.Gameplay.Expedition
             var battlefieldConfigId = ResolveBattlefieldConfigId(combatConfig, CurrentRun.CurrentEnvironmentConfigId);
             if (string.IsNullOrWhiteSpace(battlefieldConfigId))
             {
-                CurrentRun.DebugLogs.Add($"[Combat] 节点 {node.NodeConfigId} 无法解析场地。");
+                CurrentRun.DebugTrace.RecordCombat(
+                    "节点无法解析场地。",
+                    CurrentRun.Phase,
+                    node.NodeConfigId,
+                    record?.QueueEntryInstId,
+                    EnumExpeditionDebugTraceSeverity.Warning);
                 Log.Warning($"[远征流程控制器] Combat 节点无法解析场地。nodeConfigId:{node.NodeConfigId} combatEncounterConfigId:{combatConfig.CombatEncounterConfigId}");
                 return null;
             }
@@ -92,8 +97,7 @@ namespace GameLogic.Gameplay.Expedition
                     if (string.IsNullOrWhiteSpace(log))
                         continue;
 
-                    CurrentRun.DebugLogs.Add($"[CombatEnemy] {log}");
-                    record?.AddRouteDecisionLog(log);
+                    CurrentRun.DebugTrace.RecordCombat(log, CurrentRun.Phase, node.NodeConfigId, record?.QueueEntryInstId);
                 }
             }
 
@@ -102,7 +106,12 @@ namespace GameLogic.Gameplay.Expedition
                 var errorMessage = string.IsNullOrWhiteSpace(enemyBuildResult.ErrorMessage)
                     ? $"[远征流程控制器] Combat 节点敌方阵容解析失败。nodeConfigId:{node.NodeConfigId}"
                     : $"[远征流程控制器] Combat 节点敌方阵容解析失败。nodeConfigId:{node.NodeConfigId} error:{enemyBuildResult.ErrorMessage}";
-                CurrentRun.DebugLogs.Add(errorMessage);
+                CurrentRun.DebugTrace.RecordCombat(
+                    errorMessage,
+                    CurrentRun.Phase,
+                    node.NodeConfigId,
+                    record?.QueueEntryInstId,
+                    EnumExpeditionDebugTraceSeverity.Warning);
                 Log.Warning(errorMessage);
                 return null;
             }

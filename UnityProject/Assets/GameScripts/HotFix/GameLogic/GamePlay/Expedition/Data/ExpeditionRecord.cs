@@ -36,6 +36,7 @@ namespace GameLogic.Gameplay.Expedition
         public string BlackboardAfter;
         public List<string> LstAppliedBuffId = new ();
         public List<string> LstEffectSummarie = new ();
+        // 节点级执行说明，只记录本节点的路由、选择与运行结果，不承载会话级调试 trace。
         public List<string> LstRouteDecisionLog = new ();
         public List<string> LstInsertedNodeId = new ();
         public string Summary;

@@ -26,10 +26,5 @@ namespace GameLogic.Gameplay.Expedition
         {
             CurrentRun?.InsertNodeAtFront(nodeConfigId, true, CurrentRun?.GetCurrentNode()?.NodeConfigId, string.Empty, reason);
         }
-
-        public void ScheduleNodeInsertionAfterNode(string triggerNodeConfigId, string nodeConfigId, string reason, int priority = 0)
-        {
-            CurrentRun?.ScheduleInsertionAfterNode(triggerNodeConfigId, nodeConfigId, reason, priority);
-        }
     }
 }
