@@ -24,6 +24,46 @@
         private bool _showSourceAtlasRootPath = false;
         private bool _showExcludeAtlasPath = false;
 
+        private static readonly string[] SPRITE_PACKER_MODE_NAMES =
+        {
+            "Disabled",
+            "Sprite Atlas V1 - Enabled For Builds",
+            "Sprite Atlas V1 - Always Enabled",
+#if UNITY_2022_1_OR_NEWER
+            "Sprite Atlas V2 - Enabled",
+            "Sprite Atlas V2 - Enabled for Builds"
+#else
+            "Sprite Atlas V2 (Experimental) - Enabled"
+#endif
+        };
+
+        private static readonly int[] SPRITE_PACKER_MODE_VALUES =
+        {
+            (int)SpritePackerMode.Disabled,
+            (int)SpritePackerMode.BuildTimeOnlyAtlas,
+            (int)SpritePackerMode.AlwaysOnAtlas,
+            (int)SpritePackerMode.SpriteAtlasV2,
+#if UNITY_2022_1_OR_NEWER
+            (int)SpritePackerMode.SpriteAtlasV2Build
+#endif
+        };
+
+        private static readonly string[] TEXTURE_COMPRESSION_NAMES =
+        {
+            "None",
+            "Low Quality",
+            "Normal Quality",
+            "High Quality"
+        };
+
+        private static readonly int[] TEXTURE_COMPRESSION_VALUES =
+        {
+            (int)TextureImporterCompression.Uncompressed,
+            (int)TextureImporterCompression.CompressedLQ,
+            (int)TextureImporterCompression.Compressed,
+            (int)TextureImporterCompression.CompressedHQ
+        };
+
         private void OnGUI()
         {
             var config = AtlasConfiguration.Instance;
@@ -62,6 +102,10 @@
                 var enableMipmapsContent = new GUIContent(" 允许Mipmap", EditorGUIUtility.IconContent("FilterByType").image);
                 config.enableMipmaps = EditorGUILayout.Toggle(enableMipmapsContent, config.enableMipmaps);
             }
+            var compressionContent = new GUIContent(" Compression", EditorGUIUtility.IconContent("Texture Icon").image);
+            var textureCompressionValue = DrawIntPopup(compressionContent, (int)config.textureCompression,
+                TEXTURE_COMPRESSION_NAMES, TEXTURE_COMPRESSION_VALUES);
+            config.textureCompression = (TextureImporterCompression)textureCompressionValue;
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
         }
@@ -169,10 +213,16 @@
             EditorGUILayout.BeginVertical("box");
             var labelGUIContent = new GUIContent(" 图集设置", EditorGUIUtility.IconContent("SpriteAtlas Icon").image);
             GUILayout.Label(labelGUIContent, EditorStyles.boldLabel, GUILayout.ExpandWidth(true), GUILayout.Height(20));
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(EditorGUIUtility.IconContent("RectTransformBlueprint"), GUILayout.Width(16), GUILayout.Height(18));
-            config.padding = EditorGUILayout.IntPopup("Padding", config.padding, Array.ConvertAll(_paddingEnum, x => x.ToString()), _paddingEnum, GUILayout.Height(20));
-            GUILayout.EndHorizontal();
+            var spritePackerModeContent = new GUIContent(" Sprite Packer Mode", EditorGUIUtility.IconContent("SpriteAtlas Icon").image);
+            var spritePackerModeValue = DrawIntPopup(spritePackerModeContent, (int)EditorSettings.spritePackerMode,
+                SPRITE_PACKER_MODE_NAMES, SPRITE_PACKER_MODE_VALUES);
+            var spritePackerMode = (SpritePackerMode)spritePackerModeValue;
+            if (spritePackerMode != EditorSettings.spritePackerMode)
+            {
+                EditorSettings.spritePackerMode = spritePackerMode;
+            }
+            var paddingContent = new GUIContent(" Padding", EditorGUIUtility.IconContent("RectTransformBlueprint").image);
+            config.padding = DrawIntPopup(paddingContent, config.padding, Array.ConvertAll(_paddingEnum, x => x.ToString()), _paddingEnum);
             var offsetContent = new GUIContent(" Block Offset", EditorGUIUtility.IconContent("MoveTool").image);
             config.blockOffset = EditorGUILayout.IntField(offsetContent, config.blockOffset);
             var rotationContent = new GUIContent(" Enable Rotation", EditorGUIUtility.IconContent("RotateTool").image);
@@ -181,6 +231,13 @@
             config.tightPacking = EditorGUILayout.Toggle(tightPackingContent, config.tightPacking);
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
+        }
+
+        private static int DrawIntPopup(GUIContent label, int selectedValue, string[] displayedOptions, int[] optionValues)
+        {
+            using var horizontalScope = new EditorGUILayout.HorizontalScope();
+            EditorGUILayout.PrefixLabel(label);
+            return EditorGUILayout.IntPopup(selectedValue, displayedOptions, optionValues);
         }
 
 

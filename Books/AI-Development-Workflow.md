@@ -1,8 +1,8 @@
 # AI 开发工作流指南
 
-> 本文档介绍 TEngine 项目完整的 AI 辅助开发工作流，包含 wiki-query-agent 上下文隔离架构、任务等级分级机制、会话缓存策略，以及与 openspec / tengine-dev 的集成使用方式。
+> 本文档介绍 TEngine 项目完整的 AI 辅助开发工作流，包含 tengine-dev skill 按需查询架构、任务等级分级机制、会话缓存策略，以及与 openspec / unity-skills 的集成使用方式。
 
-**更新时间**: 2026-04-01
+**更新时间**: 2026-04-21
 
 ---
 
@@ -61,6 +61,8 @@
 - 已集成到 `unity-skills` 技能中
 - 安装方法见 [unity-mcp-guide.md](skills/tengine-dev/references/unity-mcp-guide.md)
 
+**unity-skills 触发词**：Unity、Unity Skills、in Unity、automate Unity、editor automation、创建脚本、场景分析、build scene、管理资源、Unity Editor 自动化、Unity 编辑器、Unity 技能、操作 Unity、全自动模式、半自动模式
+
 ---
 
 ## 目录
@@ -69,12 +71,12 @@
   - [必需工具](#必需工具)
   - [可选工具](#可选工具)
 - [概述](#概述)
-- [wiki-query-agent 工作流](#wiki-query-agent-工作流)
+- [tengine-dev Skill 工作流](#tengine-dev-skill-工作流)
   - [整体流程总览](#整体流程总览)
-  - [时序图一：上下文隔离架构](#时序图一上下文隔离架构)
+  - [时序图一：规范获取流程](#时序图一规范获取流程)
   - [时序图二：会话内缓存机制](#时序图二会话内缓存机制)
   - [时序图三：并行多主题查询](#时序图三并行多主题查询)
-  - [时序图四：自愈闭环](#时序图四自愈闭环)
+  - [时序图四：规范冲突处理](#时序图四规范冲突处理)
   - [任务等级分级说明](#任务等级分级说明)
 - [快速开始](#快速开始)
 - [openspec 工作流](#openspec-工作流)
@@ -100,17 +102,16 @@
 
 TEngine 项目提供了一套完整的 AI 辅助开发工作流，由以下核心组件构成：
 
-- **wiki-query-agent**: 上下文隔离的 subagent，专职处理 wiki 文档查询，保护主 Agent 上下文窗口
+- **tengine-dev skill**: Claude Code 专用 TEngine 开发技能，从 `references/` 按需提供精炼规范
 - **任务等级分级（L1-L4）**: 按任务复杂度决定查询深度，简单任务零开销
 - **会话内缓存**: 同一主题在同一会话中只查询一次，后续任务复用
-- **自愈闭环**: 主动检测 wiki 与代码冲突，自动触发文档同步
+- **冲突标注**: 主动检测 references 与代码冲突，标注后以代码实现为准
 - **openspec**: 规范驱动的变更管理工具
-- **tengine-dev**: Claude Code 专用的 TEngine 开发技能
 - **Unity-MCP**: Unity Editor 自动化操作工具
 
 ---
 
-## wiki-query-agent 工作流
+## tengine-dev Skill 工作流
 
 ### 整体流程总览
 
@@ -119,56 +120,52 @@ flowchart TD
     A([用户发起任务]) --> B{判断任务等级}
 
     B -->|L1 简单\ntypo/注释/日志| C[直接编写代码]
-    B -->|L2 调用\n单一 API 修改| D[轻量查询\n只查该 API]
-    B -->|L3 功能\n新功能/跨文件| E[全量查询\n相关模块规范]
-    B -->|L4 架构\n系统设计/重构| F[并行多主题查询]
+    B -->|L2 调用\n单一 API 修改| D[触发 tengine-dev skill\n只查该主题]
+    B -->|L3 功能\n新功能/跨文件| E[触发 tengine-dev skill\n全量相关主题]
+    B -->|L4 架构\n系统设计/重构| F[触发 tengine-dev skill\n并行多主题]
 
     D --> G{会话缓存命中?}
     E --> G
     F --> G
 
     G -->|命中| H[复用已有规范摘要]
-    G -->|未命中| I[启动 wiki-query-agent\nsubagent 查询]
+    G -->|未命中| I[skill 读取 references/\n提炼规范指引]
 
-    I --> J[subagent 读取 repowiki/\n处理文档内容]
-    J --> K[返回精华规范摘要]
-    H --> L[输出代码/方案]
-    K --> L
+    I --> L[输出代码/方案]
+    H --> L
     C --> L
 
     L --> M{规范与代码冲突?}
-    M -->|有冲突| N[标注冲突点\n触发 /wiki:sync]
+    M -->|有冲突| N[标注冲突点\n记录到 .claude/memory/]
     M -->|无冲突| O([任务完成])
     N --> O
 ```
 
 ---
 
-### 时序图一：上下文隔离架构
+### 时序图一：规范获取流程
 
-> **核心优势**：wiki 文档全部在 subagent 独立上下文中处理，主 Agent 只接收精华摘要，上下文窗口始终干净。
+> **核心优势**：tengine-dev skill 直接从精炼的 `references/` 文档提取规范，无多余上下文噪声。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent (Claude)
-    participant S as wiki-query-agent (subagent)
-    participant W as repowiki/zh/content/
+    participant S as tengine-dev (skill)
+    participant R as references/
 
     U->>M: 请实现背包 UI
     Note over M: 判断等级: L3 功能
-    M->>S: 启动 subagent<br/>查询: UIWindow规范 + 资源管理规范
+    M->>S: 触发 skill<br/>查询: UIWindow规范 + 资源管理规范
 
     activate S
-    S->>W: 读取 ui-development.md
-    S->>W: 读取 resource-management.md
-    S->>W: 读取 event-system.md
-    Note over S: 处理大量文档内容<br/>提炼关键规范
-    S-->>M: 返回精华摘要<br/>（~500字，非原始文档）
+    S->>R: 读取 ui-development.md
+    S->>R: 读取 resource-management.md
+    S->>R: 读取 event-system.md
+    Note over S: 提炼关键规范指引
+    S-->>M: 返回规范摘要
     deactivate S
 
-    Note over M: 主 Agent 上下文保持干净<br/>只增加了摘要，未增加文档原文
-    M->>M: 声明已查询主题
     M-->>U: 输出符合规范的代码
 ```
 
@@ -176,13 +173,13 @@ sequenceDiagram
 
 ### 时序图二：会话内缓存机制
 
-> **核心优势**：同一会话中相同主题只查询一次，后续任务直接复用，避免重复 token 消耗。
+> **核心优势**：同一会话中相同主题只查询一次，后续任务直接复用，避免重复消耗。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent
-    participant S as wiki-query-agent
+    participant S as tengine-dev skill
     participant C as 会话缓存
 
     U->>M: 任务①: 实现登录界面 UI
@@ -194,7 +191,7 @@ sequenceDiagram
     U->>M: 任务②: 实现设置界面 UI
     M->>C: 检查缓存: UIWindow 规范
     C-->>M: 命中缓存 ✅ 直接复用
-    Note over M: 无需重启 subagent<br/>零等待，零额外 token
+    Note over M: 无需重复触发 skill<br/>零等待，零额外消耗
     M-->>U: 输出设置界面代码
 
     U->>M: 任务③: 设置界面添加音效按钮
@@ -210,19 +207,19 @@ sequenceDiagram
 
 ### 时序图三：并行多主题查询（L4 架构任务）
 
-> **核心优势**：架构级任务并行启动多个 subagent，汇总后统一决策，大幅减少串行等待。
+> **核心优势**：架构级任务并行查询多个主题，汇总后统一决策，大幅减少串行等待。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent
-    participant S1 as wiki-query-agent #1
-    participant S2 as wiki-query-agent #2
-    participant S3 as wiki-query-agent #3
+    participant S1 as tengine-dev #1
+    participant S2 as tengine-dev #2
+    participant S3 as tengine-dev #3
 
     U->>M: 设计战斗系统架构<br/>涉及: UI + 事件 + FSM + 资源
 
-    Note over M: 判断等级: L4 架构<br/>并行启动 3 个 subagent
+    Note over M: 判断等级: L4 架构<br/>并行触发多主题查询
 
     par 并行查询
         M->>S1: 查询 UIWindow + UIWidget 规范
@@ -240,59 +237,57 @@ sequenceDiagram
 
 ---
 
-### 时序图四：自愈闭环（文档自动同步）
+### 时序图四：规范冲突处理
 
-> **核心优势**：AI 主动检测 wiki 与代码的不一致，自动触发同步，形成持续改进的自愈循环。
+> **核心优势**：AI 主动检测 references 与代码的不一致，标注冲突并记录，以代码实现为最终依据。
 
 ```mermaid
 sequenceDiagram
     participant M as 主 Agent
-    participant S as wiki-query-agent
-    participant W as repowiki/
+    participant S as tengine-dev skill
     participant Code as 项目代码
     participant Mem as .claude/memory/
 
     M->>S: 查询某 API 规范
-    S-->>M: wiki 描述: API_X(param1, param2)
+    S-->>M: references 描述: API_X(param1, param2)
 
     M->>Code: 读取实际代码实现
     Code-->>M: 实际签名: API_X(param1, param2, param3)
 
-    Note over M: 检测到冲突!<br/>wiki 描述与代码不符
+    Note over M: 检测到冲突!<br/>references 描述与代码不符
 
-    M->>Mem: 记录 problem_2026-04-01.md<br/>冲突详情 + 分析
-    M->>W: 触发 /wiki:sync<br/>更新 wiki 文档
+    M->>Mem: 记录 problem_YYYY-MM-DD.md<br/>冲突详情 + 分析
 
-    Note over W: wiki 同步完成<br/>下次查询将返回正确规范
+    Note over M: 以代码实现为准<br/>在输出中标注差异
 
-    M-->>U: 输出代码，并标注已修正文档冲突
+    M-->>U: 输出代码，并标注冲突点
 ```
 
 ---
 
 ### 任务等级分级说明
 
-| 等级 | 判断标准 | wiki 查询策略 | 声明步骤 |
-|------|---------|-------------|---------|
-| **L1 简单** | typo 修正、注释修改、日志输出、单行变量改名 | ❌ 跳过查询 | ❌ 跳过 |
-| **L2 调用** | 调用已知 API、单一模块的局部修改 | ✅ 轻量查询（只查该 API） | 可选 |
-| **L3 功能** | 新功能开发、跨文件修改、新增 UI/资源/事件逻辑 | ✅ 全量查询 | ✅ 必须 |
-| **L4 架构** | 模块设计、系统重构、多模块协作、架构决策 | ✅ 并行多主题查询 | ✅ 必须 |
+| 等级 | 判断标准 | 知识查询策略 |
+|------|---------|-------------|
+| **L1 简单** | typo 修正、注释修改、日志输出、单行变量改名（前提：不涉及框架 API 名称、UI 节点前缀、事件定义或资源路径） | ❌ 跳过查询，直接编码 |
+| **L2 调用** | 调用已知 API、单一模块的局部修改 | ✅ 触发 `tengine-dev` skill（只查该主题） |
+| **L3 功能** | 新功能开发、跨文件修改、新增 UI/资源/事件逻辑 | ✅ 触发 `tengine-dev` skill（全量相关主题） |
+| **L4 架构** | 模块设计、系统重构、多模块协作、架构决策 | ✅ 触发 `tengine-dev` skill（并行多主题） |
 
 > **判断原则**：宁可高估等级，不可低估——不确定时上调一级。
 
-### 五步工作流快速参考
+### 工作流快速参考
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                   TEngine AI 工作流                      │
 ├─────────────────────────────────────────────────────────┤
 │  Step 0  判断任务等级 L1/L2/L3/L4                        │
-│  Step 1  按等级决定查询深度（缓存命中则跳过）              │
-│  Step 2  wiki-query-agent 独立处理文档，返回摘要          │
-│  Step 3  L3/L4 声明已查询主题 + 关键规范摘要             │
-│  Step 4  基于规范输出代码/方案                            │
-│  Step 5  检测冲突 → 自动触发 /wiki:sync（如有）           │
+│  Step 1  L1 直接编码                                     │
+│         L2-L4 触发 tengine-dev skill 获取规范            │
+│         （会话内缓存命中则直接复用，无需重复触发）        │
+│  Step 2  基于规范输出代码/方案                            │
+│  Step 3  若规范与代码冲突，标注冲突，记录到 .claude/memory/│
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -333,7 +328,7 @@ openspec init
 
 ```bash
 # 创建一个简单的需求提案
-opsx:propose "add-simple-button"
+/opsx:propose "add-simple-button"
 ```
 
 Claude 会自动生成：
@@ -346,7 +341,7 @@ Claude 会自动生成：
 
 ```bash
 # 审查生成的文档后，开始实施
-opsx:apply
+/opsx:apply
 ```
 
 Claude 会：
@@ -359,7 +354,7 @@ Claude 会：
 
 ```bash
 # 所有任务完成后归档
-opsx:archive
+/opsx:archive
 
 # 提交代码
 git add .
@@ -377,12 +372,12 @@ sequenceDiagram
     participant Unity as Unity Editor
 
     Dev->>Claude: "帮我添加一个背包系统"
-    Claude->>OpenSpec: opsx:propose "add-inventory"
+    Claude->>OpenSpec: /opsx:propose "add-inventory"
     OpenSpec-->>Claude: 生成 artifacts
     Claude->>Dev: 展示提案和设计
 
     Dev->>Claude: "看起来不错，开始实施"
-    Claude->>OpenSpec: opsx:apply
+    Claude->>OpenSpec: /opsx:apply
     OpenSpec-->>Claude: 加载所有上下文
 
     Claude->>Claude: 读取 tasks.md
@@ -398,7 +393,7 @@ sequenceDiagram
     Unity-->>Dev: ✅ 功能正常
 
     Dev->>Claude: "测试通过，归档"
-    Claude->>OpenSpec: opsx:archive
+    Claude->>OpenSpec: /opsx:archive
     OpenSpec-->>Dev: ✅ 变更已归档
 ```
 
@@ -406,12 +401,12 @@ sequenceDiagram
 
 | 场景 | 命令 | 说明 |
 |------|------|------|
-| 需求不明确 | `opsx:explore` | 进入探索模式，梳理需求 |
-| 新功能开发 | `opsx:propose "feature-name"` | 创建提案并生成文档 |
-| 开始编码 | `opsx:apply` | 开始实施任务 |
+| 需求不明确 | `/opsx:explore` | 进入探索模式，梳理需求 |
+| 新功能开发 | `/opsx:propose "feature-name"` | 创建提案并生成文档 |
+| 开始编码 | `/opsx:apply` | 开始实施任务 |
 | 查找历史经验 | `"上次怎么做的？"` | 触发 claude-mem 搜索 |
 | Unity 自动化 | `"帮我创建..."`| 自动触发 unity-skills |
-| 完成归档 | `opsx:archive` | 归档变更 |
+| 完成归档 | `/opsx:archive` | 归档变更 |
 
 ---
 
@@ -463,13 +458,13 @@ openspec init
 
 ```bash
 # 新建议题
-opsx:propose 新建议题我要做什么
+/opsx:propose 新建议题我要做什么
 
 # 开始执行
-opex:apply 我还要附加什么条件
+/opsx:apply 我还要附加什么条件
 
 # 修改完成手动归档
-opex:archive
+/opsx:archive
 
 # 获取指令帮助
 openspec instructions <artifact-id> --change "my-feature"
@@ -487,6 +482,206 @@ openspec instructions <artifact-id> --change "my-feature"
 | design.md | 技术设计文档，说明"如何实现" |
 | specs/*.md | 详细规范，定义系统行为 |
 | tasks.md | 实施任务清单 |
+
+---
+
+## opsx:explore 探索模式
+
+### 什么是探索模式？
+
+`/opsx:explore` 是 openspec 工作流中的**思考伙伴模式**，用于在需求不明确、问题复杂、或需要调查现有代码时，先进行深度探索再决定行动方向。它不是直接生成代码，而是帮你理清思路、发现问题、评估方案。
+
+### 核心定位
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│              openspec 工作流四阶段                             │
+├──────────────────────────────────────────────────────────────┤
+│  1. /opsx:explore  →  探索思考，梳理需求和约束               │
+│  2. /opsx:propose  →  创建提案，生成设计文档和任务清单         │
+│  3. /opsx:apply    →  实施开发，逐个完成任务                  │
+│  4. /opsx:archive  →  归档变更，更新主规范                    │
+└──────────────────────────────────────────────────────────────┘
+```
+
+> **关键区别**：`explore` 是**只读探索**，不修改任何文件；`propose` 是**写入提案**，创建变更目录和 artifacts。
+
+### 何时使用 explore？
+
+| 场景 | 说明 | 示例 |
+|------|------|------|
+| **需求模糊** | 只有一个想法，不确定具体要做什么 | "我想优化 UI 加载性能" |
+| **问题调查** | 出现 Bug 或异常，需要先定位根因 | "战斗 UI 偶尔崩溃" |
+| **方案对比** | 有多种实现路径，需要评估利弊 | "用 FSM 还是状态模式管理角色状态？" |
+| **代码理解** | 需要深入理解某模块再决定如何修改 | "资源模块的引用计数是怎么工作的？" |
+| **重构评估** | 想重构但不确定影响范围 | "把事件系统从 int 改为接口事件" |
+| **架构决策** | 涉及多模块协作，需要全局视角 | "设计跨模块的战斗系统架构" |
+
+### explore 的工作方式
+
+```mermaid
+flowchart TD
+    Start([/opsx:explore]) --> Input{输入类型}
+
+    Input -->|问题/疑问| Investigate[调查问题]
+    Input -->|想法/需求| Brainstorm[头脑风暴]
+    Input -->|代码理解| Analyze[代码分析]
+
+    Investigate --> SearchCode[搜索相关代码]
+    SearchCode --> ReadImpl[读取实现细节]
+    ReadImpl --> IdentifyRoot[识别根因/关键点]
+
+    Brainstorm --> ListOptions[列出可行方案]
+    ListOptions --> CompareTradeoffs[对比利弊]
+
+    Analyze --> TraceFlow[追踪调用链]
+    TraceFlow --> MapDeps[映射依赖关系]
+
+    IdentifyRoot --> Synthesize[综合分析]
+    CompareTradeoffs --> Synthesize
+    MapDeps --> Synthesize
+
+    Synthesize --> Output[输出探索结论]
+    Output --> Decision{下一步?}
+
+    Decision -->|需求已明确| Propose[/opsx:propose]
+    Decision -->|还需深入| Start
+    Decision -->|直接修复| DirectFix[直接编写修复代码]
+
+    style Start fill:#e1f0ff
+    style Propose fill:#e1ffe1
+    style DirectFix fill:#fff4e1
+```
+
+### explore 与 tengine-dev 的协作
+
+在探索过程中，Claude 会自动触发 `tengine-dev` skill 获取框架规范，确保探索结论符合 TEngine 架构约束：
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant M as 主 Agent
+    participant E as /opsx:explore
+    participant S as tengine-dev skill
+    participant Code as 项目代码
+
+    U->>M: "我想优化 UI 加载性能，但不确定瓶颈在哪"
+    M->>E: 进入探索模式
+
+    E->>S: 查询资源加载规范 + UI 生命周期规范
+    S-->>E: 返回 TEngine 规范摘要
+
+    E->>Code: 搜索 UIWindow 子类中的资源加载模式
+    E->>Code: 检查 SetSprite vs LoadAssetAsync<Sprite> 使用情况
+    E->>Code: 分析 OnCreate/OnRefresh 中的 await 调用
+
+    Note over E: 综合分析：<br/>1. 3个UIWindow用了LoadAssetAsync<Sprite>（应改SetSprite）<br/>2. OnCreate中有串行await（应改并行）<br/>3. 缺少CancellationToken取消支持
+
+    E-->>M: 输出探索结论 + 优化建议
+    M-->>U: 展示分析结果和方案选项
+
+    U->>M: "方案1不错，创建提案"
+    M->>M: /opsx:propose "optimize-ui-loading"
+```
+
+### 使用示例
+
+#### 示例 1：Bug 调查
+
+```
+用户：/opsx:explore
+      "战斗界面偶尔出现 NullReferenceException，
+       堆栈指向 BattleMainUI.OnRefresh"
+
+Claude 探索过程：
+1. 读取 BattleMainUI.cs → 发现 OnRefresh 访问 _playerData
+2. 搜索 _playerData 赋值位置 → 仅在 OnCreate 中赋值
+3. 分析生命周期 → OnCreate 只执行一次，OnRefresh 每次都执行
+4. 查找事件流 → GameEvent.Send(OnPlayerDataChanged) 可能在 OnCreate 之前触发
+5. 结论：_playerData 可能在首次 OnRefresh 时尚未初始化
+
+输出：
+- 根因：_playerData 在 OnCreate 中赋值，但 ShowUI 可能在资源加载完成前触发 OnRefresh
+- 建议修复：在 OnRefresh 中添加 null 检查，或在 OnCreate 中初始化默认值
+- 下一步：/opsx:propose "fix-battle-ui-null-ref"
+```
+
+#### 示例 2：架构评估
+
+```
+用户：/opsx:explore
+      "我想用接口事件替换所有 int 事件常量，
+       需要评估工作量和风险"
+
+Claude 探索过程：
+1. 搜索所有 GameEvent.Send(int, ...) 调用 → 找到 23 处
+2. 搜索所有 AddUIEvent(int, ...) 调用 → 找到 15 处
+3. 搜索现有 [EventInterface] 接口 → 找到 3 个已迁移
+4. 读取 event-system.md 规范 → 确认接口事件模式
+5. 分析依赖 → 识别出 5 个模块需要同步修改
+
+输出：
+- 现状：23 处 int 事件发送 + 15 处 UI 监听，3 个接口已迁移
+- 方案A：渐进式迁移（按模块分批，低风险，2-3天）
+- 方案B：一次性迁移（需全面测试，高风险，1天）
+- 建议：方案A，先迁移事件定义最集中的 IBattleEvent
+- 下一步：/opsx:propose "migrate-to-interface-events"
+```
+
+#### 示例 3：性能瓶颈定位
+
+```
+用户：/opsx:explore
+      "背包界面打开要 2 秒，太慢了"
+
+Claude 探索过程：
+1. 读取 BagUI.cs → OnCreate 中串行 await 5 次 LoadAssetAsync
+2. 检查资源大小 → 5 个 Sprite 均小于 100KB
+3. 分析 SetSprite 使用 → 未使用，手动 LoadAssetAsync<Sprite>
+4. 对比规范 → SetSprite 有缓存池，LoadAssetAsync<Sprite> 没有
+5. 结论：串行加载 + 未使用缓存池是主要瓶颈
+
+输出：
+- 瓶颈1：5 个串行 await → 改 UniTask.WhenAll 并行加载
+- 瓶颈2：LoadAssetAsync<Sprite> → 改 SetSprite（自带缓存池）
+- 预期提升：2s → ~400ms（5x 并行 + 缓存命中）
+- 下一步：/opsx:propose "optimize-bag-ui-loading"
+```
+
+### explore 最佳实践
+
+1. **先探索再提案**：任何涉及 3 个以上文件或不确定影响的任务，先用 explore
+2. **带着问题探索**：给 explore 明确的疑问，而非泛泛的"帮我看看"
+3. **探索结论驱动决策**：explore 的输出应直接决定是否 propose、如何 propose
+4. **探索可迭代**：如果首次探索不够深入，可以继续追问，无需退出
+5. **探索不修改代码**：explore 是只读的，不会修改任何文件（这是与 apply 的核心区别）
+
+### explore → propose → apply 完整流程
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as Claude Code
+
+    Note over U,C: 阶段1：探索（只读）
+    U->>C: /opsx:explore "需求描述"
+    C->>C: 搜索代码 + 读取实现 + 查询规范
+    C-->>U: 输出探索结论（问题/方案/影响分析）
+
+    Note over U,C: 阶段2：提案（写入文档）
+    U->>C: /opsx:propose "change-name"
+    C->>C: 生成 proposal.md + design.md + specs/ + tasks.md
+    C-->>U: 展示提案，等待审查
+
+    Note over U,C: 阶段3：实施（写入代码）
+    U->>C: /opsx:apply
+    C->>C: 逐个完成 tasks.md 中的任务
+    C-->>U: 所有任务完成
+
+    Note over U,C: 阶段4：归档
+    U->>C: /opsx:archive
+    C-->>U: 变更已归档，规范已更新
+```
 
 ---
 
@@ -526,6 +721,42 @@ GameScripts/HotFix/
   └── GameLogic/        → 业务逻辑（GameApp.cs 入口）
 ```
 
+### 其他 Skills
+
+#### luban-dev
+
+Luban 游戏配置全栈工具，支持枚举/Bean/数据表的增删改查、代码生成、TEngine 集成。
+
+**触发场景**：
+- 编辑游戏配置数据（配置表/数据表/道具表/技能表/奖励表/活动表）
+- 新增/修改/删除配置表结构
+- 定义枚举/Bean/字段
+- 导表/生成配置代码
+- 编写 luban.conf 或 Schema 定义
+- Luban 类型系统/校验器问题
+
+> 即使用户未明确说"Luban"，只要是编辑游戏配置数据，也应使用此技能。
+
+#### html-to-ugui
+
+HTML 原型转 Unity UGUI 界面生成管线。通过 AI 生成符合 UI-DSL 规范的 HTML，烘焙为 JSON 坐标数据，再导入 Unity 自动生成 UGUI 节点树。
+
+**触发场景**：
+- 需要快速生成 Unity UGUI 界面原型
+- 用自然语言描述 UI 需求并自动生成
+- 创建 UIWindow/面板的初始布局
+- 批量生成表单、设置、列表等标准界面
+
+#### wiki-synchelper
+
+Wiki 同步助手，用于"项目实现内容"与"开发 Wiki 文档"之间的双向同步，确保 AI 可基于 Wiki 快速理解项目现状并按规范继续开发。
+
+**触发场景**：
+- 用户要求扫描/比对/同步/报告项目与 Wiki 的差异
+- 代码实现已更新但 Wiki 文档未跟进
+- Wiki 文档需要反向修正代码结构
+- 用户说"同步 Wiki"、"更新文档"、"Wiki 和代码不一致"、"扫描文档差异"
+
 ---
 
 ## 集成工作流
@@ -536,9 +767,9 @@ GameScripts/HotFix/
 flowchart TD
     Start([开始新需求]) --> Explore{需求是否<br/>明确?}
 
-    Explore -->|不明确| ExploreMode[opsx:explore<br/>探索模式思考]
+    Explore -->|不明确| ExploreMode[/opsx:explore<br/>探索模式思考]
     ExploreMode --> Propose
-    Explore -->|明确| Propose[opsx:propose<br/>创建提案]
+    Explore -->|明确| Propose[/opsx:propose<br/>创建提案]
 
     Propose --> GenArtifacts[自动生成 artifacts<br/>proposal/design/specs/tasks]
     GenArtifacts --> Review{人工审查<br/>artifacts}
@@ -546,7 +777,7 @@ flowchart TD
     Review -->|需要修改| EditArtifacts[手动编辑<br/>proposal.md/design.md等]
     EditArtifacts --> Review
 
-    Review -->|通过| Apply[opsx:apply<br/>开始实施]
+    Review -->|通过| Apply[/opsx:apply<br/>开始实施]
 
     Apply --> LoadContext[加载变更上下文<br/>所有 artifacts]
     LoadContext --> ChooseTask[选择下一个任务<br/>从 tasks.md]
@@ -580,7 +811,7 @@ flowchart TD
 
     FinalTest --> FinalResult{全部通过?}
     FinalResult -->|失败| ChooseTask
-    FinalResult -->|通过| Archive[opsx:archive<br/>归档变更]
+    FinalResult -->|通过| Archive[/opsx:archive<br/>归档变更]
 
     Archive --> CommitPush[git commit & push]
     CommitPush --> End([完成])
@@ -600,14 +831,14 @@ flowchart TD
 
 ```bash
 # 如果需求不明确，先进入探索模式
-opsx:explore
+/opsx:explore
 # 在探索模式中思考：
 # - 这个需求的真正目标是什么？
 # - 有哪些技术方案可选？
 # - 需要考虑哪些边界情况？
 
 # 需求明确后，创建提案
-opsx:propose "add-user-inventory-system"
+/opsx:propose "add-user-inventory-system"
 ```
 
 **自动生成的 artifacts**:
@@ -632,7 +863,7 @@ ls openspec/changes/add-user-inventory-system/
 
 ```bash
 # 开始实施，可以附加额外条件
-opsx:apply "使用 UniTask 异步加载，遵循 TEngine 资源管理规范"
+/opsx:apply "使用 UniTask 异步加载，遵循 TEngine 资源管理规范"
 ```
 
 **Claude Code 会自动**:
@@ -682,7 +913,7 @@ opsx:apply "使用 UniTask 异步加载，遵循 TEngine 资源管理规范"
 
 ```bash
 # 所有任务完成并测试通过后
-opsx:archive
+/opsx:archive
 
 # 提交代码
 git add .
@@ -696,82 +927,82 @@ git push
 
 ```mermaid
 flowchart LR
-    A[opsx:propose] --> B[编写 specs]
-    B --> C[opsx:apply]
+    A[/opsx:propose] --> B[编写 specs]
+    B --> C[/opsx:apply]
     C --> D[tengine-dev 指导]
     D --> E[unity-skills 操作]
     E --> F[测试]
-    F --> G[opsx:archive]
+    F --> G[/opsx:archive]
 ```
 
 ```bash
 # 示例：添加背包系统
-opsx:propose "add-inventory-system"
+/opsx:propose "add-inventory-system"
 # 审查生成的 artifacts
-opsx:apply "使用 TEngine 模块系统"
+/opsx:apply "使用 TEngine 模块系统"
 # 开发...
-opsx:archive
+/opsx:archive
 ```
 
 #### 场景 2: Bug 修复
 
 ```mermaid
 flowchart LR
-    A[opsx:explore] --> B[定位问题]
-    B --> C[opsx:propose]
-    C --> D[opsx:apply]
+    A[/opsx:explore] --> B[定位问题]
+    B --> C[/opsx:propose]
+    C --> D[/opsx:apply]
     D --> E[修复验证]
-    E --> F[opsx:archive]
+    E --> F[/opsx:archive]
 ```
 
 ```bash
 # 示例：修复资源泄漏
-opsx:explore  # 先调查问题根源
-opsx:propose "fix-resource-leak-in-ui"
-opsx:apply
-opsx:archive
+/opsx:explore  # 先调查问题根源
+/opsx:propose "fix-resource-leak-in-ui"
+/opsx:apply
+/opsx:archive
 ```
 
 #### 场景 3: 重构优化
 
 ```mermaid
 flowchart LR
-    A[opsx:explore] --> B[分析现状]
-    B --> C[opsx:propose]
+    A[/opsx:explore] --> B[分析现状]
+    B --> C[/opsx:propose]
     C --> D[设计新方案]
-    D --> E[opsx:apply]
+    D --> E[/opsx:apply]
     E --> F[渐进式重构]
     F --> G[测试对比]
-    G --> H[opsx:archive]
+    G --> H[/opsx:archive]
 ```
 
 ```bash
 # 示例：优化 UI 加载性能
-opsx:explore  # 分析性能瓶颈
-opsx:propose "optimize-ui-loading"
+/opsx:explore  # 分析性能瓶颈
+/opsx:propose "optimize-ui-loading"
 # 在 design.md 中详细设计优化方案
-opsx:apply
-opsx:archive
+/opsx:apply
+/opsx:archive
 ```
 
 #### 场景 4: Unity Editor 自动化操作
 
 ```mermaid
 flowchart LR
-    A[需求] --> B[opsx:propose]
-    B --> C[opsx:apply]
+    A[需求] --> B[/opsx:propose]
+    B --> C[/opsx:apply]
     C --> D[unity-skills]
     D --> E[批量操作]
     E --> F[验证结果]
-    F --> G[opsx:archive]
+    F --> G[/opsx:archive]
 ```
 
 ```bash
 # 示例：批量创建 UI Prefab
-opsx:propose "create-ui-panels-batch"
-opsx:apply "使用 unity-skills 批量创建 10 个 UI 面板预制体"
+/opsx:propose "create-ui-panels-batch"
+/opsx:apply "使用 unity-skills 批量创建 10 个 UI 面板预制体"
 # AI 会调用 unity-skills 自动化操作 Unity Editor
-opsx:archive
+/opsx:archive
 ```
 
 ### 与 Claude Code 配合的最佳实践
@@ -790,19 +1021,19 @@ opsx:archive
 
 ```bash
 # 第一阶段：UI 框架
-opsx:propose "inventory-ui-framework"
-opsx:apply
-opsx:archive
+/opsx:propose "inventory-ui-framework"
+/opsx:apply
+/opsx:archive
 
 # 第二阶段：数据逻辑
-opsx:propose "inventory-data-logic"
-opsx:apply
-opsx:archive
+/opsx:propose "inventory-data-logic"
+/opsx:apply
+/opsx:archive
 
 # 第三阶段：网络同步
-opsx:propose "inventory-network-sync"
-opsx:apply
-opsx:archive
+/opsx:propose "inventory-network-sync"
+/opsx:apply
+/opsx:archive
 ```
 
 #### 3. 充分利用 claude-mem
@@ -828,10 +1059,10 @@ opsx:archive
 
 | 操作 | 命令 |
 |------|------|
-| 探索需求 | `opsx:explore` |
-| 创建变更 | `opsx:propose "<name>"` |
-| 开始实施 | `opsx:apply "额外条件"` |
-| 归档完成 | `opsx:archive` |
+| 探索需求 | `/opsx:explore` |
+| 创建变更 | `/opsx:propose "<name>"` |
+| 开始实施 | `/opsx:apply "额外条件"` |
+| 归档完成 | `/opsx:archive` |
 | 查看帮助 | `openspec instructions <artifact-id>` |
 
 ---
@@ -844,7 +1075,7 @@ opsx:archive
 
 ```bash
 # 场景：需求不明确时
-opsx:explore
+/opsx:explore
 
 # 在探索模式中，Claude 会帮你思考：
 # - 需求的核心价值是什么？
@@ -993,7 +1224,7 @@ opsx:explore
 
 ```bash
 # 团队成员 A：创建需求
-opsx:propose "add-friend-system"
+/opsx:propose "add-friend-system"
 git add openspec/
 git commit -m "docs: add friend system proposal"
 git push
@@ -1007,9 +1238,9 @@ git push
 
 # 团队成员 C：实施开发
 git pull
-opsx:apply
+/opsx:apply
 # 开发...
-opsx:archive
+/opsx:archive
 git push
 ```
 
@@ -1021,7 +1252,7 @@ git push
 - [ ] 代码符合 TEngine 规范（异步、资源释放等）
 - [ ] 已在 Unity 中测试功能
 - [ ] 重要改动已记录到文档
-- [ ] 变更已归档（`opsx:archive`）
+- [ ] 变更已归档（`/opsx:archive`）
 
 ### 6. 调试技巧
 

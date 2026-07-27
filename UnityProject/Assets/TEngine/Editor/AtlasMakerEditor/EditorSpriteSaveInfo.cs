@@ -41,17 +41,8 @@
             assetPath = assetPath.Replace("\\", "/");
             if (!ShouldProcess(assetPath)) return;
 
-            var atlasName = GetAtlasName(assetPath);
+            var atlasName = ResolveAtlasName(assetPath);
             if (string.IsNullOrEmpty(atlasName)) return;
-
-            if (CheckIsNeedGenerateSingleAtlas(assetPath))
-            {
-                atlasName = GetSingleAtlasName(assetPath);
-            }
-            else if (CheckIsNeedGenerateRootChildDirAtlas(assetPath))
-            {
-                atlasName = GetRootChildDirAtlasName(assetPath);
-            }
 
             if (!_atlasMap.TryGetValue(atlasName, out var list))
             {
@@ -72,17 +63,8 @@
             assetPath = assetPath.Replace("\\", "/");
             if (!ShouldProcess(assetPath)) return;
 
-            var atlasName = GetAtlasName(assetPath);
+            var atlasName = ResolveAtlasName(assetPath);
             if (string.IsNullOrEmpty(atlasName)) return;
-
-            if (CheckIsNeedGenerateSingleAtlas(assetPath))
-            {
-                atlasName = GetSingleAtlasName(assetPath);
-            }
-            else if (CheckIsNeedGenerateRootChildDirAtlas(assetPath))
-            {
-                atlasName = GetRootChildDirAtlasName(assetPath);
-            }
 
             if (_atlasMap.TryGetValue(atlasName, out var list))
             {
@@ -186,6 +168,27 @@
             _dirtyAtlasNames.Clear();
             _atlasMap.Clear();
             AssetDatabase.Refresh();
+        }
+
+        public static string ResolveAtlasName(string assetPath)
+        {
+            assetPath = assetPath.Replace("\\", "/");
+            var atlasName = GetAtlasName(assetPath);
+            if (string.IsNullOrEmpty(atlasName))
+            {
+                return null;
+            }
+
+            if (CheckIsNeedGenerateSingleAtlas(assetPath))
+            {
+                atlasName = GetSingleAtlasName(assetPath);
+            }
+            else if (CheckIsNeedGenerateRootChildDirAtlas(assetPath))
+            {
+                atlasName = GetRootChildDirAtlasName(assetPath);
+            }
+
+            return atlasName;
         }
 
         public static void MarkParentAtlasesDirty(string assetPath, bool isCreateNew)

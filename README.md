@@ -88,7 +88,7 @@
 
 ## 🤖 AI 开发工作流
 
-TEngine 深度集成了一套面向 Claude Code 的 AI 辅助开发工作流。通过 **wiki-query-agent 上下文隔离架构**、**任务等级分级触发**和**会话内缓存机制**，实现了规范驱动、高效、自愈的 AI 开发体验。
+TEngine 深度集成了一套面向 Claude Code 的 AI 辅助开发工作流。通过 **tengine-dev skill 按需查询架构**、**任务等级分级触发**和**会话内缓存机制**，实现了规范驱动、高效的 AI 开发体验。
 
 ---
 
@@ -96,10 +96,10 @@ TEngine 深度集成了一套面向 Claude Code 的 AI 辅助开发工作流。�
 
 | 工具 | 用途 |
 |------|------|
-| **wiki-query-agent** | 独立上下文 subagent，处理 wiki 文档查询，保护主 Agent 上下文 |
-| **tengine-dev** | Claude Code 专用 TEngine 开发技能，覆盖全模块规范 |
+| **tengine-dev** | Claude Code 专用 TEngine 开发技能，从 `references/` 提供全模块规范 |
 | **Unity-MCP** | Unity Editor 自动化操作（场景、资源、脚本） |
 | **openspec** | 规范驱动的变更管理 |
+| **wiki-synchelper** | Wiki 文档同步助手（手动触发时使用） |
 
 ---
 
@@ -110,56 +110,52 @@ flowchart TD
     A([用户发起任务]) --> B{判断任务等级}
 
     B -->|L1 简单\ntypo/注释/日志| C[直接编写代码]
-    B -->|L2 调用\n单一 API 修改| D[轻量查询\n只查该 API]
-    B -->|L3 功能\n新功能/跨文件| E[全量查询\n相关模块规范]
-    B -->|L4 架构\n系统设计/重构| F[并行多主题查询]
+    B -->|L2 调用\n单一 API 修改| D[触发 tengine-dev skill\n只查该主题]
+    B -->|L3 功能\n新功能/跨文件| E[触发 tengine-dev skill\n全量相关主题]
+    B -->|L4 架构\n系统设计/重构| F[触发 tengine-dev skill\n并行多主题]
 
     D --> G{会话缓存命中?}
     E --> G
     F --> G
 
     G -->|命中| H[复用已有规范摘要]
-    G -->|未命中| I[启动 wiki-query-agent\nsubagent 查询]
+    G -->|未命中| I[skill 读取 references/\n提炼规范指引]
 
-    I --> J[subagent 读取 repowiki/\n处理文档内容]
-    J --> K[返回精华规范摘要]
-    H --> L[输出代码/方案]
-    K --> L
+    I --> L[输出代码/方案]
+    H --> L
     C --> L
 
     L --> M{规范与代码冲突?}
-    M -->|有冲突| N[标注冲突点\n触发 /wiki:sync]
+    M -->|有冲突| N[标注冲突点\n记录到 .claude/memory/]
     M -->|无冲突| O([任务完成])
     N --> O
 ```
 
 ---
 
-### 时序图一：上下文隔离架构
+### 时序图一：规范获取流程
 
-> **核心优势**：wiki 文档全部在 subagent 独立上下文中处理，主 Agent 只接收精华摘要，上下文窗口始终干净。
+> **核心优势**：tengine-dev skill 直接从精炼的 `references/` 文档提取规范，无多余上下文噪声。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent (Claude)
-    participant S as wiki-query-agent (subagent)
-    participant W as repowiki/zh/content/
+    participant S as tengine-dev (skill)
+    participant R as references/
 
     U->>M: 请实现背包 UI
     Note over M: 判断等级: L3 功能
-    M->>S: 启动 subagent<br/>查询: UIWindow规范 + 资源管理规范
+    M->>S: 触发 skill<br/>查询: UIWindow规范 + 资源管理规范
 
     activate S
-    S->>W: 读取 ui-development.md
-    S->>W: 读取 resource-management.md
-    S->>W: 读取 event-system.md
-    Note over S: 处理大量文档内容<br/>提炼关键规范
-    S-->>M: 返回精华摘要<br/>（~500字，非原始文档）
+    S->>R: 读取 ui-development.md
+    S->>R: 读取 resource-management.md
+    S->>R: 读取 event-system.md
+    Note over S: 提炼关键规范指引
+    S-->>M: 返回规范摘要
     deactivate S
 
-    Note over M: 主 Agent 上下文保持干净<br/>只增加了摘要，未增加文档原文
-    M->>M: 声明已查询主题
     M-->>U: 输出符合规范的代码
 ```
 
@@ -167,13 +163,13 @@ sequenceDiagram
 
 ### 时序图二：会话内缓存机制
 
-> **核心优势**：同一会话中相同主题只查询一次，后续任务直接复用，避免重复 token 消耗。
+> **核心优势**：同一会话中相同主题只查询一次，后续任务直接复用，避免重复消耗。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent
-    participant S as wiki-query-agent
+    participant S as tengine-dev skill
     participant C as 会话缓存
 
     U->>M: 任务①: 实现登录界面 UI
@@ -185,7 +181,7 @@ sequenceDiagram
     U->>M: 任务②: 实现设置界面 UI
     M->>C: 检查缓存: UIWindow 规范
     C-->>M: 命中缓存 ✅ 直接复用
-    Note over M: 无需重启 subagent<br/>零等待，零额外 token
+    Note over M: 无需重复触发 skill<br/>零等待，零额外消耗
     M-->>U: 输出设置界面代码
 
     U->>M: 任务③: 设置界面添加音效按钮
@@ -201,19 +197,19 @@ sequenceDiagram
 
 ### 时序图三：并行多主题查询（L4 架构任务）
 
-> **核心优势**：架构级任务并行启动多个 subagent，汇总后统一决策，大幅减少串行等待。
+> **核心优势**：架构级任务并行查询多个主题，汇总后统一决策，大幅减少串行等待。
 
 ```mermaid
 sequenceDiagram
     participant U as 用户
     participant M as 主 Agent
-    participant S1 as wiki-query-agent #1
-    participant S2 as wiki-query-agent #2
-    participant S3 as wiki-query-agent #3
+    participant S1 as tengine-dev #1
+    participant S2 as tengine-dev #2
+    participant S3 as tengine-dev #3
 
     U->>M: 设计战斗系统架构<br/>涉及: UI + 事件 + FSM + 资源
 
-    Note over M: 判断等级: L4 架构<br/>并行启动 3 个 subagent
+    Note over M: 判断等级: L4 架构<br/>并行触发多主题查询
 
     par 并行查询
         M->>S1: 查询 UIWindow + UIWidget 规范
@@ -231,48 +227,46 @@ sequenceDiagram
 
 ---
 
-### 时序图四：自愈闭环（文档自动同步）
+### 时序图四：规范冲突处理
 
-> **核心优势**：AI 主动检测 wiki 与代码的不一致，自动触发同步，形成持续改进的自愈循环。
+> **核心优势**：AI 主动检测 references 与代码的不一致，标注冲突并记录，以代码实现为最终依据。
 
 ```mermaid
 sequenceDiagram
     participant M as 主 Agent
-    participant S as wiki-query-agent
-    participant W as repowiki/
+    participant S as tengine-dev skill
     participant Code as 项目代码
     participant Mem as .claude/memory/
 
     M->>S: 查询某 API 规范
-    S-->>M: wiki 描述: API_X(param1, param2)
+    S-->>M: references 描述: API_X(param1, param2)
 
     M->>Code: 读取实际代码实现
     Code-->>M: 实际签名: API_X(param1, param2, param3)
 
-    Note over M: 检测到冲突!<br/>wiki 描述与代码不符
+    Note over M: 检测到冲突!<br/>references 描述与代码不符
 
-    M->>Mem: 记录 problem_2026-04-01.md<br/>冲突详情 + 分析
-    M->>W: 触发 /wiki:sync<br/>更新 wiki 文档
+    M->>Mem: 记录 problem_YYYY-MM-DD.md<br/>冲突详情 + 分析
 
-    Note over W: wiki 同步完成<br/>下次查询将返回正确规范
+    Note over M: 以代码实现为准<br/>在输出中标注差异
 
-    M-->>U: 输出代码，并标注已修正文档冲突
+    M-->>U: 输出代码，并标注冲突点
 ```
 
 ---
 
-### 五步工作流快速参考
+### 工作流快速参考
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                   TEngine AI 工作流                      │
 ├─────────────────────────────────────────────────────────┤
 │  Step 0  判断任务等级 L1/L2/L3/L4                        │
-│  Step 1  按等级决定查询深度（缓存命中则跳过）              │
-│  Step 2  wiki-query-agent 独立处理文档，返回摘要          │
-│  Step 3  L3/L4 声明已查询主题 + 关键规范摘要             │
-│  Step 4  基于规范输出代码/方案                            │
-│  Step 5  检测冲突 → 自动触发 /wiki:sync（如有）           │
+│  Step 1  L1 直接编码                                     │
+│         L2-L4 触发 tengine-dev skill 获取规范            │
+│         （会话内缓存命中则直接复用，无需重复触发）        │
+│  Step 2  基于规范输出代码/方案                            │
+│  Step 3  若规范与代码冲突，标注冲突，记录到 .claude/memory/│
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -436,6 +430,9 @@ TEngine 本身为**纯净的客户端框架**，不强绑定任何服务器。�
 | **Fantasy** | 源于 ETServer 但极为简洁，更好上手的商业级服务器框架 | [GitHub](https://github.com/qq362946/Fantasy) |
 | **GameNetty** | 源于 ETServer，首次拆分最新的 ET8.1 的前后端解决方案 | [GitHub](https://github.com/ALEXTANGXIAO/GameNetty) |
 | **JEngine** | 使 Unity 开发的游戏支持热更新的解决方案 | [GitHub](https://github.com/JasonXuDeveloper/JEngine) |
+| **DGame** | 根据TEngine框架，结合工作经验，修改和增加一些实用性拓展修改的框架 | [GitHub](https://github.com/AmaniDawn/DGame) |
+| **AlicizaXTemplate** | AlicizaX 是一套面向 Unity 项目的框架模板 | [GitHub](https://github.com/AlicizaX/AlicizaXTemplate) |
+
 
 ### 社区 Demo
 
