@@ -1,0 +1,6 @@
+interface:
+  display_name: "HTML 转 UGUI"
+  short_description: "将本地 UI-DSL 烘焙为 JSON，按明确目标生成并验证 Unity UGUI Prefab"
+  default_prompt: "使用 $html-to-ugui 处理本地 UI-DSL，按要求交付烘焙 JSON 或经确认生成的 UGUI Prefab。"
+policy:
+  allow_implicit_invocation: true

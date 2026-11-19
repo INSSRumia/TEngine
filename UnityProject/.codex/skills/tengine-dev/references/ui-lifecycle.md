@@ -1,205 +1,47 @@
-# UI 生命周期与核心 API
+# 窗口生命周期
 
-> **适用场景**：UIWindow/UIWidget 生命周期、层级（UILayer）、ShowUI/CloseUI/HideUI API、ScriptGenerator 节点绑定 | **关联文档**：[event-system.md](event-system.md)（AddUIEvent）、[ui-patterns.md](ui-patterns.md)（Widget 模板）、[naming-rules.md](naming-rules.md)（节点前缀）
+先读 [UIBase](../../../../Assets/GameScripts/HotFix/GameLogic/Module/UIModule/UIBase.cs)、
+[UIWindow](../../../../Assets/GameScripts/HotFix/GameLogic/Module/UIModule/UIWindow.cs)、
+[UIModule](../../../../Assets/GameScripts/HotFix/GameLogic/Module/UIModule/UIModule.cs) 的调用链；
+属性声明见 [WindowAttribute](../../../../Assets/GameScripts/HotFix/GameLogic/Module/UIModule/WindowAttribute.cs)。
 
----
+## 创建与刷新
 
-## 一、核心 API
+首次准备完成时执行 `Inject → ScriptGenerator → BindMemberProperty → RegisterEvent → OnCreate`，
+随后 `OnRefresh`。已有窗口再次显示时更新参数并刷新，不重复创建和注册。
+`UserData` 是首个参数，`UserDatas` 是完整数组；先做类型匹配。生命周期回调不接收 userData 参数，也没有 `OnClose`。
 
-### UILayer 层级
+窗口通过 `[Window(UILayer.UI, location: "...")]` 声明层级与已确认的资源地址。
+`UILayer` 为 Bottom/UI/Top/Tips/System；空 location 的回退规则见 `UIModule.CreateInstance`，不能凭类名推断收集器地址。
+绑定节点和组件必须与实际 Prefab 一致，生成规则见 [命名与绑定](naming-rules.md)。
 
-| 值 | 层级 | 用途 |
-|----|------|------|
-| 0 | Bottom | 底层（世界空间 UI、背景）|
-| 1 | UI | 普通 UI 层（主要界面）|
-| 2 | Top | 顶层（弹窗、全屏遮罩）|
-| 3 | Tips | 提示层（Toast、飘字）|
-| 4 | System | 系统层（加载中、异常提示）|
+`ShowUIAsync<T>` 返回 void。`ShowUIAsyncAwait<T>` 返回 `UniTask<T>`，但当前实现有以下限制：
 
-### WindowAttribute 窗口标记
+- 已存在且仍在加载的窗口可直接返回。
+- 新窗口等待 `IsLoadDone`，超过按 `Time.deltaTime` 累计的 60 秒仍返回窗口；没有业务取消参数。
+- `Handle_Completed` 在 Canvas 检查和 `OnCreate` 前设置 `IsLoadDone`，返回实例不等于创建成功。
 
-每个 UIWindow 子类必须标记 `[Window]` 特性：
+`window != null && window.IsPrepare && window.gameObject != null` 只是必要保护，不能证明绑定和 `OnCreate` 成功：
+`IsPrepare` 在准备回调前设置，`InternalCreate` 也先设置创建标记；初始化抛错后这些检查仍可能全部成立。
+依赖控件的调用方还需有明确的初始化成功/失败信号；不能把三项 guard 当作该等待契约的修复。
+`GetUIAsyncAwait<T>(token)` 也有上述加载标记和超时限制，不能当成成功保证。
+需要严格可取消的打开协议时，在本次任务范围内设计并验证，不能只给现有调用加上 await。
 
-```csharp
-[Window(UILayer.UI, "BattleMainUI")]
-public class BattleMainUI : UIWindow { }
+## 显隐与关闭
 
-[Window(layer: UILayer.Top, location: "LoginUI", fullScreen: true, hideTimeToClose: 10f)]
-public class LoginUI : UIWindow { }
-```
+| 操作 | 当前行为 |
+|---|---|
+| `HideUI<T>` 且 `HideTimeToClose > 0` | 改 Canvas layer 和 Raycaster，保留实例与监听，定时调用 Close |
+| `HideUI<T>` 且 `HideTimeToClose <= 0` | 立即 Close |
+| 窗口 `Visible` 变化 | 创建完成后调用 `OnSetVisible(bool)`；不通过 SetActive 隐藏整个窗口 |
+| `CloseUI<T>` | 清窗口事件 → 子 Widget 的 OnDestroy 与内部清理 → 窗口 OnDestroy → 销毁面板 |
 
-**location** 即 Prefab 资源地址（`AssetRaw/UI/Prefabs/` 下的文件名，不含扩展名）。
+`hideTimeToClose` 默认 10 秒。定时关闭前重新显示会取消隐藏计时器；已有监听可能在隐藏期间收到事件。
+窗口 `InternalUpdate` 只更新已准备且可见的窗口。隐藏时是否取消异步、暂停计时器由业务明确决定。
 
-### UIWindow 生命周期
+`UIWindow` 是普通 C# 对象，`this == null` 无法判断面板销毁。
+在自己的 `OnDestroy` 中取消业务任务、归还持有资源；不要再手动调用内部销毁方法或重复清理框架事件池。
+异步工作放在返回 `UniTask` 的方法内，调用方 await 或显式 Forget 并观察异常。
 
-```
-ShowUI<T>()
-    │
-    ▼
-Inject()               ← 首次：依赖注入扩展点（UIBase.Injector 静态委托）
-    │
-    ▼
-ScriptGenerator()     ← 首次：绑定 UI 节点引用（仅一次）
-    │
-    ▼
-BindMemberProperty()  ← 首次：框架预留扩展点，通常跳过
-    │
-    ▼
-RegisterEvent()       ← 首次：注册 UI 事件（随窗口销毁自动清理）
-    │
-    ▼
-OnCreate()            ← 首次：窗口创建初始化（仅一次）
-    │
-    ▼
-OnRefresh()           ← 每次 ShowUI 都执行（刷新显示数据）
-    │
-    ▼
-OnUpdate()            ← 每帧更新（子类必须 override 才会被框架调用，基类设 _hasOverrideUpdate = false）
-    │
-    ▼
-HideUI() / CloseUI()
-    ├── 隐藏：OnSetVisible(false)，超时后触发 Close
-    └── 关闭流程：
-        RemoveAllUIEvent()     ← 自动清理所有 UI 事件监听
-            │
-            ▼
-        子Widget.OnDestroy()   ← 先销毁子 Widget
-            │
-            ▼
-        OnDestroy()            ← 窗口自身销毁前清理
-            │
-            ▼
-        Destroy(gameObject)    ← 销毁 GameObject
-```
-
-**关键规则**：
-- `Inject` / `ScriptGenerator` / `BindMemberProperty` / `RegisterEvent` / `OnCreate` 只执行一次
-- `OnRefresh` 每次 Show 都执行
-- `OnUpdate` 基类实现设 `_hasOverrideUpdate = false`，子类必须 override 才会被框架调用；尽量避免使用，改用 `GameModule.Timer`
-- 窗口销毁方法为 `OnDestroy()`，不存在 `OnClose` 方法
-- 完整前缀表见 [naming-rules.md](naming-rules.md#ui-节点命名规范)
-
-### 扩展虚方法
-
-| 方法 | 签名 | 用途 |
-|------|------|------|
-| `OnSortDepth` | `protected virtual void OnSortDepth()` | 窗口层级排序回调（Depth 属性变化时触发） |
-| `OnSetVisible` | `protected virtual void OnSetVisible(bool visible)` | 窗口显隐回调（Hide/Show 时触发） |
-
-### UIModule 核心 API
-
-```csharp
-// 打开窗口
-GameModule.UI.ShowUIAsync<BattleMainUI>();                       // fire and forget
-var win = await GameModule.UI.ShowUIAsyncAwait<BattleMainUI>();  // 等待实例
-GameModule.UI.ShowUIAsync<ItemDetailUI>(itemId, extraData);      // 携带用户数据
-
-// 关闭 / 隐藏
-GameModule.UI.CloseUI<BattleMainUI>();          // 关闭并销毁
-GameModule.UI.HideUI<BattleMainUI>();           // 隐藏（超时自动关闭）
-GameModule.UI.CloseAll();                       // 关闭所有
-GameModule.UI.CloseAllWithOut<BattleMainUI>();  // 保留指定窗口
-
-// 查询
-bool exists   = GameModule.UI.HasWindow<BattleMainUI>();
-bool loading  = GameModule.UI.IsAnyLoading();
-```
-
-### UIWidget 子组件
-
-```csharp
-var widget = CreateWidget<ItemWidget>("path/to/node");                     // 路径
-var widget = CreateWidgetByPath<ItemWidget>(parent, "Location");           // 动态加载
-var widget = await CreateWidgetByPathAsync<ItemWidget>(parent, "Loc");     // 异步
-var widget = CreateWidgetByPrefab<ItemWidget>(prefab, parent);             // Prefab 克隆
-AdjustIconNum<ItemWidget>(listIcon, count: items.Count, parent, prefab);   // 列表数量
-```
-
-UIWidget 生命周期与 UIWindow 相同：`ScriptGenerator → BindMemberProperty → RegisterEvent → OnCreate → OnRefresh → OnDestroy`
-
----
-
-## 二、使用模式
-
-### UI 内部事件（AddUIEvent）
-
-在 `RegisterEvent()` 中使用，事件监听随窗口销毁**自动清理**：
-
-```csharp
-protected override void RegisterEvent()
-{
-    // 无泛型参数
-    AddUIEvent(GameEventDef.OnGoldChanged, OnGoldChanged);
-    // 1 个泛型参数
-    AddUIEvent<int>(GameEventDef.OnHpChanged, OnHpChanged);
-    // 2 个泛型参数
-    AddUIEvent<int, string>(GameEventDef.OnItemAcquired, OnItemAcquired);
-    // 3 个泛型参数
-    AddUIEvent<int, string, float>(GameEventDef.OnAttrModified, OnAttrModified);
-    // 4 个泛型参数
-    AddUIEvent<int, string, float, bool>(GameEventDef.OnComplexEvent, OnComplexHandler);
-}
-```
-
-**AddUIEvent 支持 0~4 个泛型参数**：`AddUIEvent`、`AddUIEvent<T>`、`AddUIEvent<T,U>`、`AddUIEvent<T,U,V>`、`AddUIEvent<T,U,V,W>`。
-
-### 典型窗口实现
-
-```csharp
-[Window(UILayer.UI, "BagUI")]
-public class BagUI : UIWindow
-{
-    private List<ItemWidget> _items = new();
-
-    protected override void ScriptGenerator()
-    {
-        // 绑定 UI 节点引用
-    }
-
-    protected override void RegisterEvent()
-    {
-        AddUIEvent<int>(GameEventDef.OnItemChanged, OnItemChanged);
-    }
-
-    protected override void OnCreate()
-    {
-        // 一次性初始化（创建 Widget 等）
-    }
-
-    protected override void OnRefresh()
-    {
-        // 每次 Show 时刷新数据
-    }
-
-    // 仅在需要每帧更新时 override；基类设 _hasOverrideUpdate = false，不 override 不会被调用
-    // protected override void OnUpdate() { }
-
-    protected override void OnDestroy()
-    {
-        // 销毁前清理（子 Widget 会先于此方法销毁）
-    }
-}
-```
-
----
-
-## 三、常见错误
-
-| 错误 | 正确做法 |
-|------|---------|
-| 在 `RegisterEvent` 外使用 `GameEvent.AddEventListener` | 使用 `AddUIEvent`（自动随窗口销毁清理），详见 [event-system.md](event-system.md#常见错误) |
-| override `OnUpdate` 但忘记实际需要每帧更新 | 优先使用 `GameModule.Timer`，避免不必要的每帧计算 |
-| 使用不存在的 `OnClose` 方法 | 销毁回调为 `OnDestroy()` |
-| 在 `OnDestroy` 中访问子 Widget | 子 Widget 的 `OnDestroy` 先于窗口 `OnDestroy` 执行，此时子 Widget 已销毁 |
-
----
-
-## 四、交叉引用
-
-| 主题 | 文档 |
-|------|------|
-| 事件系统详细用法与避坑 | [event-system.md](event-system.md) |
-| UI 进阶模式（Widget 模板/节点绑定） | [ui-patterns.md](ui-patterns.md) |
-| 资源加载与生命周期 | [resource-api.md](resource-api.md) |
-| 命名规范与节点前缀 | [naming-rules.md](naming-rules.md) |
-| 模块 API（Timer 等） | [modules.md](modules.md) |
+Widget 的创建和销毁顺序见 [Widget 与列表](ui-patterns.md)，事件规则见 [事件系统](event-system.md)，
+按改动选择 [验证场景](verification.md)。

@@ -1,128 +1,56 @@
 ---
 name: luban-dev
-description: Luban 游戏配置全栈工具，支持枚举/Bean/数据表的增删改查、代码生成、TEngine 集成。触发场景：(1) 编辑游戏配置数据（配置表/数据表/道具表/技能表/奖励表/活动表），(2) 新增/修改/删除配置表结构，(3) 定义枚举/Bean/字段，(4) 导表/生成配置代码，(5) 编写 luban.conf 或 Schema 定义，(6) Luban 类型系统/校验器问题。即使用户未明确说"Luban"，只要是编辑游戏配置数据，也应使用此技能。
+description: 维护本仓库 Luban 游戏配置的表、数据、枚举、Bean、模板、校验和普通/整表懒加载导出，核实分片需求的实际能力。普通应用设置、Unity ProjectSettings 或仅讨论游戏技能设计不触发。
 ---
 
-# Luban 数据配置工具
+# Luban 开发
 
-## TEngine 项目核心约定
+## 定位与任务终点
 
-- **生成格式**：`cs-bin`（C# 代码）+ `bin`（二进制数据）
-- **命名空间**：`GameConfig`（非默认 `cfg`）
-- **数据加载**：`ConfigSystem.Instance.Tables` 懒加载，底层走 YooAsset
-- **代码位置**：`GameScripts/HotFix/GameProto/GameConfig/`（热更程序集）
-- **数据位置**：`AssetRaw/Configs/bytes/`（YooAsset 管理）
-- **表定义**：Excel（`__tables__.xlsx`/`__beans__.xlsx`/`__enums__.xlsx`）+ XML Schema（`Defines/`）
-- **导出数据 → 使用导出脚本，不要手动拼 dotnet 命令**
+先读 git status、表注册、字段、数据、引用和当前导出脚本，确定目标表/主键、
+客户端/服务端分组、导出模式与兼容性。不要按字段关键词推断业务分组。
+源位于仓库 `Configs/GameConfig`，从 Unity 项目出发为 `../Configs/GameConfig`；
+命名空间为 `GameConfig`。修改生成 C#/bytes 时回溯源表或模板。
 
-### 导出脚本
+| 用户目标 | 执行到哪里 |
+|---|---|
+| 查表、解释结构或讨论方案 | 只读数据、实现和 helper 输出，不导出、不连接 Editor |
+| 修改源记录/字段/模板 | 沿用明确的目标与授权编辑，检查引用和 diff，再隔离 validate |
+| 更新生产生成产物 | 隔离 validate 后 preview，展示覆盖范围，取得确认再 approve/apply |
+| 运行时加载问题 | 读真实加载器/生成类；组合 tengine-dev，实际运行验证再用 unity-cli |
+| 按关卡/区间分片 | 先查 exporter、模板与生成 API，当前未实现，不能直接套 tags 或宣称完成 |
 
-所有脚本位于 `Configs/GameConfig/`，使用相对路径调用。
+普通源修改不自动扩大到生产覆盖；删除/重命名需说明兼容性影响并取得对应确认。
+不安装工具、不重建 Luban，不用普通导出掩盖分片要求。
 
-| 脚本 | 用途 | 说明 |
-|:---|:---|:---|
-| `gen_code_bin_to_project_lazyload` | 客户端（**推荐**，懒加载模板） | AI 调用此脚本 |
-| `gen_code_bin_to_project` | 客户端（标准模板） | 非懒加载 |
-| `gen_code_bin_to_server` | 服务端 | - |
+## 校验与生产导出
 
-### AI 调用导表命令
+1. 用 [helper](scripts/luban_helper.py) 的实际 `--help` 操作；多行 Bean 表头等复杂结构先核对实现，
+   不使用会破坏格式的扁平 CRUD。缺依赖明确阻塞。
+2. `python .codex/scripts/workflow.py luban validate` 在 runs 中复制配置与现有工具快照，
+   用真实 Luban 校验并导出；helper 诊断仅为辅助，不写生产产物。
+3. 需要生产导出时运行 `luban preview --mode lazyload` 或显式 `--mode standard`，
+   展示配置输入、模板、生成 C# 和 bytes 的覆盖范围。
+4. 在具体确认后记录 approve（high-risk），执行 `luban apply`；范围或输入改变则重新预览。
+5. 核对实际产物、模板、模式和隔离输出哈希，随后按生成改动取得 .NET、Editor 及运行证据。
 
-根据操作系统选择对应扩展名：
+当前两个脚本均使用 `-d bin`。`lazyload` 增加整表懒加载模板，**不是分片导出**；
+没有经源码证实的 `LoadTbXPartition/ReleaseTbXPartition/ClearPartitions` API。
+分片是另一个需实现和验收的能力，详情见集成参考。
+`luban test` 覆盖当前普通/整表懒加载的隔离导出，不代表分片或所有业务配置通过。
 
-**Windows：**
-```bash
-cmd //c "set AI_MODE=1 && Configs\GameConfig\gen_code_bin_to_project_lazyload.bat"
-```
+## 按需读取
 
-**macOS/Linux：**
-```bash
-bash Configs/GameConfig/gen_code_bin_to_project_lazyload.sh
-```
+| 任务 | 参考 |
+|---|---|
+| 项目导出、加载器和分片能力边界 | [tengine-integration.md](references/tengine-integration.md) |
+| helper 参数、Excel 修改 | [operating-guide.md](references/operating-guide.md) |
+| 类型和 Schema | [type-system.md](references/type-system.md)、[schema.md](references/schema.md) |
+| 配置文件、生成参数 | [luban-conf.md](references/luban-conf.md)、[command-reference.md](references/command-reference.md) |
+| 数据源 | [excel-format.md](references/excel-format.md)、[data-sources.md](references/data-sources.md) |
+| 校验和运行时 | [validators.md](references/validators.md)、[runtime.md](references/runtime.md) |
 
-### 新增配置表流程
-
-1. 在 `Datas/__tables__.xlsx` 注册新表
-2. 创建 `Datas/xxx.xlsx` 数据表
-3. 在 `__beans__.xlsx` / `__enums__.xlsx` 定义复合类型/枚举（可选）
-4. 运行导出脚本生成代码和数据
-5. 在 `GameLogic/Config/` 封装 `XxxConfigMgr`
-
-### 配置管理红线
-
-- **不要直接修改** `GameProto/GameConfig/` 下的生成代码
-- 复杂模块封装 `XxxConfigMgr`，业务代码通过管理器访问
-- 新增字段前向兼容，删除/改名字段不兼容
-
----
-
-## 配置表操作工具（luban_helper.py）
-
-通过 Python 脚本直接 CRUD Excel 配置表，无需手动编辑 xlsx。
-
-### 前置条件
-
-Python 3.8+，`pip install openpyxl`
-
-### 执行方式
-
-```bash
-python scripts/luban_helper.py --data-dir Configs/GameConfig/Datas <command>
-```
-
-`--data-dir` 必须放在子命令之前。PowerShell 中用 `;` 分隔命令，JSON 参数推荐用 `--file` 从文件读取。
-
-**参数类型**：位置参数（大写，如 `NAME`、`TABLE`）直接传值，不加 `--` 前缀；可选参数带 `--` 前缀。例如 `table get test.TbItem`（正确）而非 `table get --name test.TbItem`（错误）。
-
-### 命令速查
-
-| 分类 | 命令 | 功能 |
-|------|------|------|
-| 枚举 | `enum list/get/add/update/delete` | 枚举 CRUD |
-| 结构 | `bean list/get/add/update/delete` | Bean CRUD |
-| 表 | `table list/get/add/update/delete` | 表 CRUD |
-| 字段 | `field list/add/update/delete/disable/enable` | 字段操作 |
-| 数据 | `row list/get/query/add/update/delete` | 数据行操作 |
-| 批量 | `batch fields/rows` | 批量操作 |
-| 导入导出 | `export/import` | JSON 导入导出 |
-| 验证 | `validate` / `ref` | 数据验证 / 引用检查 |
-| 类型 | `type list/validate/suggest/search/guide/info` | 类型系统 |
-| 自动 | `auto list/create` | 自动导入表（`#` 前缀，不推荐） |
-| 管理 | `rename/copy/diff/template` | 表管理工具 |
-
-### 操作规范
-
-- **只读操作**（list/get/query/search）：直接执行
-- **写入操作**（add/update/delete）：**必须确认**后再执行
-- **删除操作**：先 `ref` 检查引用，提醒风险，二次确认
-- **修改前**：先 `table get` / `field list` 确认结构，`row get` 避免主键冲突
-- **修改后**：用 `validate` 验证
-
-### 分组自动推断
-
-添加字段时不指定 `--group`，自动推断：
-- `c`（客户端）：name, desc, icon, image, model, effect, sound, ui 等
-- `s`（服务器）：server, logic, damage, hp, mp, exp, level, rate 等
-- `cs`（两端）：id, 其他无法判断的字段
-
----
-
-## 参考文档（按需加载）
-
-| 场景 | 文档 | 内容 |
-|------|------|------|
-| TEngine 集成 / ConfigSystem / 生成脚本 / 兼容性 | [tengine-integration.md](references/tengine-integration.md) | 项目结构、加载器、导出脚本、Excel规范 |
-| 操作工具命令详解 / Excel结构 / 数据填写格式 | [operating-guide.md](references/operating-guide.md) | luban_helper.py 完整命令参考 |
-| 类型系统和语法 | [type-system.md](references/type-system.md) | 基础/容器/自定义/可空类型、Mapper、constalias |
-| Schema 定义（XML/Excel）/ 多态规范 | [schema.md](references/schema.md) | enum/bean/table 定义、字段属性、多态bean、flags约束 |
-| luban.conf 配置 | [luban-conf.md](references/luban-conf.md) | 完整配置项、分组策略、级联选项、topModule |
-| 校验器类型和用法 / ref行为 | [validators.md](references/validators.md) | ref/range/path/size/set/index/!、Ref字段命名、ResolveRef |
-| Excel 数据格式 | [excel-format.md](references/excel-format.md) | 标题行、容器格式、多态、标签 |
-| CLI 命令行参数 | [command-reference.md](references/command-reference.md) | 完整参数列表、代码/数据目标、--variant/--timeZone |
-| JSON/XML/YAML/Lua 数据源 | [data-sources.md](references/data-sources.md) | 非Excel数据源格式、多态鉴别符 |
-| 运行时加载 / 类型映射 / 本地化工作流 | [runtime.md](references/runtime.md) | Unity加载、代码风格、本地化完整流程 |
-
-示例：`examples/tengine-project/`（TEngine 完整示例）、`examples/item-system/`（CSV+XML）、`examples/skill-system/`（JSON+多态）
-
-脚本：`scripts/luban_helper.py`（操作工具）、`scripts/requirements.txt`（依赖）
-
-官方文档：https://www.datable.cn/docs/intro
+配置源检查和隔离导出不必连接 Editor；实际生成 C#/资源后按项目
+[unity-cli](../unity-cli/SKILL.md) 验证，框架接入读取 [tengine-dev](../tengine-dev/SKILL.md)。
+交付数据/模板 diff、引用与兼容性、模式、日志、产物及实际验证范围。
+失败保留输入和日志，不回滚用户已有数据，不将缺失产物或 Editor 离线写成通过。
