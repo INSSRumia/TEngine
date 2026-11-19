@@ -1,266 +1,212 @@
 # TEngine 常见问题排障
 
-## 目录
+> **适用场景**：编译报错/热更失败/资源加载失败/UI 不显示/事件无响应/性能问题/Luban 配置问题排查 | **关联文档**：[resource-api.md](resource-api.md)、[event-system.md](event-system.md)、[hotfix-workflow.md](hotfix-workflow.md)
 
-- [HybridCLR 问题](#hybridclr-问题)
-- [YooAsset 资源问题](#yooasset-资源问题)
-- [UI 模块问题](#ui-模块问题)
-- [事件系统问题](#事件系统问题)
-- [内存与性能问题](#内存与性能问题)
-- [Luban 配置表问题](#luban-配置表问题)
-- [UniTask 问题](#unitask-问题)
+> 解决新问题后记录到 `.claude/memory/problem_YYYY-MM-DD.md`
 
----
+## 核心 API
 
-## HybridCLR 问题
+### 场景索引
 
-### 问题：ExecutionEngineException: AOT code was not generated
-
-**原因**：热更代码使用了主包没有 AOT 实例的泛型组合。
-
-**排查步骤**：
-1. 查看错误堆栈，找到具体的类型/方法名
-2. 在 `Assets/HybridCLRData/AOTGenericReferences.cs` 中找是否缺少该泛型
-3. 菜单：`HybridCLR → Generate → AOT Generic References` 重新生成
-4. 若仍缺失，在文件中手动添加一个占位引用：
-   ```csharp
-   // 在 AOTGenericReferences.cs 中
-   static void UseCustomGenericType()
-   {
-       _ = new List<MyCustomType>();  // 添加这行触发 AOT 生成
-   }
-   ```
-5. 重新打包主包
+| 场景 | 常见问题 |
+|------|---------|
+| 编译/热更 | AOT 泛型、Editor 正常真机报错、DLL 加载失败、iOS 链接失败、生命周期签名错误 |
+| 资源加载 | location 无效、内存增长、缓存未更新、SetSprite callback 类型错误 |
+| UI | 界面空白、Widget 复用异常、事件销毁后触发、生命周期签名错误 |
+| 事件 | 接口事件无响应、监听收不到、UnRegisterAll 不存在 |
+| 内存/性能 | GC 频繁、启动慢、DrawCall 高 |
+| Luban | 生成报错、Tables 为 null、ConfigSystem 找不到 |
+| UniTask | 异常被吞、await 后对象为 null |
 
 ---
 
-### 问题：热更代码在 Editor 模式正常，真机报错
+## 使用模式
 
-**原因**：Editor 模式下 Mono 编译，不走 HybridCLR；真机才会走 IL2CPP + HybridCLR 解释。
+### 编译/热更问题
 
-**排查步骤**：
-1. 在 Android 上先测试（比 iOS 快）
-2. 检查是否有 `dynamic`、`Emit` 等不支持的 C# 特性
-3. 检查反射代码（`Type.GetMethod`、`Activator.CreateInstance` 等）在 AOT 环境是否受限
-4. 开启 `Development Build` + `Script Debugging` 获取完整堆栈
+#### AOT 泛型异常：`ExecutionEngineException`
 
----
-
-### 问题：热更 DLL 加载失败 / 程序集找不到
-
-**排查步骤**：
-1. 检查 `HybridCLRSettings.asset` 中热更程序集列表是否包含所有 HotFix 程序集
-2. 确认热更 DLL 已打进 AssetBundle（YooAsset 收集器配置中有 `HybridCLRData` 目录）
-3. 检查 `ProcedureLoadAssembly.cs` 中加载的 DLL 文件名与实际生成的 DLL 名一致
-4. 确认资源服务器上的 DLL 版本是最新的
-
----
-
-### 问题：iOS 打包失败，提示找不到某些符号
-
-**原因**：Burst / IL2CPP 链接器裁剪了部分代码。
-
-**解决**：
-```
-在 Assets/link.xml 中保留需要的类型：
-<linker>
-  <assembly fullname="UnityEngine">
-    <type fullname="UnityEngine.Rigidbody" preserve="all"/>
-  </assembly>
-</linker>
-```
-
----
-
-## YooAsset 资源问题
-
-### 问题：资源加载失败，location 无效
-
-**排查步骤**：
-1. 检查 `AssetBundleCollector` 中是否有收集该路径的资产
-2. 确认 location 写法（不含路径、不含扩展名，如 `HeroPrefab` 而非 `Actor/Hero/HeroPrefab.prefab`）
-3. 调用 `GameModule.Resource.CheckLocationValid("location")` 返回 false 说明未收集
-4. 确认已重新打包资源（Editor 模式使用模拟器时可能引用旧的清单）
-
----
-
-### 问题：资源加载成功但内存一直增长
-
-**排查步骤**：
-1. 打开 TEngine 调试器（`~` 键或 DebuggerModule 按钮）查看资源引用计数
-2. 找到引用计数不为 0 的资产，定位到加载位置
-3. 常见原因：
-   - 加载后忘记 `UnloadAsset`
-   - 静态变量持有 Asset 引用
-   - UI 关闭但 Widget 里的 Asset 未释放
-4. 场景切换后调用：
-   ```csharp
-   GameModule.Resource.ForceUnloadUnusedAssets(gcCollection: true);
-   ```
-
----
-
-### 问题：热更后旧资源未更新（缓存问题）
-
-**排查步骤**：
-1. 检查 CDN 服务器上的资源版本文件是否更新
-2. 确认 `RequestPackageVersionAsync` 获取到了新版本号
-3. 检查 `UpdatePackageManifestAsync` 是否成功执行
-4. 本地测试时清空 `Application.persistentDataPath` 下的缓存目录
-
----
-
-## UI 模块问题
-
-### 问题：UI 打开后界面空白 / 节点找不到
-
-**排查步骤**：
-1. 检查 `[Window]` 特性中 `location` 是否与 Prefab 文件名一致
-2. 确认 Prefab 在 `AssetRaw/UI/Prefabs/` 下，且 YooAsset 已收集
-3. 检查 `ScriptGenerator` 中的路径是否与 Prefab 节点层级一致
-4. 在 `ScriptGenerator` 中加日志检查 `FindChild` 是否返回 null
-
----
-
-### 问题：UIWidget 数量不对 / 复用有问题
-
-**排查步骤**：
-1. 检查 `AdjustIconNum` 调用时 `count` 参数是否正确
-2. 确认 `OnRefresh` 在每次 Widget 显示时都被调用（框架保证）
-3. 复用场景中检查 `SetData` 是否正确重置了所有状态（旧数据可能残留）
-
----
-
-### 问题：UI 事件回调在对象销毁后仍触发
-
-**原因**：在 `RegisterEvent()` 外使用了 `GameEvent.AddEventListener`，未自动清理。
-
-**解决**：
+热更代码使用了主包没有 AOT 实例的泛型。菜单 `HybridCLR → Generate → AOT Generic References` 重新生成，若仍缺失则在 `AOTGenericReferences.cs` 手动添加占位引用：
 ```csharp
-// ❌ 错误位置
-protected override void OnCreate()
-{
-    GameEvent.AddEventListener<int>(EventId.OnHp, OnHp); // 不会自动清理
-}
+static void UseCustomGenericType() { _ = new List<MyCustomType>(); }
+```
 
-// ✅ 正确位置
-protected override void RegisterEvent()
-{
-    AddUIEvent<int>(EventId.OnHp, OnHp); // 自动随窗口销毁清理
-}
+#### Editor 正常，真机报错
+
+Editor 走 Mono 编译，真机走 IL2CPP + HybridCLR。检查是否有 `dynamic`/`Emit` 等不支持特性，反射代码是否受限。开启 `Development Build` + `Script Debugging` 获取完整堆栈。
+
+#### 热更 DLL 加载失败
+
+1. `HybridCLRSettings.asset` 中热更程序集列表是否完整
+2. 热更 DLL 是否已打入 AssetBundle（YooAsset 收集器含 `HybridCLRData` 目录）
+3. `ProcedureLoadAssembly.cs` 加载的 DLL 名与实际一致
+
+#### iOS 链接失败
+
+Burst/IL2CPP 裁剪了代码。在 `Assets/link.xml` 中保留需要的类型：
+```xml
+<linker><assembly fullname="UnityEngine"><type fullname="UnityEngine.Rigidbody" preserve="all"/></assembly></linker>
 ```
 
 ---
 
-## 事件系统问题
+### 资源加载问题
 
-### 问题：接口事件调用无响应
+#### location 无效
 
-**排查步骤**：
-1. 确认 `GameEventHelper.Init()` 在 `GameApp.Entrance` 中已调用
-2. 确认接口上有 `[EventInterface]` 特性
-3. 确认实现类已通过 `GameEventHelper.RegisterListener<IXxx>()` 注册
-4. 检查接口事件的 Source Generator 是否已重新生成（修改接口后需要重新编译）
+1. `AssetBundleCollector` 是否收集该资产
+2. location 不含路径和扩展名（`HeroPrefab` 而非 `Actor/Hero/HeroPrefab.prefab`）
+3. `GameModule.Resource.CheckLocationValid("location")` 返回 false 说明未收集
+4. 重新打包资源（Editor 模拟器可能引用旧清单）
 
----
+#### 内存持续增长
 
-### 问题：int 事件发送后有些监听收不到
+调试器（`~` 键）查看资源引用计数。常见原因：忘记 `UnloadAsset`、静态变量持有引用、UI Widget Asset 未释放、异步加载完成后对象已销毁导致 OnDestroy 未执行释放。API 详情见 [resource-api.md](resource-api.md)，生命周期模式见 [resource-patterns.md](resource-patterns.md)。
 
-**原因**：参数类型不匹配（`Send<float>` vs `AddEventListener<int>`）。
+#### 热更后旧资源未更新
 
-**排查**：严格保证 `Send<T>` 和 `AddEventListener<T>` 的泛型类型完全一致。
-
----
-
-## 内存与性能问题
-
-### 问题：GC 频繁导致卡顿
-
-**排查步骤**：
-1. 在 Profiler 中查看 GC Alloc 热点
-2. 常见原因：
-   - 字符串拼接（用 `StringBuilder` 或插值，避免在 Update 中）
-   - 闭包捕获（Lambda 中捕获变量会生成对象）
-   - `Linq` 操作（每次都分配中间集合）
-   - 频繁 `new` 数据对象（改用 `MemoryPool.Acquire<T>()`）
-
-### 问题：启动加载时间过长
-
-**优化策略**：
-1. 减少 `PRELOAD` 标签的资源数量，只预加载核心资源
-2. 使用进度回调展示加载进度，改善感知体验
-3. 对于大型 Prefab 使用异步实例化（Unity 的 `InstantiateAsync`，或分帧创建）
-
-### 问题：DrawCall 过高
-
-**排查步骤**：
-1. Frame Debugger 查看合批情况
-2. UI：确保同 Atlas 的图片在同一 Canvas 下，使用 Sprite Atlas 自动合批
-3. 3D：使用 GPU Instancing 或 Static Batching
-4. 确认材质和 Shader 一致（不一致的材质无法合批）
+1. CDN 资源版本文件是否更新
+2. `RequestPackageVersionAsync` 是否获取到新版本号
+3. 本地测试清空 `Application.persistentDataPath` 缓存
 
 ---
 
-## Luban 配置表问题
+### UI 问题
 
-### 问题：生成脚本报错 / 表格式不对
+#### 界面空白/节点找不到
 
-**排查步骤**：
-1. 确认 Excel 第2行类型拼写正确（`int`/`string`/`float` 等，区分大小写）
-2. 数组类型在 Excel 单元格中用英文逗号分隔（`1,2,3`）
-3. Bean 类型需要先在 `__beans__.xlsx` 中定义
-4. 表注册的 `value_type` 必须与数据 Excel 的 Bean 类型名完全一致
+1. `[Window]` 特性 location 与 Prefab 文件名一致
+2. Prefab 在 `AssetRaw/UI/Prefabs/` 且 YooAsset 已收集
+3. `ScriptGenerator` 路径与 Prefab 节点层级一致
+4. `FindChild` 返回 null 时加日志
 
----
+#### UI 事件销毁后仍触发
 
-### 问题：运行时找不到配置数据 / Tables 为 null
-
-**排查步骤**：
-1. 确认 `ConfigSystem.Instance.Load()` 已在 `ProcedurePreload` 后调用
-2. 检查 `.bytes` 数据文件是否在 `AssetRaw/Configs/bytes/` 下
-3. 确认数据文件已被 YooAsset AssetBundleCollector 收集（有 `PRELOAD` 标签）
-4. 在 Editor 模式检查 `Resources.Load<TextAsset>("bytes/item")` 是否能加载（Debug 用）
+在 `RegisterEvent()` 外使用 `GameEvent.AddEventListener` 不会自动清理。必须用 `AddUIEvent`。详见 [event-system.md](event-system.md)。
 
 ---
 
-## UniTask 问题
+### 事件系统问题
 
-### 问题：UniTask 异常被吞掉，找不到错误
+#### 接口事件无响应
 
-**原因**：`UniTaskVoid` 方法中的异常默认不会传播到调用方。
+1. `GameEventHelper.Init()` 是否已调用（`GameApp.Entrance` 最先调用）
+2. 接口有 `[EventInterface]` 特性
+3. Source Generator 已重新生成（重新编译项目）；无需手动调用 `RegisterListener`，它由编译器自动生成和注册
+4. `EEventGroup` 枚举是否已在主项目中定义
 
-**解决**：
+#### 监听收不到
+
+`Send<T>` 和 `AddEventListener<T>` 泛型类型必须完全一致（`Send<int>` 对 `AddEventListener<int>`）。
+
+---
+
+### 内存/性能问题
+
+#### GC 频繁
+
+Profiler 查看 GC Alloc 热点。常见：字符串拼接改 `StringBuilder`、闭包捕获避免 Lambda、Linq 改 `for` 循环、频繁 `new` 改 `MemoryPool.Acquire<T>()`。
+
+#### 启动慢
+
+减少 `PRELOAD` 标签资源、用进度回调展示、大型 Prefab 异步实例化。
+
+#### DrawCall 高
+
+Frame Debugger 查看合批。UI 同 Atlas 同 Canvas、3D 用 GPU Instancing/Static Batching、确认材质 Shader 一致。
+
+---
+
+### Luban 问题
+
+#### 生成报错
+
+Excel 第2行类型拼写正确（`int`/`string`/`float`，区分大小写）；数组用英文逗号；Bean 先在 `__beans__.xlsx` 定义；`value_type` 与 Bean 类型名一致。
+
+#### Tables 为 null
+
+1. `ConfigSystem.Instance.Load()` 已在 `ProcedurePreload` 后调用
+2. `.bytes` 在 `AssetRaw/Configs/bytes/` 且 YooAsset 已收集
+3. 数据文件有 `PRELOAD` 标签
+
+#### ConfigSystem.cs 找不到
+
+`ConfigSystem.cs` 不在 Assets 默认目录中，需从 Luban CustomTemplate 模板生成。详见 [luban-config.md](luban-config.md)。
+
+---
+
+### UniTask 问题
+
+#### 异常被吞
+
+`UniTaskVoid` 异常不传播。方法内 try-catch，或设置全局回调：
 ```csharp
-// 方式1：在 UniTaskVoid 方法中 try-catch
-public async UniTaskVoid DoSomethingAsync()
-{
-    try
-    {
-        await SomeOperation();
-    }
-    catch (Exception e)
-    {
-        Log.Error($"异步操作失败: {e}");
-    }
-}
-
-// 方式2：设置全局未处理异常回调（在 GameApp 初始化时）
-UniTaskScheduler.UnobservedExceptionHandler = e =>
-{
-    Log.Error($"未处理的 UniTask 异常: {e}");
-};
+UniTaskScheduler.UnobservedExceptionHandler = e => Log.Error($"未处理 UniTask 异常: {e}");
 ```
 
-### 问题：await 后 Unity 对象变成 null
+#### await 后对象为 null
 
-**原因**：await 期间对象被销毁（场景切换、UI 关闭等）。
-
-**解决**：
+await 期间对象被销毁。返回后检查：
 ```csharp
-var sprite = await GameModule.Resource.LoadAssetAsync<Sprite>("icon", _cts.Token);
-
-// await 返回后检查对象是否还存在
-if (this == null || _imgIcon == null) return; // Unity Object 的 null 检查
-
-_imgIcon.sprite = sprite;
+if (this == null || _imgIcon == null) return;
 ```
+
+---
+
+## 常见错误
+
+| 错误 | 原因 | 修复 |
+|------|------|------|
+| UIWindow `OnCreate(object userData)` 编译失败 | 生命周期方法无参数 | `OnCreate()` 无参，数据通过 `UserData` 属性获取 |
+| UIWindow `OnRefresh(object userData)` 编译失败 | 同上 | `OnRefresh()` 无参 |
+| UIWindow `OnDestroy()` 误写为 `OnDestroy(bool isShutdown)` | 与 ProcedureBase.OnDestroy 签名混淆 | UIWindow.OnDestroy() 无参数 |
+| `SetSprite` callback 写成 `Action<Sprite>` | callback 参数类型不是 Sprite | 实际为 `Action<Image>`，回调参数是设置完 Sprite 后的 Image 组件 |
+| `GameEvent.UnRegisterAll()` 编译失败 | GameEvent 中不存在此方法 | 使用 `GameEvent.RemoveEventListener(eventType, handler)` 或 `GameEventMgr.Clear()` |
+| `SetSprite` callback 写成 `Action<SpriteRenderer>` | SpriteRenderer 重载的 callback 是 `Action<SpriteRenderer>` | Image 版和 SpriteRenderer 版 callback 类型不同，按需使用 |
+
+### UIWindow 生命周期签名速查
+
+```csharp
+// ✅ 正确签名（UIBase 中定义）
+protected virtual void OnCreate()      // 无参数
+protected virtual void OnRefresh()     // 无参数
+protected virtual void OnUpdate()      // 无参数
+protected virtual void OnDestroy()     // 无参数（非 ProcedureBase 的 OnDestroy(ProcedureOwner)）
+
+// ❌ 常见错误签名
+protected override void OnCreate(object userData)   // 不存在此签名
+protected override void OnDestroy(bool isShutdown)  // 这是 ProcedureBase 的签名，不是 UIWindow
+```
+
+### SetSprite callback 签名速查
+
+`SetSprite` 的 callback 类型是 `Action<Image>`（Image 扩展）或 `Action<SpriteRenderer>`（SpriteRenderer 扩展），**不是** `Action<Sprite>`。完整签名见 [resource-api.md](resource-api.md#setsprite-扩展方法4-个签名)。
+
+### GameEvent 清理方法速查
+
+```csharp
+// ✅ UI 内部事件自动清理（AddUIEvent 在 OnDestroy 时自动 RemoveAllUIEvent）
+AddUIEvent(eventType, handler);
+
+// ✅ 手动移除单个事件监听
+GameEvent.RemoveEventListener(eventType, handler);
+
+// ✅ 清理 UI 内所有事件（UIBase 内部调用）
+RemoveAllUIEvent();           // UIBase 方法，内部调 GameEventMgr.Clear()
+// 或
+EventMgr.Clear();             // GameEventMgr 实例方法
+
+// ❌ 不存在的方法
+GameEvent.UnRegisterAll();    // 编译错误：GameEvent 无此方法
+```
+
+---
+
+## 交叉引用
+
+- UI 生命周期见 [ui-lifecycle.md](ui-lifecycle.md)
+- 事件系统见 [event-system.md](event-system.md)
+- 资源加载见 [resource-api.md](resource-api.md)
+- 热更开发见 [hotfix-workflow.md](hotfix-workflow.md)
+- Luban 配置见 [luban-config.md](luban-config.md)
+- 架构总览见 [architecture.md](architecture.md)

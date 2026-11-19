@@ -1,34 +1,14 @@
 ---
 name: tengine-dev
-description: TEngine Unity 商业游戏框架全栈开发指导。在 TEngine 框架项目中编写或修改任何代码时触发，包括：(1) 模块系统使用（ResourceModule/AudioModule/TimerModule 等），(2) UI 开发（UIWindow/UIWidget/UIModule），(3) 事件系统（int事件/接口事件/UIEvent），(4) 资源管理（YooAsset 加载/释放/热更），(5) 热更代码开发（HybridCLR 程序集划分/GameApp 入口），(6) Luban 配置表集成与访问，(7) 异步编程规范（UniTask），(8) 代码规范与架构设计审查，(9) 通过 unity-mcp (CoplayDev) 操作 Unity Editor（拼 UI Prefab / 操作场景 / 创建脚本 / 材质 / 动画 / 测试自动化）。关键词：TEngine, UIWindow, UIWidget, GameModule, ResourceModule, YooAsset, HybridCLR, UniTask, EventInterface, GameEvent, Luban, ConfigSystem, ProcedureBase, ModuleSystem, GameApp, unity-mcp, manage_gameobject, manage_scene, manage_prefabs, manage_ui, manage_script, batch_execute.
+description: TEngine Unity 游戏框架开发指导。触发词：TEngine, UIWindow, UIWidget, GameEvent, AddUIEvent, LoadAssetAsync, SetSprite, HybridCLR, YooAsset, Luban, GameModule, 热更, 资源加载, UI开发, 事件系统, 配置表
 ---
 
-# TEngine 开发技能
+# TEngine 开发指导
 
-TEngine 基于 HybridCLR + YooAsset + UniTask + Luban 构建。
+TEngine 是基于 HybridCLR + YooAsset + UniTask + Luban 的 Unity 游戏框架。
+本 skill 提供 AI 专用的精炼参考文档，确保生成的代码与框架 API 完全一致。
 
-## 快速导航
-
-| 需要什么 | 查看文件 |
-|---------|---------|
-| 项目结构 / 分层架构 / 启动流程 | [architecture.md](references/architecture.md) |
-| 所有模块 API 速查（Timer/Scene/Audio/Fsm 等）| [modules.md](references/modules.md) |
-| UI 开发（Window/Widget/生命周期）| [ui-development.md](references/ui-development.md) |
-| 事件系统（int事件 / 接口事件 / UIEvent）| [event-system.md](references/event-system.md) |
-| 资源加载 / 释放（Sprite / GameObject / Asset）| [resource-management.md](references/resource-management.md) |
-| 热更包下载 / Manifest 更新 / 缓存清理 | [hotpatch-management.md](references/hotpatch-management.md) |
-| 热更代码 / HybridCLR / GameApp 入口 | [hotfix-development.md](references/hotfix-development.md) |
-| Luban 配置表生成与访问 | [luban-config.md](references/luban-config.md) |
-| 代码规范 / 命名约定 / 设计模式 | [conventions.md](references/conventions.md) |
-| 常见问题 / 错误排查 | [troubleshooting.md](references/troubleshooting.md) |
-| **unity-mcp 全工具索引 / batch_execute / 目标定位** | [unity-mcp-guide.md](references/unity-mcp-guide.md) |
-| **UI Prefab 拼接（节点命名规范 / 工作流 / 模板）** | [ui-prefab-builder.md](references/ui-prefab-builder.md) |
-| **场景 / GameObject / 组件 操作** | [scene-gameobject.md](references/scene-gameobject.md) |
-| **脚本创建 / 精确编辑 / 资源文件管理** | [script-asset-workflow.md](references/script-asset-workflow.md) |
-| **材质 / Shader / VFX / 动画控制器** | [material-shader-vfx.md](references/material-shader-vfx.md) |
-| **Editor 自动化 / PlayMode / 测试 / 日志** | [editor-automation.md](references/editor-automation.md) |
-
-## 核心原则
+## 核心红线
 
 1. **异步优先**：IO 操作用 `UniTask`，禁止同步加载/Coroutine
 2. **模块访问**：通过 `GameModule.XXX` 访问，而非 `ModuleSystem.GetModule<T>()`
@@ -36,13 +16,20 @@ TEngine 基于 HybridCLR + YooAsset + UniTask + Luban 构建。
 4. **热更边界**：`GameScripts/Main` 不热更，`GameScripts/HotFix/` 全部热更
 5. **事件解耦**：模块间用 `GameEvent`，UI 内部用 `AddUIEvent`
 
-## 程序集分层
+## 文档路由
 
-```
-GameScripts/Main/       → 主包（不热更）
-GameScripts/HotFix/
-  ├── GameProto/        → Luban 配置代码
-  └── GameLogic/        → 业务逻辑（GameApp.cs 入口）
-```
+根据任务类型，读取对应的 reference 文档：
 
-**依赖**：GameLogic → TEngine.Runtime（单向）
+| 任务类型 | 必读文档 | 进阶文档 | 优先级 |
+|---------|---------|---------|--------|
+| UI 开发 | [ui-lifecycle.md](references/ui-lifecycle.md) | [ui-patterns.md](references/ui-patterns.md) | P0 |
+| 事件系统 | [event-system.md](references/event-system.md) | [event-antipatterns.md](references/event-antipatterns.md) | P0 |
+| 资源加载 | [resource-api.md](references/resource-api.md) | [resource-patterns.md](references/resource-patterns.md) | P0 |
+| 模块使用 | [modules.md](references/modules.md) | — | P0 |
+| 热更代码 | [hotfix-workflow.md](references/hotfix-workflow.md) | — | P1 |
+| 代码规范 | [naming-rules.md](references/naming-rules.md) | — | P1 |
+| Luban 配置 | [luban-config.md](references/luban-config.md) | — | P1 |
+| 项目结构 | [architecture.md](references/architecture.md) | — | P2 |
+| 问题排查 | [troubleshooting.md](references/troubleshooting.md) | — | P2 |
+| MCP 场景/GO/UI/脚本/Editor | [mcp-tools.md](references/mcp-tools.md) | — | P1 |
+| MCP 材质/Shader/动画/VFX | [mcp-visual.md](references/mcp-visual.md) | — | P2 |

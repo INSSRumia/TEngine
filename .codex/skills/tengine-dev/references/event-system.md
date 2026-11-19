@@ -1,342 +1,330 @@
-# TEngine 事件系统
+# 事件系统
 
-## 目录
+> **适用场景**：GameEvent/AddUIEvent/GameEventMgr 使用、接口事件定义与发送、事件监听清理 | **关联文档**：[ui-lifecycle.md](ui-lifecycle.md)（AddUIEvent 自动清理）、[event-antipatterns.md](event-antipatterns.md)（避坑）、[naming-rules.md](naming-rules.md)（事件命名）
 
-- [两种事件模式对比](#两种事件模式对比)
-- [模式一：int 事件（传统发布订阅）](#模式一int-事件)
-- [模式二：接口事件（Source Generator）](#模式二接口事件)
-- [UI 内部事件（自动生命周期）](#ui-内部事件)
-- [GameEventMgr（非 UI 类的事件管理）](#gameeventmgr)
-- [事件分组（EEventGroup）](#事件分组)
-- [事件定义规范](#事件定义规范)
-- [常见错误与避坑](#常见错误与避坑)
+## 架构概览
 
----
+TEngine 事件系统由三个核心组件构成：
 
-## 两种事件模式对比
+| 组件 | 类型 | 职责 |
+|------|------|------|
+| **GameEvent** | 全局静态门面 | 持有 `static readonly EventMgr _eventMgr`，所有方法委托给内部 EventMgr 实例 |
+| **GameEventMgr** | 局部作用域管理器 | 实现 `IMemory`，用于 UI 面板等需要随生命周期自动解绑的场景，只有 `AddEvent` + `Clear()` |
+| **GameEventHelper** | Source Generator 生成类 | 源码中无 .cs 文件，由 `[EventInterface]` 特性在编译时自动生成，提供 `Init()` 和 `RegisterListener<T>()` |
 
-| 特性 | int 事件（底层） | 接口事件（推荐） |
-|------|---------|---------|
-| 事件 ID 来源 | Source Generator 从接口自动生成 `static readonly int` | 同左，接口即定义 |
-| 类型安全 | 弱（参数需手动匹配） | 强（编译期检查） |
-| 发送方式 | `GameEvent.Send<T>(ILoginUI_Event.ShowLoginUI, data)` | `GameEvent.Get<ILoginUI>().ShowLoginUI()` |
-| 收听方式 | `GameEvent.AddEventListener<T>(ILoginUI_Event.ShowLoginUI, cb)` | 无需手动收听，实现接口即可 |
-| 适用场景 | UI 内部事件绑定（`AddUIEvent`）、精细订阅控制 | 模块间通信（推荐默认选择） |
+TEngine 提供两种事件模式：**int/string 事件**（委托回调）和**接口事件**（类型安全）。
 
-**关键认知**：**两种模式共用同一套事件 ID**。接口事件 `[EventInterface]` 标记的接口，由 Source Generator 自动为每个方法生成 `static readonly int` 事件 ID（如 `ILoginUI_Event.ShowLoginUI`）。无需手动维护任何 int 常量文件。
+### 模式对比
 
-**推荐**：新功能优先使用**接口事件**（类型安全，调用直观）；UI 内部简单响应用 `AddUIEvent` + 生成的事件 ID。
+| 特性 | int/string 事件 | 接口事件 |
+|------|----------------|---------|
+| 定义方式 | `const int` 常量 / string | 带 `[EventInterface]` 的接口 |
+| 发送 | `GameEvent.Send(int/string)` | `GameEvent.Get<ITrade>().OnTrade(...)` |
+| 监听 | `GameEvent.AddEventListener(int/string, callback)` | 实现接口 + `RegisterListener` |
+| 类型安全 | 无编译检查 | 编译期检查 |
+| 适用场景 | 简单通知、UI 内部 | 模块间通信、多参数 |
 
 ---
 
-## 模式一：int 事件（底层）
+## 核心 API
 
-### 事件 ID 的来源
+### GameEvent 静态方法
 
-**无需手动定义 int 常量。** 事件 ID 由 Source Generator 从 `[EventInterface]` 接口自动生成：
+#### Send（发送事件）
 
 ```csharp
-// 1. 定义接口（开发者只需写这个）
+// int 版本：支持 0~6 个泛型参数
+GameEvent.Send(int eventType);
+GameEvent.Send<T1>(int eventType, T1 arg1);
+GameEvent.Send<T1,T2>(int eventType, T1 arg1, T2 arg2);
+// ... 最多 Send<T1,T2,T3,T4,T5,T6>
+
+// string 版本：支持 0~5 个泛型参数（内部通过 RuntimeId.ToRuntimeId 转为 int）
+GameEvent.Send(string eventType);
+GameEvent.Send<T1>(string eventType, T1 arg1);
+// ... 最多 Send<T1,T2,T3,T4,T5>
+```
+
+#### AddEventListener（监听事件）
+
+返回 `bool`（是否监听成功）。UI 内推荐用 `AddUIEvent`（自动清理，无需关心返回值）。
+
+```csharp
+// int 版本：支持 0~6 个泛型参数
+bool GameEvent.AddEventListener(int eventType, Action handler);
+bool GameEvent.AddEventListener<T1>(int eventType, Action<T1> handler);
+// ... 最多 AddEventListener<T1,T2,T3,T4,T5,T6>
+
+// string 版本：支持 0~5 个泛型参数
+bool GameEvent.AddEventListener(string eventType, Action handler);
+bool GameEvent.AddEventListener<T1>(string eventType, Action<T1> handler);
+// ... 最多 AddEventListener<T1,T2,T3,T4,T5>
+```
+
+#### RemoveEventListener（移除监听）
+
+```csharp
+// int 版本：支持 0~5 个泛型参数 + Delegate 重载
+GameEvent.RemoveEventListener(int eventType, Action handler);
+GameEvent.RemoveEventListener<T1>(int eventType, Action<T1> handler);
+// ... 最多 RemoveEventListener<T1,T2,T3,T4,T5>
+GameEvent.RemoveEventListener(int eventType, Delegate handler);  // Delegate 重载
+
+// string 版本：支持 0~5 个泛型参数 + Delegate 重载
+GameEvent.RemoveEventListener(string eventType, Action handler);
+// ... 最多 RemoveEventListener<T1,T2,T3,T4,T5>
+GameEvent.RemoveEventListener(string eventType, Delegate handler);  // Delegate 重载
+```
+
+#### Get（接口事件获取）
+
+```csharp
+// 返回接口实例，内部调用 _eventMgr.GetInterface<T>()
+T GameEvent.Get<T>();
+```
+
+#### Shutdown（清除所有事件注册）
+
+```csharp
+// 仅在游戏退出时调用，内部调用 _eventMgr.Init() 重置所有事件
+GameEvent.Shutdown();
+```
+
+> **注意**：源码中没有 `UnRegisterAll<T>()` 或 `UnRegisterAll()` 方法。需要清除所有事件时使用 `Shutdown()`（全局）或 `GameEventMgr.Clear()`（局部）。
+
+### GameEventMgr 局部管理器
+
+实现 `IMemory`，仅支持 `int` eventType，最多 5 个泛型参数。没有 `RemoveEvent` 方法，通过 `Clear()` 一次性移除所有已注册事件。
+
+```csharp
+private readonly GameEventMgr _eventMgr = new();
+
+// 注册（仅在 AddEventListener 返回 true 时才记录到内部列表）
+_eventMgr.AddEvent(int eventType, Action handler);
+_eventMgr.AddEvent<T1>(int eventType, Action<T1> handler);
+// ... 最多 AddEvent<T1,T2,T3,T4,T5>
+
+// 一次性移除所有
+_eventMgr.Clear();
+```
+
+---
+
+## 使用模式
+
+### int 事件
+
+```csharp
+// 1. 定义事件接口（必须 [EventInterface]，需指定事件组）
 [EventInterface(EEventGroup.GroupUI)]
-public interface ILoginUI
+public interface IGameEvent
 {
-    void ShowLoginUI();
-    void CloseLoginUI();
+    void OnGoldChanged();
+
+    void OnHpChanged(int hp)
 }
 
-// 2. Source Generator 自动生成（编译期，不存在实体 .cs 文件）：
-// ILoginUI_Event.g.cs
-public partial class ILoginUI_Event
+// 2. 源代码生成器自动实现并注册
+public class IGameEvent_Event
 {
-    public static readonly int ShowLoginUI  = RuntimeId.ToRuntimeId("ILoginUI_Event.ShowLoginUI");
-    public static readonly int CloseLoginUI = RuntimeId.ToRuntimeId("ILoginUI_Event.CloseLoginUI");
+    public static readonly int OnGoldChanged = RuntimeId.ToRuntimeId("IGameEvent_Event.OnGoldChanged");
+    public static readonly int OnHpChanged = RuntimeId.ToRuntimeId("IGameEvent_Event.OnHpChanged");
 }
+
+public class IGameEvent_Gen : IGameEvent
+{
+    void OnGoldChanged() { /* 自动生成 */ }
+
+    void OnHpChanged(int hp) { /* 自动生成 */ }
+}
+
+// 发送
+GameEvent.Get<IGameEvent>().OnGoldChanged();
+GameEvent.Get<IGameEvent>().OnHpChanged(hp);
+
+// 监听（UI 内用 AddUIEvent 自动清理）
+AddUIEvent(IGameEvent_Event.OnGoldChanged, OnGoldChanged);
+AddUIEvent<int>(IGameEvent_Event.OnHpChanged, OnHpChanged);
+
+// 非 UI 类监听（必须手动移除）
+void OnEnable() { GameEvent.AddEventListener<int>(IGameEvent_Event.OnHpChanged, OnHpChanged); }
+void OnDisable() { GameEvent.RemoveEventListener<int>(IGameEvent_Event.OnHpChanged, OnHpChanged); }
 ```
 
-直接使用生成的事件 ID：`ILoginUI_Event.ShowLoginUI`（int 类型）
+### string 事件类型
 
-### 注册监听
+除 `int` 外，`GameEvent` 也支持 `string` 作为事件 ID（API 与 int 版本对称，但是不推荐使用）：
 
 ```csharp
-// 无参
-GameEvent.AddEventListener(ILoginUI_Event.ShowLoginUI, OnShowLoginUI);
+// 发送
+GameEvent.Send("OnGoldChanged");
+GameEvent.Send<int>("OnHpChanged", 50);
 
-// 1个参数
-GameEvent.AddEventListener<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
+// 监听（UI 内）
+AddUIEvent("OnGoldChanged", OnGoldChanged);
+AddUIEvent<int>("OnHpChanged", OnHpChanged);
 
-// 2个参数
-GameEvent.AddEventListener<int, string>(IXxx_Event.OnXxx, OnXxx);
-
-// 最多支持6个参数
+// 非 UI 类监听
+GameEvent.AddEventListener<int>("OnHpChanged", OnHpChanged);
+GameEvent.RemoveEventListener<int>("OnHpChanged", OnHpChanged);
 ```
 
-### 发送事件
+适用场景：事件名需要动态拼接、或跨模块字符串约定时使用。性能略低于 int（内部通过 `RuntimeId.ToRuntimeId` 转换），优先用 int。
+
+### 接口事件
 
 ```csharp
-GameEvent.Send(ILoginUI_Event.ShowLoginUI);
-GameEvent.Send<int>(IBattleEvent_Event.OnHpChanged, newHp);
-GameEvent.Send<int, string>(IXxx_Event.OnXxx, arg1, arg2);
-```
-
-### 移除监听
-
-```csharp
-GameEvent.RemoveEventListener<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
-```
-
-**注意**：非 UIWindow/UIWidget 类中注册的监听必须在对象销毁时手动 `RemoveEventListener`，否则内存泄漏。
-
----
-
-## 模式二：接口事件（推荐）
-
-### 定义事件接口
-
-```csharp
-// GameScripts/HotFix/GameLogic/IEvent/ILoginUI.cs
+// 1. 定义接口（必须 [EventInterface]，需指定事件组）
 [EventInterface(EEventGroup.GroupUI)]
-public interface ILoginUI
+public interface ITrade
 {
-    void ShowLoginUI();
-    void CloseLoginUI();
-    void RefreshLoginState(int state, string message);
-}
-```
-
-Source Generator 自动生成：
-- `ILoginUI_Event.g.cs` — 每个方法对应一个 `static readonly int` 事件 ID
-- `ILoginUI_Gen.g.cs` — 实现 `ILoginUI`，方法体内调用 `dispatcher.Send(事件ID)`
-- `GameEventHelper.g.cs` — `Init()` 中实例化所有 `_Gen` 类并注册
-
-### 触发事件（发送方）
-
-```csharp
-// 任意位置调用，等同于发送对应的 int 事件
-GameEvent.Get<ILoginUI>().ShowLoginUI();
-GameEvent.Get<ILoginUI>().RefreshLoginState(1, "登录成功");
-```
-
-### 监听事件（接收方）
-
-接口事件的**接收**仍然通过 `AddEventListener` 订阅对应的 int 事件 ID：
-
-```csharp
-// 在 UIWindow.RegisterEvent() 中（推荐）
-protected override void RegisterEvent()
-{
-    AddUIEvent(ILoginUI_Event.ShowLoginUI, OnShowLoginUI);
-    AddUIEvent<int, string>(ILoginUI_Event.RefreshLoginState, OnRefreshState);
+    void OnTradeComplete(int itemId, int count);
 }
 
-// 或在普通类中
-_eventMgr.AddEvent(ILoginUI_Event.ShowLoginUI, OnShowLoginUI);
-_eventMgr.AddEvent<int, string>(ILoginUI_Event.RefreshLoginState, OnRefreshState);
+// 2. 源代码生成器自动实现并注册
+public class ITrade_Gen : ITrade
+{
+    void OnTradeComplete(int itemId, int count) { /* 自动生成 */ }
+}
+
+// 3. 发送
+GameEvent.Get<ITrade>().OnTradeComplete(itemId, count);
 ```
 
-### 初始化（必须调用）
+**前提**：`GameEventHelper.Init()` 已在 `GameApp.Entrance` 中最先调用。
+
+> **注意**：`GameEventHelper` 是 Source Generator 自动生成的类，源码中不存在 `.cs` 文件。编译时由事件接口上的 `[EventInterface]` 特性触发生成，提供 `Init()`（注册所有接口事件）和 `RegisterListener<T>()`（运行时注册实现类）方法。
+
+### GameEventMgr 批量管理
+
+非 UI 类的事件监听推荐用 `GameEventMgr` 统一管理，避免忘记移除：
 
 ```csharp
-// GameApp.Entrance() 中，必须最先调用
-GameEventHelper.Init();  // 实例化所有 _Gen 代理，否则 GameEvent.Get<T>() 全部无响应
+private readonly GameEventMgr _eventMgr = new();
+
+public void Init()
+{
+    _eventMgr.AddEvent(GameEventDef.OnGoldChanged, OnGoldChanged);
+    _eventMgr.AddEvent<int>(GameEventDef.OnHpChanged, OnHpChanged);
+}
+
+public void Dispose() => _eventMgr.Clear();  // 一次性移除所有
 ```
 
 ---
 
-## UI 内部事件
+## 常见错误
 
-在 `UIWindow` / `UIWidget` 的 `RegisterEvent()` 方法中注册，随窗口/组件销毁**自动清理**，无需手动移除。使用 Source Generator 生成的事件 ID：
+### 1. 忘记 GameEventHelper.Init()
 
 ```csharp
-protected override void RegisterEvent()
+// 错误：GameEvent.Get<T>() 全部无响应，无报错，极难排查
+public static void Entrance(Assembly[] assemblies)
 {
-    // 无参（使用接口生成的事件 ID）
-    AddUIEvent(ILoginUI_Event.ShowLoginUI, OnShowLoginUI);
-    
-    // 1个参数
-    AddUIEvent<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
-    
-    // 2个参数
-    AddUIEvent<int, string>(IXxx_Event.OnItemGet, OnItemGet);
+    // GameEventHelper.Init();  <- 忘记调用
+    GameApp_RegisterSystem.Register();
 }
 
-private void OnHpChanged(int hp) { _txtHp.text = hp.ToString(); }
-private void OnItemGet(int itemId, string itemName) { ShowGetTip(itemName); }
+// 正确：必须最先调用
+GameEventHelper.Init();
 ```
 
-**原则**：
-- 只在 `RegisterEvent()` 内调用 `AddUIEvent`
-- 禁止在 `RegisterEvent` 外调用 `GameEvent.AddEventListener`（不会自动清理）
-- 框架在 `UIWindow.InternalDestroy` 时自动调用 `RemoveAllUIEvent()`
-
----
-
-## GameEventMgr
-
-用于普通 C# 类（非 UIWindow/UIWidget）管理多个事件监听，统一生命周期：
+### 2. UI 外部使用 AddEventListener（内存泄漏）
 
 ```csharp
+// 错误：退出窗口不会自动清理
+void SomeMethod()
+    => GameEvent.AddEventListener<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
+
+// 正确：UIWindow 中用 AddUIEvent（自动清理）
+protected override void RegisterEvent()
+    => AddUIEvent<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
+
+// 正确：非 UI 类用 GameEventMgr
+private readonly GameEventMgr _eventMgr = new();
+public void Dispose() => _eventMgr.Clear();
+```
+
+### 3. 手写事件 ID 常量
+
+```csharp
+// 错误：手写 int 常量，容易重复/拼错
+public const int OnHpChanged = 1001;
+
+// 正确：Source Generator 自动生成
+AddUIEvent(IBattleEvent_Event.OnHpChanged, OnHpChanged);
+```
+
+### 4. 事件回调签名不匹配
+
+```csharp
+// 错误：事件发送 int，回调接收 string -> 运行时异常
+GameEvent.Send<int>(IBattleEvent_Event.OnHpChanged, hp);
+AddUIEvent<string>(IBattleEvent_Event.OnHpChanged, OnHp);
+
+// 正确：接口事件模式可编译期检查
+GameEvent.Get<IBattleEvent>().OnHpChanged(hp); // 类型安全
+```
+
+### 5. 非 UI 类忘记移除监听
+
+```csharp
+// 错误：销毁时不移除，回调引用已释放对象
 public class PlayerSystem
 {
-    private readonly GameEventMgr _eventMgr = new GameEventMgr();
-
-    public void Initialize()
-    {
-        // 使用 Source Generator 生成的事件 ID
-        _eventMgr.AddEvent(IPlayerEvent_Event.OnPlayerDead, OnPlayerDead);
-        _eventMgr.AddEvent<int>(IBattleEvent_Event.OnHpChanged, OnHpChanged);
-    }
-
-    public void Dispose()
-    {
-        _eventMgr.Clear();  // 批量移除所有已注册监听
-    }
-
-    private void OnPlayerDead() { }
-    private void OnHpChanged(int hp) { }
+    public void Init() => GameEvent.AddEventListener(IPlayerEvent_Event.OnDead, OnDead);
+    // 没有 RemoveEventListener -> 泄漏
 }
+
+// 正确：使用 GameEventMgr 批量清理
+private readonly GameEventMgr _eventMgr = new();
+public void Init()    => _eventMgr.AddEvent(IPlayerEvent_Event.OnDead, OnDead);
+public void Dispose() => _eventMgr.Clear();
 ```
 
----
-
-## 事件分组（EEventGroup）
-
-框架内置两种分组（`EventInterfaceAttribute.cs` 定义）：
+### 6. 误用不存在的 UnRegisterAll
 
 ```csharp
-public enum EEventGroup
-{
-    GroupUI,     // UI 相关的交互事件
-    GroupLogic,  // 逻辑层内部相关的交互事件
-}
+// 错误：源码中不存在 UnRegisterAll<T>() 或 UnRegisterAll() 方法
+GameEvent.UnRegisterAll<int>(eventType);
+GameEvent.UnRegisterAll();
+
+// 正确：按需使用以下方式清除
+GameEvent.RemoveEventListener(eventType, handler);  // 移除单个监听
+GameEventMgr.Clear();                               // 局部批量清除
+GameEvent.Shutdown();                               // 全局清除（仅游戏退出时）
 ```
 
-```csharp
-[EventInterface(EEventGroup.GroupUI)]    // UI 模块间通信
-public interface ILoginUI { ... }
+### 7. 误用不存在的 RegisterListener
 
-[EventInterface(EEventGroup.GroupLogic)] // 逻辑层事件
-public interface IBattleEvent { ... }
+```csharp
+// 错误：GameEvent 中不存在 RegisterListener<T>() 方法
+GameEvent.RegisterListener<ITrade>(implementation);
+
+// 正确：GameEventHelper.Init() 由 Source Generator 自动注册，无需手动调用 RegisterListener
+// 接口事件实现类由编译时自动生成和注册，只需确保 GameEventHelper.Init() 在 GameApp.Entrance 中最先调用
+GameEventHelper.Init();
 ```
 
 ---
 
 ## 事件定义规范
 
-### 核心规则：只定义接口，不手写 ID
-
-```
-❌ 不要创建  GameEventDef.cs  手动维护 const int 常量
-✅ 只需定义  [EventInterface] 接口，Source Generator 自动生成所有 ID
-```
-
-### 接口命名规范
-
-```
-I{UIName}           → UI 相关（ILoginUI, IMainMenuUI, IBattleUI）
-I{Domain}Event      → 逻辑层事件（IBattleEvent, IPlayerEvent）
-```
-
-### 文件组织
-
-```
-GameLogic/IEvent/
-├── ILoginUI.cs          # 登录 UI 相关接口（GroupUI）
-├── IMainMenuUI.cs       # 主菜单 UI 接口（GroupUI）
-├── IBattleUI.cs         # 战斗 UI 接口（GroupUI）
-├── IBattleEvent.cs      # 战斗逻辑事件（GroupLogic）
-└── IPlayerEvent.cs      # 玩家逻辑事件（GroupLogic）
-```
-
-### 添加新事件的完整流程
-
-```
-1. 在 IEvent/ 下新建接口文件
-2. 标记 [EventInterface(EEventGroup.GroupUI/GroupLogic)]
-3. 定义方法签名
-4. 重新编译 → Source Generator 自动生成 IXxx_Event.g.cs / IXxx_Gen.g.cs / 更新 GameEventHelper.g.cs
-5. 使用：发送 GameEvent.Get<IXxx>().Method()，接收 AddUIEvent(IXxx_Event.Method, cb)
-```
+| 规则 | 说明 |
+|------|------|
+| ID 范围 | 自定义事件 >= 10000，1~9999 保留 |
+| 命名 | `On` + 过去式动词 + 名词：`OnGoldChanged`、`OnBattleEnded` |
+| 接口命名 | `I` + 动词 + 名词：`ITrade`、`IBattle` |
+| 泛型参数 | int 事件最多 6 个，string 事件最多 5 个，GameEventMgr 最多 5 个 |
+| 禁止 | 手写事件 ID 硬编码数字，应用常量 |
 
 ---
 
-## 常见错误与避坑
+## 交叉引用
 
-**1. 手动定义 int 常量（错误做法）**
-
-```csharp
-// ❌ 错误：手动维护事件 ID，容易冲突且无类型保障
-public static class GameEventDef
-{
-    public const int OnHpChanged = 10001; // 不要这样做！
-}
-
-// ✅ 正确：定义接口，让 Source Generator 生成 ID
-[EventInterface(EEventGroup.GroupLogic)]
-public interface IBattleEvent
-{
-    void OnHpChanged(int hp);
-}
-// 直接使用：IBattleEvent_Event.OnHpChanged（自动生成的 int ID）
-```
-
-**2. 忘记移除监听导致内存泄漏**
-
-```csharp
-// ❌ 错误：在普通类中注册但不清理
-public class MySystem
-{
-    public void Init()
-    {
-        GameEvent.AddEventListener<int>(IBattleEvent_Event.OnHpChanged, OnHp); // 泄漏！
-    }
-}
-
-// ✅ 正确：使用 GameEventMgr 统一清理
-public class MySystem
-{
-    private readonly GameEventMgr _mgr = new();
-    public void Init()    => _mgr.AddEvent<int>(IBattleEvent_Event.OnHpChanged, OnHp);
-    public void Dispose() => _mgr.Clear();
-}
-```
-
-**3. 在 UI 中绕开 AddUIEvent**
-
-```csharp
-// ❌ 错误：不会自动清理，窗口关闭后仍触发
-protected override void OnCreate()
-{
-    GameEvent.AddEventListener<int>(IBattleEvent_Event.OnHpChanged, OnHp);
-}
-
-// ✅ 正确：在 RegisterEvent 中用 AddUIEvent
-protected override void RegisterEvent()
-{
-    AddUIEvent<int>(IBattleEvent_Event.OnHpChanged, OnHp);
-}
-```
-
-**4. 接口事件未调用 Init**
-
-```csharp
-// ❌ 错误：忘记初始化，所有 GameEvent.Get<T>().Method() 调用均无响应
-public static void Entrance(Assembly[] assemblies) { /* ... */ }
-
-// ✅ 正确：必须在 Entrance 第一行调用
-public static void Entrance(Assembly[] assemblies)
-{
-    GameEventHelper.Init();  // 必须！Source Generator 生成，自动包含所有接口
-    // ...
-}
-```
-
-**5. 发送与监听的参数类型不匹配**
-
-```csharp
-// ❌ 错误：接口定义参数 int，但订阅时用 float
-GameEvent.Get<IBattleEvent>().OnHpChanged(100); // 接口方法参数是 int
-GameEvent.AddEventListener<float>(IBattleEvent_Event.OnHpChanged, cb); // 类型不匹配！
-
-// ✅ 正确：订阅参数类型与接口方法参数一致
-GameEvent.AddEventListener<int>(IBattleEvent_Event.OnHpChanged, cb);
-```
+| 相关文档 | 内容 |
+|---------|------|
+| ui-lifecycle.md | AddUIEvent 在 UIWindow 生命周期中的自动清理机制 |
+| modules.md | GameModule 事件相关模块 |
+| event-antipatterns.md | 事件系统反模式与避坑指南 |
+| naming-rules.md | 事件常量与接口的命名约定 |

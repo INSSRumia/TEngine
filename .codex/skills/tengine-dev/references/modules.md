@@ -1,263 +1,165 @@
 # TEngine 模块 API 速查
 
-## 目录
+> **适用场景**：使用 GameModule.Timer/Scene/Audio/Fsm/MemoryPool/Log 等模块 API | **关联文档**：[ui-lifecycle.md](ui-lifecycle.md)（UI 模块）、[resource-api.md](resource-api.md)（Resource 模块）、[event-system.md](event-system.md)（事件模块）
 
-- [GameModule 统一访问入口](#gamemodule-统一访问入口)
-- [TimerModule 计时器](#timermodule-计时器)
-- [SceneModule 场景管理](#scenemodule-场景管理)
-- [AudioModule 音频](#audiomodule-音频)
-- [FsmModule 有限状态机](#fsmmodule-有限状态机)
-- [MemoryPool 内存池](#memorypool-内存池)
-- [ObjectPool 对象池](#objectpool-对象池)
-- [Log 日志系统](#log-日志系统)
-- [LocalizationModule 本地化](#localizationmodule-本地化)
+## 核心 API：GameModule 统一访问入口
 
----
-
-## GameModule 统一访问入口
-
-所有模块通过 `GameModule` 静态类访问，内部已缓存，禁止重复 `ModuleSystem.GetModule<T>()`：
+所有模块通过 `GameModule` 静态类访问（已缓存），禁止重复 `ModuleSystem.GetModule<T>()`：
 
 ```csharp
-GameModule.Resource      // IResourceModule  — 资源加载
-GameModule.UI            // UIModule         — UI 管理
-GameModule.Audio         // IAudioModule     — 音频
-GameModule.Timer         // ITimerModule     — 计时器
-GameModule.Scene         // ISceneModule     — 场景
-GameModule.Fsm           // IFsmModule       — 有限状态机
-GameModule.Procedure     // IProcedureModule — 流程
+GameModule.Base          // RootModule          — 根模块（框架初始化入口）
+GameModule.Debugger      // IDebuggerModule     — 调试器（`~` 键呼出）
+GameModule.Fsm           // IFsmModule          — 有限状态机
+GameModule.Procedure     // IProcedureModule    — 流程
+GameModule.Resource      // IResourceModule     — 资源加载
+GameModule.Audio         // IAudioModule        — 音频
+GameModule.UI            // UIModule            — UI 管理
+GameModule.Scene         // ISceneModule        — 场景
+GameModule.Timer         // ITimerModule        — 计时器
 GameModule.Localization  // ILocalizationModule — 本地化
+
+GameModule.Shutdown()   // 清空所有模块缓存引用，仅在游戏退出时调用
 ```
+
+> **注意**：`UI` 属性类型是 `UIModule`（单例），不是 `IUIModule`；`Base` 属性通过 `FindObjectOfType<RootModule>()` 获取，其余通过 `ModuleSystem.GetModule<T>()` 获取。
 
 ---
 
-## TimerModule 计时器
+## 使用模式
 
-### 添加计时器
-
-```csharp
-// 单次计时器（3秒后触发一次）
-int tid = GameModule.Timer.AddTimer(OnTimerTick, time: 3f);
-
-// 循环计时器（每1秒触发）
-int tid = GameModule.Timer.AddTimer(OnTimerTick, time: 1f, isLoop: true);
-
-// 非缩放时间（不受 Time.timeScale 影响）
-int tid = GameModule.Timer.AddTimer(OnTimerTick, time: 5f, isLoop: false, isUnscaled: true);
-```
-
-### 控制计时器
+### TimerModule 计时器
 
 ```csharp
+// 添加计时器
+int tid = GameModule.Timer.AddTimer(OnTick, time: 3f);                         // 单次
+int tid = GameModule.Timer.AddTimer(OnTick, time: 1f, isLoop: true);           // 循环
+int tid = GameModule.Timer.AddTimer(OnTick, time: 5f, isUnscaled: true);       // 非缩放时间
+
+// 控制
 GameModule.Timer.Stop(timerId);         // 暂停
 GameModule.Timer.Resume(timerId);       // 恢复
-GameModule.Timer.Restart(timerId);      // 重置并重新开始
-GameModule.Timer.RemoveTimer(timerId);  // 移除（销毁对象时必须调用）
-GameModule.Timer.RemoveAllTimer();      // 清除所有计时器
+GameModule.Timer.Restart(timerId);      // 重置
+GameModule.Timer.RemoveTimer(timerId);  // 移除（销毁时必须调用）
+GameModule.Timer.RemoveAllTimer();      // 清除所有
+
+// 查询
+float left = GameModule.Timer.GetLeftTime(timerId);
+bool running = GameModule.Timer.IsRunning(timerId);
 ```
 
-### 查询
+### SceneModule 场景管理
 
 ```csharp
-float left   = GameModule.Timer.GetLeftTime(timerId);   // 剩余时间
-bool running = GameModule.Timer.IsRunning(timerId);     // 是否运行中
-```
-
-**最佳实践**：在对象销毁（`OnDestroy` 或 `UIWindow.OnDestroy`）时调用 `RemoveTimer(tid)`，防止空引用。
-
----
-
-## SceneModule 场景管理
-
-### 加载场景
-
-```csharp
-// 单场景加载（替换当前场景）
+// 加载
 Scene scene = await GameModule.Scene.LoadSceneAsync("SceneName");
-
-// 叠加加载
 Scene scene = await GameModule.Scene.LoadSceneAsync("SceneName", LoadSceneMode.Additive);
+Scene scene = await GameModule.Scene.LoadSceneAsync("SceneName", LoadSceneMode.Single,
+    progressCallBack: p => { /* 0~1 */ });
 
-// 带进度回调
-Scene scene = await GameModule.Scene.LoadSceneAsync(
-    "SceneName",
-    LoadSceneMode.Single,
-    progressCallBack: p => { /* p: 0~1 */ }
-);
-```
-
-### 卸载 / 激活
-
-```csharp
+// 卸载/激活
 bool ok = await GameModule.Scene.UnloadAsync("SceneName");
-GameModule.Scene.ActivateScene("SceneName");  // 设为活动场景
+GameModule.Scene.ActivateScene("SceneName");
 bool has = GameModule.Scene.IsContainScene("SceneName");
 ```
 
-**注意**：场景资产必须放在 `AssetRaw/Scenes/` 并由 YooAsset 管理，通过 location 字符串寻址，禁止 `SceneManager.LoadScene()`。
-
----
-
-## AudioModule 音频
-
-### 播放
+### AudioModule 音频
 
 ```csharp
-// 背景音乐（循环）
-AudioAgent agent = GameModule.Audio.Play(AudioType.Music, "path/to/bgm", bLoop: true);
+// 播放
+AudioAgent agent = GameModule.Audio.Play(AudioType.Music, "bgm_path", bLoop: true);   // BGM
+AudioAgent agent = GameModule.Audio.Play(AudioType.Sound, "sfx_path");                  // 音效
+AudioAgent agent = GameModule.Audio.Play(AudioType.UISound, "ui_click", bAsync: true);  // UI
 
-// 音效（单次）
-AudioAgent agent = GameModule.Audio.Play(AudioType.Sound, "path/to/sfx");
-
-// UI 音效（异步加载，fire and forget）
-AudioAgent agent = GameModule.Audio.Play(AudioType.UISound, "ui_click", bAsync: true);
-```
-
-### 停止
-
-```csharp
-GameModule.Audio.Stop(AudioType.Music, fadeout: true);  // 渐出停止
-GameModule.Audio.Stop(AudioType.Sound);
+// 停止
+GameModule.Audio.Stop(AudioType.Music, fadeout: true);
 GameModule.Audio.StopAll(fadeout: false);
+
+// 音量
+GameModule.Audio.Volume      = 1.0f;  // 全局 (0~1)
+GameModule.Audio.MusicVolume = 0.8f;
+GameModule.Audio.SoundVolume = 1.0f;
+GameModule.Audio.MusicEnable = true;
+GameModule.Audio.SoundEnable = true;
 ```
 
-### 音量控制
-
-```csharp
-GameModule.Audio.Volume      = 1.0f;   // 全局音量 (0~1)
-GameModule.Audio.MusicVolume = 0.8f;   // 音乐音量
-GameModule.Audio.SoundVolume = 1.0f;   // 音效音量
-GameModule.Audio.MusicEnable = true;   // 音乐开关
-GameModule.Audio.SoundEnable = true;   // 音效开关
-```
-
----
-
-## FsmModule 有限状态机
-
-### 创建并启动状态机
+### FsmModule 有限状态机
 
 ```csharp
 // 定义状态
 public class IdleState : FsmState<MyOwner>
 {
     protected override void OnEnter(IFsm<MyOwner> fsm)  { }
-    protected override void OnUpdate(IFsm<MyOwner> fsm, float elapseSeconds, float realElapseSeconds) { }
+    protected override void OnUpdate(IFsm<MyOwner> fsm, float elapse, float real) { }
     protected override void OnLeave(IFsm<MyOwner> fsm, bool isShutdown) { }
 }
 
-// 创建状态机
-IFsm<MyOwner> fsm = GameModule.Fsm.CreateFsm<MyOwner>(
-    "FsmName",
-    owner,
-    new IdleState(),
-    new RunState(),
-    new AttackState()
-);
+// 创建并启动
+IFsm<MyOwner> fsm = GameModule.Fsm.CreateFsm<MyOwner>("FsmName", owner,
+    new IdleState(), new RunState(), new AttackState());
 fsm.Start<IdleState>();
-```
 
-### 状态切换
-
-```csharp
-// 在状态内部切换
+// 切换与传数据
 fsm.ChangeState<RunState>();
-
-// 数据传递
 fsm.SetData<int>("Key", value);
 int val = fsm.GetData<int>("Key");
-```
 
-### 销毁
-
-```csharp
+// 销毁
 GameModule.Fsm.DestroyFsm<MyOwner>("FsmName");
 ```
 
----
+### MemoryPool 内存池
 
-## MemoryPool 内存池
-
-用于频繁创建/销毁的纯 C# 对象，避免 GC 分配：
+频繁创建/销毁的纯 C# 对象，避免 GC：
 
 ```csharp
-// 对象需实现 IMemory 接口
 public class DamageInfo : IMemory
 {
     public int Damage;
-    public int TargetId;
-    
-    public void Clear()  // 归还池时重置数据
-    {
-        Damage = 0;
-        TargetId = 0;
-    }
+    public void Clear() { Damage = 0; }  // 归还时重置
 }
 
-// 获取
 var info = MemoryPool.Acquire<DamageInfo>();
 info.Damage = 100;
-
-// 归还（不要再使用此引用）
-MemoryPool.Release(info);
+MemoryPool.Release(info);  // Release 后禁止再访问，禁止 Release 两次
 ```
 
-**规则**：`Release` 后禁止再访问该对象；不能 `Release` 同一对象两次。
-
----
-
-## ObjectPool 对象池
-
-用于 GameObject 的复用，减少 Instantiate/Destroy 开销：
+### Log 日志系统
 
 ```csharp
-// 框架内置 ObjectPoolModule，通过 YooAsset 管理 Prefab
-// 生成对象（从池中取或新建）
-GameObject go = GameModule.ObjectPool.Spawn("PrefabLocation", parent);
-
-// 回收对象（不要 Destroy，而是归还池）
-GameModule.ObjectPool.Unspawn(go);
-
-// 预热（提前创建若干实例）
-GameModule.ObjectPool.WarmUp("PrefabLocation", count: 10);
-```
-
----
-
-## Log 日志系统
-
-```csharp
-Log.Debug("调试信息，仅 Development Build 输出");
+Log.Debug("仅 Development Build 输出");  // 发布包自动剥离
 Log.Info("普通信息");
-Log.Warning("警告信息");
-Log.Error("错误信息");
-Log.Fatal("严重错误，通常需要停止游戏");
-
-// 条件断言
-Log.Assert(condition, "条件不满足时的提示");
-
-// 格式化
-Log.Info($"玩家 {playerId} 死亡，位置 {pos}");
+Log.Warning("警告");
+Log.Error("错误，始终保留");
+Log.Fatal("严重错误");
+Log.Assert(condition, "断言失败提示");
 ```
-
-**发布规则**：`Log.Debug` 在非 Development 包中会被自动剥离；`Log.Error` 和 `Log.Fatal` 始终保留。
 
 ---
 
-## LocalizationModule 本地化
+## 常见错误
 
-```csharp
-// 获取本地化字符串
-string text = GameModule.Localization.GetString("key");
+| 错误写法 | 正确写法 | 原因 |
+|---------|---------|------|
+| `ModuleSystem.GetModule<ITimerModule>()` | `GameModule.Timer` | 重复查找，未利用缓存 |
+| `OnDestroy` 忘记 `RemoveTimer(tid)` | 必须调用 `RemoveTimer` | 计时器回调引用已销毁对象，导致空引用 |
+| `SceneManager.LoadScene()` | `GameModule.Scene.LoadSceneAsync()` | 绕过框架资源管理，热更包无法加载 |
+| `GameModule.UI` 误用接口 `IUIModule` | 类型是 `UIModule`（单例实现） | 源码中 UI 属性返回 `UIModule.Instance`，非 `GetModule<T>()` |
+| `Shutdown()` 后继续访问模块属性 | `Shutdown()` 仅游戏退出时调用 | 所有缓存引用置 null，后续访问触发重新查找或空引用 |
+| `MemoryPool.Release()` 后访问对象 | Release 后禁止再访问 | 对象已归还池中，状态不确定 |
+| `MemoryPool.Release()` 同一对象两次 | 确保只 Release 一次 | 重复归还导致池状态异常 |
+| `GameModule.LoadScene` | `GameModule.Scene.LoadSceneAsync` | 不存在 `GameModule.LoadScene`，场景加载通过 `GameModule.Scene` |
+| `new FsmState<>()` | 继承 `FsmState<TOwner>` | 状态必须继承基类，不能直接 new |
+| `GameModule.Timer.AddTimer(time, callback)` | `GameModule.Timer.AddTimer(callback, time)` | 参数顺序：回调在前，时间在后 |
 
-// 带参数
-string text = GameModule.Localization.GetString("key", arg1, arg2);
+---
 
-// 切换语言
-GameModule.Localization.Language = Language.ChineseSimplified;
+## 交叉引用
 
-// 查询当前语言
-Language lang = GameModule.Localization.Language;
-```
-
-**集成说明**：TEngine 集成 I2Localization 编辑器工具（`Assets/Editor/I2Localization/`），本地化数据需在 I2Localization 面板中配置，并正确标记资源供 YooAsset 管理。
+| 关联主题 | 文档 | 说明 |
+|---------|------|------|
+| 资源加载/卸载 | resource-api.md | `GameModule.Resource` 的完整 API 与生命周期 |
+| UI 管理 | ui-lifecycle.md | `GameModule.UI` 的窗口生命周期与层级 |
+| UI 进阶 | ui-patterns.md | Widget 模板与节点绑定 |
+| 事件系统 | event-system.md | `GameEvent` 模块间解耦，`AddUIEvent` UI 内部事件 |
+| 热更边界 | hotfix-workflow.md | `GameModule` 所在程序集与热更边界 |
+| 资源管理模式 | resource-patterns.md | 资源生命周期与模块协作 |
