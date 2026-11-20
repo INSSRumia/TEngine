@@ -21,7 +21,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                 return;
 
             var targetSpd = Owner.RuntimeData.Frame.TargetVelocityManager.GetCombinedValue();
-            var curSpdAlongDir = Vector2.Dot(Owner.Rigidbody.velocity, targetDir);
+            var curSpdAlongDir = Vector2.Dot(Owner.Rigidbody.linearVelocity, targetDir);
 
             if (curSpdAlongDir >= targetSpd)
                 return;

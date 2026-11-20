@@ -26,8 +26,8 @@ namespace GameLogic.Gameplay.Combat.Equipment
             var rigidbodies = EquipmentOwner.GetComponentsInChildren<Rigidbody2D>();
             foreach (var rigidbody in rigidbodies)
             {
-                rigidbody.drag = 2f;
-                rigidbody.angularDrag = 2f;
+                rigidbody.linearDamping = 2f;
+                rigidbody.angularDamping = 2f;
             }
 
             foreach (var collider in EquipmentOwner.GetComponentsInChildren<Collider2D>())

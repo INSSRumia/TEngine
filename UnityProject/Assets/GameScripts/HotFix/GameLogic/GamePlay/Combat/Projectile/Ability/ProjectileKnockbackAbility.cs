@@ -29,7 +29,7 @@ namespace GameLogic.Gameplay.Combat
         {
             if (Owner.Rigidbody != null)
             {
-                var velocity = Owner.Rigidbody.velocity;
+                var velocity = Owner.Rigidbody.linearVelocity;
                 if (velocity.sqrMagnitude > 0.0001f)
                     return velocity.normalized;
             }

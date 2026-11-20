@@ -112,7 +112,7 @@ namespace GameLogic.Gameplay.Combat
 
             Gizmos.color = Color.red;
             var pos = transform.position;
-            Gizmos.DrawLine(pos, pos + (Vector3)Rigidbody.velocity.normalized * 2f);
+            Gizmos.DrawLine(pos, pos + (Vector3)Rigidbody.linearVelocity.normalized * 2f);
             Gizmos.DrawWireSphere(pos, 0.2f);
 
             Gizmos.color = Color.yellow;

@@ -45,8 +45,8 @@ namespace GameLogic.Gameplay.Combat.Marble
 
             if(Owner.Rigidbody != null)
             {
-                Owner.Rigidbody.drag = 5f;
-                Owner.Rigidbody.angularDrag = 5f;
+                Owner.Rigidbody.linearDamping = 5f;
+                Owner.Rigidbody.angularDamping = 5f;
             }
 
             var collider = Owner.GetComponentInChildren<Collider2D>();

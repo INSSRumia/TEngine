@@ -70,7 +70,7 @@ namespace GameLogic.Gameplay.Combat.Marble
                     return dirToTarget.normalized;
             }
 
-            Vector2 currentVelocity = Owner.Rigidbody != null ? Owner.Rigidbody.velocity : default;
+            Vector2 currentVelocity = Owner.Rigidbody != null ? Owner.Rigidbody.linearVelocity : default;
             if (currentVelocity.sqrMagnitude > 0.0001f)
                 return currentVelocity.normalized;
 

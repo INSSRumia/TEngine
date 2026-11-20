@@ -38,8 +38,10 @@ python .codex/scripts/workflow.py unity query "scene list_open"
 
 ## 执行边界
 
-- 使用 `<group> <name>` 全名，如 `script recompile`、`test list`。包装器将全名作为一个带引号的参数接收；
-  原生 CLI 的 group/name 是两个参数。旧扁平名只作为迁移线索。
+- 使用 `<group> <name>` 全名，如 `script recompile`、`test list`。本项目安装的 CLI `1.0.0-beta.3`
+  要求原生调用也把全名作为单个参数，例如 `command "editor status"`，全局选项放在 `command` 前。
+  Python 包装器按同一约定传参，不能拆分 group/name 或把全局选项混入命令参数；
+  见[操作规程](references/operations.md)。旧扁平名只作为迁移线索。
 - 包命令多用 `dry-run`、`filter-type`；本项目自定义命令仍有 `dry_run`。按 schema 原样传键，不统一替换命名。
 - 查询不能凭名称判定。新增对象、捕获文件、切换选择、Profiler、Play Mode、脚本和菜单可能改变状态。
 - 源码使用代码编辑工具。`eval`、`script run`、MethodReload、菜单及文本写入不能绕过代码审查和 Unity 授权。

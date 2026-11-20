@@ -132,7 +132,7 @@ def dispatch(run, args):
 def runtime_status(unity, path):
     from workflow_lib.unity import decode_response
     path = path.resolve()
-    value = decode_response(unity.raw(["command", "--runtime-path", str(path), "runtime", "status"]))
+    value = decode_response(unity.raw(["command", "--runtime-path", str(path), "runtime status"]))
     if not isinstance(value, dict):
         blocked("Runtime status has no verifiable Player identity.")
     version = value.get("unityVersion", value.get("UnityVersion"))

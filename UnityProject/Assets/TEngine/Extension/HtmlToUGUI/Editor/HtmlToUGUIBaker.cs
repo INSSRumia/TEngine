@@ -1529,6 +1529,15 @@ namespace HtmlToUGUI
             return go;
         }
 
+        private static void SetTextWrapping(TMP_Text text, bool enabled)
+        {
+#if UNITY_6000_6_OR_NEWER
+            text.textWrappingMode = enabled ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
+#else
+            text.enableWordWrapping = enabled;
+#endif
+        }
+
         private Transform ApplyComponentByType(GameObject go, UIDataNode nodeData, BakeContext bakeContext)
         {
             Color bgColor = ParseHexColor(nodeData.color, Color.white);
@@ -1565,7 +1574,7 @@ namespace HtmlToUGUI
                         txt.color = fontColor;
                         txt.fontSize = fontSize;
                         txt.alignment = ParseTextAlign(nodeData.textAlign);
-                        txt.enableWordWrapping = isMultiLine;
+                        SetTextWrapping(txt, isMultiLine);
                         txt.overflowMode = isMultiLine ? TextOverflowModes.Truncate : TextOverflowModes.Overflow;
                         txt.raycastTarget = false;
                     }
@@ -1598,7 +1607,7 @@ namespace HtmlToUGUI
                         btnTxt.color = fontColor;
                         btnTxt.fontSize = fontSize;
                         btnTxt.alignment = ParseTextAlign(nodeData.textAlign);
-                        btnTxt.enableWordWrapping = false;
+                        SetTextWrapping(btnTxt, false);
                         btnTxt.overflowMode = TextOverflowModes.Overflow;
                         btnTxt.raycastTarget = false;
                     }
@@ -1650,14 +1659,14 @@ namespace HtmlToUGUI
                         phTxt.color = phColor;
                         phTxt.fontSize = fontSize;
                         phTxt.alignment = ParseTextAlign(nodeData.textAlign);
-                        phTxt.enableWordWrapping = false;
+                        SetTextWrapping(phTxt, false);
                         phTxt.raycastTarget = false;
 
                         TextMeshProUGUI inTxt = textGo.AddComponent<TextMeshProUGUI>();
                         inTxt.color = fontColor;
                         inTxt.fontSize = fontSize;
                         inTxt.alignment = ParseTextAlign(nodeData.textAlign);
-                        inTxt.enableWordWrapping = false;
+                        SetTextWrapping(inTxt, false);
                         inTxt.raycastTarget = false;
 
                         inputField.textViewport = textAreaGo.GetComponent<RectTransform>();
@@ -1727,7 +1736,7 @@ namespace HtmlToUGUI
                         tLblTxt.color = fontColor;
                         tLblTxt.fontSize = fontSize;
                         tLblTxt.alignment = TextAlignmentOptions.MidlineLeft;
-                        tLblTxt.enableWordWrapping = false;
+                        SetTextWrapping(tLblTxt, false);
                     }
 
                     toggle.targetGraphic = tBgImg;
@@ -1857,13 +1866,13 @@ namespace HtmlToUGUI
                         dLblTxt.color = fontColor;
                         dLblTxt.fontSize = fontSize;
                         dLblTxt.alignment = TextAlignmentOptions.MidlineLeft;
-                        dLblTxt.enableWordWrapping = false;
+                        SetTextWrapping(dLblTxt, false);
 
                         TextMeshProUGUI itemLblTxt = itemLblGo.AddComponent<TextMeshProUGUI>();
                         itemLblTxt.color = Color.black;
                         itemLblTxt.fontSize = fontSize;
                         itemLblTxt.alignment = TextAlignmentOptions.MidlineLeft;
-                        itemLblTxt.enableWordWrapping = false;
+                        SetTextWrapping(itemLblTxt, false);
 
                         dropdown.targetGraphic = dBgImg;
                         dropdown.template = templateRect;

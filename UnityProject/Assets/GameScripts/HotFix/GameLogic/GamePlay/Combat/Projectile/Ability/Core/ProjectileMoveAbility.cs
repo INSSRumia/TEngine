@@ -17,7 +17,7 @@ namespace GameLogic.Gameplay.Combat
             if (targetDir.sqrMagnitude < 0.001f)
                 return;
 
-            Owner.Rigidbody.velocity = targetDir * MoveSpeed;
+            Owner.Rigidbody.linearVelocity = targetDir * MoveSpeed;
 
             // var angle = Mathf.Atan2(targetDir.y, targetDir.x) * Mathf.Rad2Deg;
             // Owner.transform.rotation = Quaternion.Euler(0f, 0f, angle);

@@ -177,8 +177,8 @@ class ConnectionTests(unittest.TestCase):
             json.dumps(instance(self.root, "settling")), json.dumps({"commands": [spec]})])
         self.assertEqual(self.unity.describe("scene get_hierarchy"), spec)
         catalog_call = self.unity.raw.call_args_list[-1].args[0]
-        self.assertEqual(catalog_call[-4:], ["pipeline", "list_commands", "--detail", "full"])
-        self.assertFalse(any("editor" in call.args[0] for call in self.unity.raw.call_args_list))
+        self.assertEqual(catalog_call[-3:], ["pipeline list_commands", "--detail", "full"])
+        self.assertFalse(any("editor status" in call.args[0] for call in self.unity.raw.call_args_list))
 
     def test_query_rejects_unreviewed_mutations_before_any_call(self):
         self.unity.ready = Mock()
@@ -206,27 +206,68 @@ class InvocationTests(unittest.TestCase):
         self.execute = Mock(return_value=subprocess.CompletedProcess([], 0, '{"status":"ready"}', ""))
         self.unity = Unity(SimpleNamespace(context=self.context, execute=self.execute))
 
-    def test_canonical_command_uses_split_argv_and_exact_parameter_names(self):
+    def test_canonical_command_is_one_argument_and_global_options_come_first(self):
         self.unity.capabilities = {"test run"}
         self.unity.call("test run", {"filter-type": "assembly", "async-tests": True}, mutating=True)
+        self.assertEqual(self.execute.call_args.args[0], [
+            self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy",
+            "command", "--project-path", str(self.root), "--timeout", "45", "test run",
+            "--filter-type", "assembly", "--async-tests", "true",
+        ])
+        self.assertEqual(self.execute.call_args.kwargs, {"timeout": 50, "mutating": True})
+
+    def test_ready_preserves_full_command_through_raw_invocation(self):
+        self.execute.side_effect = [
+            subprocess.CompletedProcess([], 0, json.dumps(instance(self.root)), ""),
+            subprocess.CompletedProcess([], 0, json.dumps(editor_status(self.root)), ""),
+        ]
+        self.assertEqual(self.unity.ready()["editorStatus"]["status"], "ready")
+        self.assertEqual(self.execute.call_args.args[0], [
+            self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy",
+            "command", "--project-path", str(self.root), "editor status",
+        ])
+
+    def test_discovery_preserves_command_and_business_flags(self):
+        self.execute.side_effect = [
+            subprocess.CompletedProcess([], 0, json.dumps(instance(self.root)), ""),
+            subprocess.CompletedProcess([], 0, '{"commands":[{"command":"scene list_open"}]}', ""),
+        ]
+        self.assertEqual(self.unity.discover(require_ready=False), ["scene list_open"])
+        self.assertEqual(self.execute.call_args.args[0], [
+            self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy",
+            "command", "--project-path", str(self.root), "pipeline list_commands", "--detail", "full",
+        ])
+
+    def test_dotted_group_and_structured_parameters_are_not_split(self):
+        self.unity.capabilities = {"animation.animator get_controller"}
+        target = {"path": "Assets/带 空格.controller"}
+        self.unity.call("animation.animator get_controller", {"target": target}, timeout=12)
         args = self.execute.call_args.args[0]
-        position = args.index("test")
-        self.assertEqual(args[position:position + 2], ["test", "run"])
-        self.assertEqual(args[args.index("--filter-type") + 1], "assembly")
-        self.assertEqual(args[args.index("--async-tests") + 1], "true")
-        self.assertTrue(self.execute.call_args.kwargs["mutating"])
+        self.assertIn("animation.animator get_controller", args)
+        self.assertNotIn("animation.animator", args)
+        self.assertEqual(json.loads(args[args.index("--target") + 1]), target)
+        self.assertEqual(args[args.index("--timeout") + 1], "12")
+        self.assertEqual(self.execute.call_args.kwargs, {"timeout": 17, "mutating": False})
+
+    def test_top_level_status_keeps_global_options_out_of_command_arguments(self):
+        self.unity.raw(["status", "--project-path", str(self.root)])
+        self.assertEqual(self.execute.call_args.args[0], [
+            self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy",
+            "status", "--project-path", str(self.root),
+        ])
 
     def test_project_alias_is_sent_as_global_command(self):
         self.unity.capabilities = {"global tengine_validate_assets"}
         self.unity.call("tengine_validate_assets", {"paths": ["Assets/A.asset"]})
         args = self.execute.call_args.args[0]
-        self.assertIn("global", args)
+        self.assertIn("global tengine_validate_assets", args)
+        self.assertNotIn("global", args)
         self.assertEqual(json.loads(args[args.index("--paths") + 1]), ["Assets/A.asset"])
 
     def test_cli_timeout_does_not_replay_a_mutation(self):
         self.execute.return_value = subprocess.CompletedProcess([], 14, "", "Timed out")
         with self.assertRaises(WorkflowError) as caught:
-            self.unity.raw(["command", "asset", "delete"], mutating=True)
+            self.unity.raw(["command", "asset delete"], mutating=True)
         self.assertEqual(caught.exception.status, "blocked")
         self.assertIn("outcome is unknown", str(caught.exception))
         self.execute.assert_called_once()
@@ -245,7 +286,17 @@ class InvocationTests(unittest.TestCase):
         value = workflow.runtime_status(self.unity, self.root / "player")
         self.assertEqual(value["selectionSource"], "CLI --runtime-path")
         self.assertEqual(value["runtime"], payload)
-        self.assertEqual(self.unity.raw.call_args.args[0][-2:], ["runtime", "status"])
+        self.assertEqual(self.unity.raw.call_args.args[0][-1], "runtime status")
+
+    def test_runtime_status_keeps_selection_and_global_options_before_full_command(self):
+        payload = {"UnityVersion": "2022.3.62f3", "Platform": "WindowsPlayer", "IsPlaying": True}
+        self.execute.return_value = subprocess.CompletedProcess([], 0, json.dumps(payload), "")
+        path = self.root / "player with spaces"
+        workflow.runtime_status(self.unity, path)
+        self.assertEqual(self.execute.call_args.args[0], [
+            self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy",
+            "command", "--runtime-path", str(path.resolve()), "runtime status",
+        ])
 
     def test_runtime_empty_or_editor_payload_cannot_pass(self):
         self.unity.raw = Mock(return_value='{"status":"ready"}')

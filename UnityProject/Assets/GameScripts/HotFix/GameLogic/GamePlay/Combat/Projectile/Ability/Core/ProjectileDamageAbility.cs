@@ -32,8 +32,8 @@ namespace GameLogic.Gameplay.Combat
             int damage = Owner.RuntimeData.Damage;
             if (IsDamageByVelocity)
             {
-                Vector2 velocity = Owner.Rigidbody != null ? Owner.Rigidbody.velocity : Vector2.zero;
-                Vector2 targetVelocity = hitContext.TargetRigidbody != null ? hitContext.TargetRigidbody.velocity : Vector2.zero;
+                Vector2 velocity = Owner.Rigidbody != null ? Owner.Rigidbody.linearVelocity : Vector2.zero;
+                Vector2 targetVelocity = hitContext.TargetRigidbody != null ? hitContext.TargetRigidbody.linearVelocity : Vector2.zero;
                 float relativeVelocity = velocity.sqrMagnitude > 0.0001f
                     ? velocity.magnitude - Vector2.Dot(velocity.normalized, targetVelocity)
                     : 0f;

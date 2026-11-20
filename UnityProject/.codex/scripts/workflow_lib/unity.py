@@ -275,8 +275,9 @@ class Unity:
     def raw(self, arguments, timeout=45, mutating=False):
         if not self.context.cli.is_file():
             blocked(f"Unity CLI is missing: {self.context.cli}")
+        # beta.3 forwards flags after the command name as Pipeline parameters.
         result = self.run.execute(
-            [self.context.cli, *arguments, "--format", "json", "--non-interactive", "--no-log-proxy"],
+            [self.context.cli, "--format", "json", "--non-interactive", "--no-log-proxy", *arguments],
             timeout=timeout, mutating=mutating,
         )
         if result.returncode:
@@ -297,14 +298,14 @@ class Unity:
                                    self.context.project, require_ready)
         if require_ready:
             status = decode_response(self.raw(
-                ["command", "--project-path", str(self.context.project), "editor", "status"]))
+                ["command", "--project-path", str(self.context.project), "editor status"]))
             return {**instance, "editorStatus": validate_editor_status(status, self.context.project)}
         return instance
 
     def discover(self, require_ready=True):
         self.ready(require_ready)
         value = decode_response(self.raw(["command", "--project-path", str(self.context.project),
-                                         "pipeline", "list_commands", "--detail", "full"]))
+                                         "pipeline list_commands", "--detail", "full"]))
         self.catalog = command_catalog(value)
         self.capabilities = set(self.catalog)
         return sorted(self.capabilities)
@@ -323,7 +324,7 @@ class Unity:
         if command not in self.capabilities:
             blocked(f"Command is not registered in this project: {command}")
         arguments = ["command", "--project-path", str(self.context.project),
-                     "--timeout", str(timeout), *command.split()]
+                     "--timeout", str(timeout), command]
         for key, value in (parameters or {}).items():
             arguments.extend(["--" + key, json.dumps(value, ensure_ascii=False) if not isinstance(value, str) else value])
         return decode_response(self.raw(arguments, timeout=timeout + 5, mutating=mutating))

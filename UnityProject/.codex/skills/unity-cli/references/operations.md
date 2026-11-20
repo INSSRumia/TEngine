@@ -16,6 +16,23 @@
 2022.3 没有完整的模态弹窗镜像。请求无响应可能需要维护者处理弹窗，不能自动点击保存、重置或关闭项目。
 不读取或打印 `Library/Pipeline` 描述文件；CLI 负责发现、token 和传输选择。
 
+### CLI 1.0.0-beta.3 实测兼容提醒（2026-11-19）
+
+当前项目内安装此固定版本。命令全名必须作为单个参数，全局选项必须在 `command` 前：
+
+```powershell
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy status --project-path .
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . "editor status"
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . "scene list_open"
+```
+
+先规范化并逐字核对 status 中唯一实例的工程路径，再执行后两项；仅供已审核的只读操作。
+Python 包装器与此约定一致：`Unity.raw` 前置全局选项，`ready/discover/call` 和 Player `runtime_status`
+保留完整命令为单个参数；业务参数仍位于命令之后并保留 schema 键名。
+旧版拆分方式会产生 Command Not Found（如 Editor 中找不到 editor），后置选项则被误作业务参数。
+修复后已在当前工程通过 `doctor/unity list/describe/query` 只读验收；Player 路径仅完成离线回归测试。
+旧 Console 错误不会因调用成功而自动消失，不要通过清空日志或降低 Pipeline 日志级别掩盖问题。
+
 ## 发现与参数
 
 ```powershell
@@ -31,14 +48,15 @@ python .codex/scripts/workflow.py unity query "settings.player get"
 首次按组探索时，可用原生 CLI 缩小目录：
 
 ```powershell
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail groups
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail compact --group prefab
-& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . pipeline list_commands --detail full --query "prefab save_contents"
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . "pipeline list_commands" --detail groups
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . "pipeline list_commands" --detail compact --group prefab
+& ./Tools/unity.exe --json --non-interactive --no-log-proxy command --project-path . "pipeline list_commands" --detail full --query "prefab save_contents"
 ```
 
 `query` 匹配名称、说明和标签的子串，返回结果还需按 `command` 精确选择。
 完整 schema 比复制的参数表可靠。`animation.animator` 是一个 group，不能拆成三个单词。
-项目自定义 `tengine_bake_ugui`、`tengine_validate_assets` 位于 `global` 组，其短名是显式支持的项目便捷名。
+项目便捷名 `tengine_bake_ugui`、`tengine_validate_assets` 在包装器中映射到 `global` 组，
+但本次实际目录未发现这两个命令；映射存在不等于命令已注册，不能直接调用。
 
 包装器参数放入 JSON 文件，经 `--params-file` 传入。例如读取已确认 Prefab 的字段：
 
